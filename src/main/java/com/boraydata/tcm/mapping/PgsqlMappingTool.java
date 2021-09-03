@@ -19,104 +19,123 @@ import java.util.Map;
  */
 public class PgsqlMappingTool implements MappingTool {
 
-    static Map<String, DataTypeMapping> MappingMap = new HashMap<>();
+    static Map<String, DataTypeMapping> mappingMap = new HashMap<>();
     static {
-        MappingMap.put("BOOLEAN",DataTypeMapping.BOOLEAN);
-        MappingMap.put("BIT(1)",DataTypeMapping.BOOLEAN);
-        MappingMap.put("BIT(>1)",DataTypeMapping.BYTES);
-        MappingMap.put("SMALLINT",DataTypeMapping.INT16);
-        MappingMap.put("SMALLSERIAL",DataTypeMapping.INT16);
-        MappingMap.put("INTEGER",DataTypeMapping.INT32);
-        MappingMap.put("SERIAL",DataTypeMapping.INT32);
-        MappingMap.put("BIGINT",DataTypeMapping.INT64);
-        MappingMap.put("BIGSERIAL",DataTypeMapping.INT64);
-        MappingMap.put("REAL",DataTypeMapping.FLOAT32);
-        MappingMap.put("REAL",DataTypeMapping.FLOAT32);
-        MappingMap.put("DOUBLE",DataTypeMapping.FLOAT64);
-        MappingMap.put("PRECISION",DataTypeMapping.FLOAT64);
-        MappingMap.put("CHAR",DataTypeMapping.STRING);
-        MappingMap.put("VARCHAR",DataTypeMapping.STRING);
-        MappingMap.put("CHARACTER",DataTypeMapping.STRING);
-        MappingMap.put("CHARACTERVARYING",DataTypeMapping.STRING);
-        MappingMap.put("TIMESTAMPTZ",DataTypeMapping.STRING);
-        MappingMap.put("TIMESTAMPWITHTIMEZONE",DataTypeMapping.STRING);
-        MappingMap.put("TIMETZ",DataTypeMapping.STRING);
-        MappingMap.put("TIMEWITHTIMEZONE",DataTypeMapping.STRING);
+        mappingMap.put("BOOLEAN",DataTypeMapping.BOOLEAN);
+        mappingMap.put("BIT(1)",DataTypeMapping.BOOLEAN);
+        mappingMap.put("BIT(>1)",DataTypeMapping.BYTES);
+        mappingMap.put("SMALLINT",DataTypeMapping.INT16);
+        mappingMap.put("SMALLSERIAL",DataTypeMapping.INT16);
+        mappingMap.put("INTEGER",DataTypeMapping.INT32);
+        mappingMap.put("SERIAL",DataTypeMapping.INT32);
+        mappingMap.put("BIGINT",DataTypeMapping.INT64);
+        mappingMap.put("BIGSERIAL",DataTypeMapping.INT64);
+        mappingMap.put("REAL",DataTypeMapping.FLOAT32);
+        mappingMap.put("REAL",DataTypeMapping.FLOAT32);
+        mappingMap.put("DOUBLE",DataTypeMapping.FLOAT64);
+        mappingMap.put("PRECISION",DataTypeMapping.FLOAT64);
+        mappingMap.put("CHAR",DataTypeMapping.STRING);
+        mappingMap.put("VARCHAR",DataTypeMapping.STRING);
+        mappingMap.put("CHARACTER",DataTypeMapping.STRING);
+        mappingMap.put("CHARACTERVARYING",DataTypeMapping.STRING);
+        mappingMap.put("TIMESTAMPTZ",DataTypeMapping.STRING);
+        mappingMap.put("TIMESTAMPWITHTIMEZONE",DataTypeMapping.STRING);
+        mappingMap.put("TIMETZ",DataTypeMapping.STRING);
+        mappingMap.put("TIMEWITHTIMEZONE",DataTypeMapping.STRING);
 
-        MappingMap.put("INTERVAL",DataTypeMapping.INT64);
+        mappingMap.put("INTERVAL",DataTypeMapping.INT64);
 
-        MappingMap.put("BYTEA",DataTypeMapping.BYTES);
-        MappingMap.put("JSON",DataTypeMapping.STRING);
-        MappingMap.put("JSONB",DataTypeMapping.STRING);
-        MappingMap.put("XML",DataTypeMapping.STRING);
-        MappingMap.put("UUID",DataTypeMapping.STRING);
-        MappingMap.put("POINT",DataTypeMapping.STRING);
-        MappingMap.put("LTREE",DataTypeMapping.STRING);
-        MappingMap.put("CITEXT",DataTypeMapping.STRING);
-        MappingMap.put("INET",DataTypeMapping.STRING);
-        MappingMap.put("INT4RANGE",DataTypeMapping.STRING);
-        MappingMap.put("INT8RANGE",DataTypeMapping.STRING);
-        MappingMap.put("NUMRANGE",DataTypeMapping.STRING);
-        MappingMap.put("TSRANGE",DataTypeMapping.STRING);
-        MappingMap.put("TSTZRANGE",DataTypeMapping.STRING);
-        MappingMap.put("DATERANGE",DataTypeMapping.STRING);
-        MappingMap.put("ENUM",DataTypeMapping.STRING);
+        mappingMap.put("BYTEA",DataTypeMapping.BYTES);
+        mappingMap.put("JSON",DataTypeMapping.STRING);
+        mappingMap.put("JSONB",DataTypeMapping.STRING);
+        mappingMap.put("XML",DataTypeMapping.STRING);
+        mappingMap.put("UUID",DataTypeMapping.STRING);
+        mappingMap.put("POINT",DataTypeMapping.STRING);
+        mappingMap.put("LTREE",DataTypeMapping.STRING);
+        mappingMap.put("CITEXT",DataTypeMapping.STRING);
+        mappingMap.put("INET",DataTypeMapping.STRING);
+        mappingMap.put("INT4RANGE",DataTypeMapping.STRING);
+        mappingMap.put("INT8RANGE",DataTypeMapping.STRING);
+        mappingMap.put("NUMRANGE",DataTypeMapping.STRING);
+        mappingMap.put("TSRANGE",DataTypeMapping.STRING);
+        mappingMap.put("TSTZRANGE",DataTypeMapping.STRING);
+        mappingMap.put("DATERANGE",DataTypeMapping.STRING);
+        mappingMap.put("ENUM",DataTypeMapping.STRING);
 
-        MappingMap.put("DATE",DataTypeMapping.INT32);
+        mappingMap.put("DATE",DataTypeMapping.INT32);
 
-        // TIME(1) and TIME(6) is not distinguished, so default is INT64;
-        MappingMap.put("TIME",DataTypeMapping.INT64);
-        MappingMap.put("TIMESTAMP",DataTypeMapping.INT64);
+        /*
+         * TIME(1) and TIME(6) is not distinguished, so default is INT64;
+         * */
+        mappingMap.put("TIME",DataTypeMapping.INT64);
+        mappingMap.put("TIMESTAMP",DataTypeMapping.INT64);
 
-        // https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#decimal-values
-        MappingMap.put("NUMERIC",DataTypeMapping.BYTES);
-        MappingMap.put("DECIMAL",DataTypeMapping.FLOAT64);
-
-        // https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#hstore-values
-        MappingMap.put("HSTORE",DataTypeMapping.STRING);
-
-        // https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#network-address-types
-        MappingMap.put("INET",DataTypeMapping.STRING);
-        MappingMap.put("CIDR",DataTypeMapping.STRING);
-        MappingMap.put("MACADDR",DataTypeMapping.STRING);
-        MappingMap.put("MACADDR8",DataTypeMapping.STRING);
-
-        // https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#_postgis_types
-        MappingMap.put("GEOMETRY",DataTypeMapping.STRUCT);
+        /*
+        * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#decimal-values
+        * */
+        mappingMap.put("NUMERIC",DataTypeMapping.BYTES);
+        mappingMap.put("DECIMAL",DataTypeMapping.FLOAT64);
 
 
-        // The following are self-defined
-        // If have other data types that need to be mapped, please define below
-        MappingMap.put("BIT",DataTypeMapping.BYTES);
-        MappingMap.put("BOX",DataTypeMapping.STRUCT);
-        MappingMap.put("CIRCLE",DataTypeMapping.STRUCT);
-        MappingMap.put("DOUBLEPRECISION",DataTypeMapping.FLOAT64);
-        MappingMap.put("LINE",DataTypeMapping.STRUCT);
-        MappingMap.put("LSEG",DataTypeMapping.STRUCT);
-        MappingMap.put("MONEY",DataTypeMapping.FLOAT32);
-        MappingMap.put("PATH",DataTypeMapping.STRUCT);
-        MappingMap.put("TEXT",DataTypeMapping.STRING);
-        MappingMap.put("POLYGON",DataTypeMapping.STRING);
-        MappingMap.put("TIMEWITHOUTTIMEZONE",DataTypeMapping.STRING);
-        MappingMap.put("TIMESTAMPWITHOUTTIMEZONE",DataTypeMapping.STRING);
-        MappingMap.put("TSQUERY",DataTypeMapping.STRUCT);
-        MappingMap.put("TSVECTOR",DataTypeMapping.STRUCT);
-        MappingMap.put("TXID_SNAPSHOT",DataTypeMapping.STRUCT);
+        /*
+         * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#hstore-values
+         * */
+        mappingMap.put("HSTORE",DataTypeMapping.STRING);
 
-        MappingMap.put("BITVARYING",DataTypeMapping.STRING);
-        MappingMap.put("DOUBLEPRECISION",DataTypeMapping.FLOAT64);
+        /*
+         * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#network-address-types
+         * */
+        mappingMap.put("INET",DataTypeMapping.STRING);
+        mappingMap.put("CIDR",DataTypeMapping.STRING);
+        mappingMap.put("MACADDR",DataTypeMapping.STRING);
+        mappingMap.put("MACADDR8",DataTypeMapping.STRING);
+
+        /*
+         * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#_postgis_types
+         * */
+        mappingMap.put("GEOMETRY",DataTypeMapping.STRUCT);
+
+
+        /*
+         * The following are self-defined
+         * If have other data types that need to be mapped, please define below
+         * */
+        mappingMap.put("BIT",DataTypeMapping.BYTES);
+        mappingMap.put("BOX",DataTypeMapping.STRUCT);
+        mappingMap.put("CIRCLE",DataTypeMapping.STRUCT);
+        mappingMap.put("DOUBLEPRECISION",DataTypeMapping.FLOAT64);
+        mappingMap.put("LINE",DataTypeMapping.STRUCT);
+        mappingMap.put("LSEG",DataTypeMapping.STRUCT);
+        mappingMap.put("MONEY",DataTypeMapping.FLOAT32);
+        mappingMap.put("PATH",DataTypeMapping.STRUCT);
+        mappingMap.put("TEXT",DataTypeMapping.STRING);
+        mappingMap.put("POLYGON",DataTypeMapping.STRING);
+        mappingMap.put("TIMEWITHOUTTIMEZONE",DataTypeMapping.STRING);
+        mappingMap.put("TIMESTAMPWITHOUTTIMEZONE",DataTypeMapping.STRING);
+        mappingMap.put("TSQUERY",DataTypeMapping.STRUCT);
+        mappingMap.put("TSVECTOR",DataTypeMapping.STRUCT);
+        mappingMap.put("TXID_SNAPSHOT",DataTypeMapping.STRUCT);
+
+        mappingMap.put("BITVARYING",DataTypeMapping.STRING);
+        mappingMap.put("DOUBLEPRECISION",DataTypeMapping.FLOAT64);
     }
 
 
+    /**
+     *  To look up metadata from the mapping ‘mappingMap’ to the TCM datatype
+     * @Param null : table={...,..,..,columns={...,...,...,DataType=integer,dataTypeMapping=null}}
+     * @Return: null : table={...,..,..,columns={...,...,...,DataType=integer,dataTypeMapping=INT32}}
+     */
     @Override
     public Table createSourceMappingTable(Table table) {
         List<Column> columns = table.getColumns();
         for (Column column : columns){
             if (StringUtil.isNullOrEmpty(column.getDataType()))
                 throw new TCMException("not found DataType value in "+column.getColumnInfo());
-            DataTypeMapping relation = StringUtil.findRelation(MappingMap,column.getDataType(),null);
-//            if (relation == null)
-//                throw new TCMException("not found DataType relation in "+column.getColumnInfo());
+            DataTypeMapping relation = StringUtil.findRelation(mappingMap,column.getDataType(),null);
+//            if (relation == null){
+//                    throw new TCMException("not found DataType relation in "+column.getColumnInfo());
+//            }
             column.setDataTypeMapping(relation);
         }
         table.setColumns(columns);
@@ -124,6 +143,11 @@ public class PgsqlMappingTool implements MappingTool {
     }
 
 
+    /**
+     * return table provides the mapping table to the PgSQL data type, according "*.core.DataTypeMapping"
+     * @Param null :    table={...,MYSQL,..,columns={...,...,col_int,DataType=mediumint,dataTypeMapping=INT32}}
+     * @Return: null :  table={null,PGSQL,..,columns={null,null,col_int,DataType=INT,dataTypeMapping=INT32}}
+     */
     @Override
     public Table createCloneMappingTable(Table table) {
         Table cloneTable = table.clone();
@@ -142,8 +166,20 @@ public class PgsqlMappingTool implements MappingTool {
     }
 
 
-    //  Please refer to the official documentation
-    //  https://www.postgresql.org/docs/13/sql-createtable.html
+
+    /**
+     *
+     * generate the same information table creation SQL.
+     *
+     * Please refer to the official documentation (PgSQL 13)
+     *  url: https://www.postgresql.org/docs/13/sql-createtable.html
+     *
+     * in pgsql,when you create a new table,you can provide SchemaName or not.
+     *  You should view the ({url} # Description),and make some change.
+     *
+     * @Param Table : table={null,PGSQL,test_table,columns={null,null,col_int,DataType=INT,dataTypeMapping=INT32}}
+     * @Return: String : "Create Table If Not Exists test_table(col_int int);"
+     */
     @Override
     public String getCreateTableSQL(Table table) {
         if(table.getTablename() == null)
@@ -156,7 +192,7 @@ public class PgsqlMappingTool implements MappingTool {
         List<Column> columns = table.getColumns();
         for(Column column : columns){
             if(column.getDataType() == null)
-                throw new TCMException("Create Table SQL is fail,Because unable use null type:"+column.getColumnInfo());
+                throw new TCMException("Create Table SQL is fail,Because unable use null datatype:"+column.getColumnInfo());
             stringBuilder.append(column.getColumnName()).append(" ").append(column.getDataType());
             if (Boolean.FALSE.equals(column.isNullAble()))
                 stringBuilder.append("NOT NULL");

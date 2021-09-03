@@ -17,67 +17,72 @@ import java.util.*;
  */
 public class MysqlMappingTool implements MappingTool {
 
-    static Map<String,DataTypeMapping> MappingMap = new HashMap<>();
+    static Map<String,DataTypeMapping> mappingMap = new HashMap<>();
     static {
-        MappingMap.put("BOOLEAN",DataTypeMapping.BOOLEAN);
-        MappingMap.put("BOOL",DataTypeMapping.BOOLEAN);
-        MappingMap.put("BIT(1)",DataTypeMapping.BOOLEAN);
-        MappingMap.put("BIT(>1)",DataTypeMapping.BYTES);
-        MappingMap.put("BIT",DataTypeMapping.BYTES);
-        MappingMap.put("TINYINT",DataTypeMapping.INT16);
-        MappingMap.put("SMALLINT",DataTypeMapping.INT16);
-        MappingMap.put("MEDIUMINT",DataTypeMapping.INT32);
-        MappingMap.put("INT",DataTypeMapping.INT32);
-        MappingMap.put("INTEGER",DataTypeMapping.INT32);
-        MappingMap.put("BIGINT",DataTypeMapping.INT64);
-        MappingMap.put("REAL",DataTypeMapping.FLOAT64);
-        MappingMap.put("FLOAT",DataTypeMapping.FLOAT64);
-        MappingMap.put("DOUBLE",DataTypeMapping.FLOAT64);
-        MappingMap.put("CHAR",DataTypeMapping.STRING);
-        MappingMap.put("VARCHAR",DataTypeMapping.STRING);
-        MappingMap.put("BINARY",DataTypeMapping.BYTES);
-        MappingMap.put("VARBINARY",DataTypeMapping.BYTES);
-        MappingMap.put("TINYBLOB",DataTypeMapping.BYTES);
-        MappingMap.put("TINYTEXT",DataTypeMapping.STRING);
-        MappingMap.put("BLOB",DataTypeMapping.BYTES);
-        MappingMap.put("TEXT",DataTypeMapping.STRING);
-        MappingMap.put("MEDIUMBLOB",DataTypeMapping.BYTES);
-        MappingMap.put("MEDIUMTEXT",DataTypeMapping.STRING);
-        MappingMap.put("LONGBLOB",DataTypeMapping.BYTES);
-        MappingMap.put("LONGTEXT",DataTypeMapping.STRING);
-        MappingMap.put("JSON",DataTypeMapping.STRING);
-        MappingMap.put("ENUM",DataTypeMapping.STRING);
-        MappingMap.put("SET",DataTypeMapping.STRING);
+        mappingMap.put("BOOLEAN",DataTypeMapping.BOOLEAN);
+        mappingMap.put("BOOL",DataTypeMapping.BOOLEAN);
+        mappingMap.put("BIT(1)",DataTypeMapping.BOOLEAN);
+        mappingMap.put("BIT(>1)",DataTypeMapping.BYTES);
+        mappingMap.put("BIT",DataTypeMapping.BYTES);
+        mappingMap.put("TINYINT",DataTypeMapping.INT16);
+        mappingMap.put("SMALLINT",DataTypeMapping.INT16);
+        mappingMap.put("MEDIUMINT",DataTypeMapping.INT32);
+        mappingMap.put("INT",DataTypeMapping.INT32);
+        mappingMap.put("INTEGER",DataTypeMapping.INT32);
+        mappingMap.put("BIGINT",DataTypeMapping.INT64);
+        mappingMap.put("REAL",DataTypeMapping.FLOAT64);
+        mappingMap.put("FLOAT",DataTypeMapping.FLOAT64);
+        mappingMap.put("DOUBLE",DataTypeMapping.FLOAT64);
+        mappingMap.put("CHAR",DataTypeMapping.STRING);
+        mappingMap.put("VARCHAR",DataTypeMapping.STRING);
+        mappingMap.put("BINARY",DataTypeMapping.BYTES);
+        mappingMap.put("VARBINARY",DataTypeMapping.BYTES);
+        mappingMap.put("TINYBLOB",DataTypeMapping.BYTES);
+        mappingMap.put("TINYTEXT",DataTypeMapping.STRING);
+        mappingMap.put("BLOB",DataTypeMapping.BYTES);
+        mappingMap.put("TEXT",DataTypeMapping.STRING);
+        mappingMap.put("MEDIUMBLOB",DataTypeMapping.BYTES);
+        mappingMap.put("MEDIUMTEXT",DataTypeMapping.STRING);
+        mappingMap.put("LONGBLOB",DataTypeMapping.BYTES);
+        mappingMap.put("LONGTEXT",DataTypeMapping.STRING);
+        mappingMap.put("JSON",DataTypeMapping.STRING);
+        mappingMap.put("ENUM",DataTypeMapping.STRING);
+        mappingMap.put("SET",DataTypeMapping.STRING);
         // YEAR[(2|4)]
-        MappingMap.put("YEAR",DataTypeMapping.INT32);
-        MappingMap.put("TIMESTAMP",DataTypeMapping.STRING);
+        mappingMap.put("YEAR",DataTypeMapping.INT32);
+        mappingMap.put("TIMESTAMP",DataTypeMapping.STRING);
 
-        MappingMap.put("DATE",DataTypeMapping.INT32);
-        MappingMap.put("TIME",DataTypeMapping.INT64);
-        MappingMap.put("DATETIME",DataTypeMapping.INT64);
+        mappingMap.put("DATE",DataTypeMapping.INT32);
+        mappingMap.put("TIME",DataTypeMapping.INT64);
+        mappingMap.put("DATETIME",DataTypeMapping.INT64);
 
         // https://debezium.io/documentation/reference/1.0/connectors/mysql.html#_decimal_values
-        MappingMap.put("NUMERIC",DataTypeMapping.BYTES);
-        MappingMap.put("DECIMAL",DataTypeMapping.FLOAT64);
+        mappingMap.put("NUMERIC",DataTypeMapping.BYTES);
+        mappingMap.put("DECIMAL",DataTypeMapping.FLOAT64);
 
         // https://debezium.io/documentation/reference/1.0/connectors/mysql.html#_spatial_data_types
-        MappingMap.put("GEOMETRY",DataTypeMapping.STRUCT);
-        MappingMap.put("LINESTRING",DataTypeMapping.STRUCT);
-        MappingMap.put("POINT",DataTypeMapping.STRUCT);
-        MappingMap.put("POLYGON",DataTypeMapping.STRUCT);
-        MappingMap.put("MULTIPOINT",DataTypeMapping.STRUCT);
-        MappingMap.put("MULTILINESTRING",DataTypeMapping.STRUCT);
-        MappingMap.put("MULTIPOLYGON",DataTypeMapping.STRUCT);
-        MappingMap.put("GEOMETRYCOLLECTION",DataTypeMapping.STRUCT);
+        mappingMap.put("GEOMETRY",DataTypeMapping.STRUCT);
+        mappingMap.put("LINESTRING",DataTypeMapping.STRUCT);
+        mappingMap.put("POINT",DataTypeMapping.STRUCT);
+        mappingMap.put("POLYGON",DataTypeMapping.STRUCT);
+        mappingMap.put("MULTIPOINT",DataTypeMapping.STRUCT);
+        mappingMap.put("MULTILINESTRING",DataTypeMapping.STRUCT);
+        mappingMap.put("MULTIPOLYGON",DataTypeMapping.STRUCT);
+        mappingMap.put("GEOMETRYCOLLECTION",DataTypeMapping.STRUCT);
     }
 
+    /**
+     *  To look up metadata from the mapping ‘mappingMap’ to the TCM datatype
+     * @Param null : table={...,..,..,columns={...,...,...,DataType=integer,dataTypeMapping=null}}
+     * @Return: null : table={...,..,..,columns={...,...,...,DataType=integer,dataTypeMapping=INT32}}
+     */
     @Override
     public Table createSourceMappingTable(Table table) {
         List<Column> columns = table.getColumns();
         for (Column column : columns){
             if (StringUtil.isNullOrEmpty(column.getDataType()))
                 throw new TCMException("not found DataType value in "+column.getColumnInfo());
-            DataTypeMapping relation = StringUtil.findRelation(MappingMap,column.getDataType(),null);
+            DataTypeMapping relation = StringUtil.findRelation(mappingMap,column.getDataType(),null);
 //            if (relation == null)
 //                throw new TCMException("not found DataType relation in "+column.getColumnInfo());
             column.setDataTypeMapping(relation);
@@ -87,7 +92,11 @@ public class MysqlMappingTool implements MappingTool {
     }
 
 
-
+    /**
+     * return table provides the mapping table to the PgSQL data type, according "*.core.DataTypeMapping"
+     * @Param null :    table={...,PGSQL,..,columns={...,...,col_int,DataType=serial,dataTypeMapping=INT32}}
+     * @Return: null :  table={null,MYSQL,..,columns={null,null,col_int,DataType=INT,dataTypeMapping=INT32}}
+     */
     @Override
     public Table createCloneMappingTable(Table table) {
         Table cloneTable = table.clone();
@@ -105,6 +114,18 @@ public class MysqlMappingTool implements MappingTool {
         return cloneTable;
     }
 
+    /**
+     *
+     * generate the same information table creation SQL.
+     *
+     * Please refer to the official documentation (MySQL 5.7)
+     *  url: https://dev.mysql.com/doc/refman/5.7/en/create-table.html
+     *
+     *  "Engine InnoDB" is added by default, you can also not add;
+     *
+     * @Param Table : table={null,MySQL,test_table,columns={null,null,col_int,DataType=INT,dataTypeMapping=INT32}}
+     * @Return: String : "Create Table If Not Exists test_table(col_int int)Engine InnoDB;"
+     */
     @Override
     public String getCreateTableSQL(Table table) {
         if(table.getTablename() == null)

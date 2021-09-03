@@ -6,7 +6,7 @@ package com.boraydata.tcm;
  */
 public enum CreateTableSQL {
     Pgsql(
-            "CREATE TABLE robin_types_full(\n" +
+            "CREATE TABLE types_full(\n" +
                     "                          col_bigint bigint,\n" +
                     "                          col_bigserial bigserial,\n" +
                     "                          col_bit bit,\n" +
@@ -52,21 +52,21 @@ public enum CreateTableSQL {
                     ");"
     ),
     Mysql(
-            "Create Table If Not Exists `colume_type_1`(\n" +
-                    "int_test INT\n" +
-                    ",tinyint_test SMALLINT\n" +
-                    ",smallint_test SMALLINT\n" +
-                    ",float_test DOUBLE\n" +
-                    ",double_test DOUBLE\n" +
-                    ",decimal_test DOUBLE\n" +
-                    ",char_test VARCHAR(256)\n" +
-                    ",varchar_test VARCHAR(256)\n" +
-                    ",text_test VARCHAR(256)\n" +
-                    ",mediumtext_test VARCHAR(256)\n" +
-                    ",date_test INT\n" +
-                    ",time_test BIGINT\n" +
-                    ",datetime_test BIGINT\n" +
-                    ",linestring_test MULTIPOLYGON\n" +
+            "Create Table If Not Exists 'colume_type'(\n" +
+                    ",col_int int\n" +
+                    ",col_tinyint tinyint\n" +
+                    ",col_smallint smallint\n" +
+                    ",col_float float\n" +
+                    ",col_double double\n" +
+                    ",col_decimal decimal \n" +
+                    ",col_char char(256)\n" +
+                    ",col_varchar varchar(256)\n" +
+                    ",col_text text\n" +
+                    ",col_mediumtext mediumtext\n" +
+                    ",col_date date\n" +
+                    ",col_time time\n" +
+                    ",col_datetime datetime\n" +
+                    ",col_linestring linestring\n" +
                     ")Engine InnoDB;"
     );
 

@@ -10,6 +10,8 @@ class DataTypeMappingTest {
         System.out.println(DataTypeMapping.BOOLEAN);
         System.out.println(DataTypeMapping.BOOLEAN.name());
         System.out.println(DataTypeMapping.BOOLEAN.value);
+        System.out.println(DataTypeMapping.BOOLEAN.getOutDataType(DataSourceType.MYSQL));
+        System.out.println(DataTypeMapping.BOOLEAN.getOutDataType(DataSourceType.POSTGRES));
     }
 
 }

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.boray</groupId>
-    <artifactId>MetadataMappingTable</artifactId>
+    <artifactId>TableCloneManage</artifactId>
     <version>1</version>
     <description>根据 Metadata 来生成 Create Table 的 Mapping</description>
 

@@ -11,7 +11,24 @@ import com.boraydata.tcm.utils.StringUtil;
 import java.sql.*;
 import java.util.LinkedList;
 
-/** implement create table structure and clone table structure
+/**
+ * provide use DatabaseConfig to get Table Information by table name  e.g.: getSourceTable()
+ *
+ * Mapping the table from the SourceDB to the table of the CloneDB   e.g.: mappingCloneTable()
+ *
+ *
+ * ！！！ init TableCloneManage should provide double DatabaseConfig (sourceConfig、cloneConfig)，
+ * ！！！ The following describes the process of initializing sourceConfig table of cloneConfig
+ *
+ * (1),use SQL ( by *.core.DataSourceType ) query table info and set Table ( name = sourceTable ).
+ *
+ * (2),use *MappingTool to mapping 'sourceTable' datatype to TCM datatype,
+ *     and set Table.columns.DataTypeMapping. ( name = sourceMappingTable )
+ *
+ * (3),clone 'sourceMappingTable' temp table,set Table.columns.datatype use *.core.DataTypeMapping.( name = cloneTable)
+ *
+ * (4),use *MappingTool to create cloneTable Create Table SQL and Execute SQL.
+ *
  * @author bufan
  * @data 2021/8/25
  */
@@ -58,7 +75,6 @@ public class TableCloneManage {
                 Connection con =DatasourceConnectionFactory.createDataSourceConnection(databaseConfig);
                 PreparedStatement ps =  con.prepareStatement(dsType.SQL_TableInfoByTableName);
         ){
-
             // padding Table_Name
             ps.setString(1,tablename);
             ResultSet rs = ps.executeQuery();
@@ -103,6 +119,7 @@ public class TableCloneManage {
         return createTableInCloneDatasource(table,cloneConfig);
     }
     private boolean createTableInCloneDatasource(Table table,DatabaseConfig databaseConfig){
+        // get table create SQL
         cloneMappingTool.getCreateTableSQL(table);
         try (Connection conn = DatasourceConnectionFactory.createDataSourceConnection(databaseConfig);
              Statement statement = conn.createStatement();){

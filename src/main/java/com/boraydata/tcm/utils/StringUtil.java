@@ -30,10 +30,10 @@ public class StringUtil {
 //    }
 
     /**
-     * @Param map : database datatype mapping relationship Map   e.g. : {("int":INT),("integer":INT)}
-     * @Param string : datatype just like e.g. : int , integer , bool
-     * @Param def : if not found relation in define map,can set default
-     * @Return: DataTypeMapping : find a type in DataTypeMapping define
+     * @Param map : database datatype mapping relationship Map.          e.g. : {("int":INT),("integer":INT)}
+     * @Param string : Need to be mapped to the TCM datatype.            e.g. : int , integer
+     * @Param def : if not found relation in define map,can set default.
+     * @Return: DataTypeMapping : find a type in DataTypeMapping define. e.g. : INT , INT
      */
     public static DataTypeMapping findRelation(Map<String,DataTypeMapping> map,String string,DataTypeMapping def){
         return map.keySet().stream().filter(

@@ -2,7 +2,7 @@ package com.boraydata.tcm.core;
 
 import com.boraydata.tcm.configuration.DatabaseConfig;
 
-/**
+/** Initiates the connection information of the data sources
  * @author bufan
  * @data 2021/8/25
  */
@@ -34,7 +34,6 @@ public class TableCloneManageContext {
         public Builder setSourceConfig(DatabaseConfig sourceConfig) {
             this.sourceConfig = sourceConfig;
             return this;
-
         }
 
         public Builder setCloneConfig(DatabaseConfig cloneConfig) {
@@ -46,8 +45,5 @@ public class TableCloneManageContext {
             return new TableCloneManageContext(this);
         }
     }
-
-
-
 
 }

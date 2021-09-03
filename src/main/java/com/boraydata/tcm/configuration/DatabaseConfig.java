@@ -2,15 +2,19 @@ package com.boraydata.tcm.configuration;
 
 import com.boraydata.tcm.core.DataSourceType;
 
-/** Used to define metadata related information
+/** Used to define metadata related information,this info be used to create Connection.
  * @author bufan
  * @data 2021/8/25
  */
 public class DatabaseConfig {
 
+    // 主机名
     private String host;
+    // 端口号
     private String port;
+    // 登陆 用户名
     private String username;
+    // 登陆 密码
     private String password;
     // 数据库的类型 以及相关信息
     private DataSourceType dataSourceType;
@@ -18,9 +22,8 @@ public class DatabaseConfig {
     private String databasename;
     // 连接驱动的名称
     private String driver;
-    // 连接的地址
+    // 连接的地址 （该地址可以手动设置，若没有设置，在获取 Connection 时 会根据前面的相关信息生成 URL 并赋值）
     private String url;
-
 
     DatabaseConfig(Builder builder){
         username = builder.username;
@@ -75,15 +78,13 @@ public class DatabaseConfig {
         private String port;
         private String username;
         private String password;
-        // 数据库的类型
         private DataSourceType dataSourceType;
-        // 数据库名称
         private String databasename;
         private String driver;
-        // 根据以上信息 生成 连接 数据库的 URL
         private String url;
 
         public Builder() {
+            // Do nothing .
         }
 
         public DatabaseConfig create() {
@@ -132,19 +133,4 @@ public class DatabaseConfig {
         }
     }
 
-//    @Override
-//    public String toString() {
-//        if (url != null)
-//            return url+" username : "+username+" password : "+password;
-//
-//        return "DatabaseConfig{" +
-//                "host='" + host + '\'' +
-//                ", port='" + port + '\'' +
-//                ", username='" + username + '\'' +
-//                ", password='" + password + '\'' +
-//                ", dataSourceType=" + dataSourceType.name() +
-//                ", databasename='" + databasename + '\'' +
-//                ", driver='" + driver + '\'' +
-//                '}';
-//    }
 }

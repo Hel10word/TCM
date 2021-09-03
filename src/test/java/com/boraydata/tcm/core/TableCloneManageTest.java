@@ -45,20 +45,25 @@ class TableCloneManageTest {
             .create();
     TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmc);
 
+    // 获取 在 CreateConfig 上创建表的语句
     @Test
     public void testGetDatabaseTable(){
+        // 获取 SourceConfig 中表的信息 里面包含了 映射到 TCM 的数据类型
         Table table = tcm.getSourceTable("colume_type");
 //        Table table = tcm.getSourceTable("robin_types_full");
 
-        Table cloneMappingTable = tcm.getSourceMappingTool().createCloneMappingTable(table);
+        // 创建一个 映射到 CloneConfig 上的表
+        Table cloneMappingTable = tcm.getCloneMappingTool().createCloneMappingTable(table);
 //        List<Column> columns = table.getColumns();
 //        for (Column column : columns)
 //            System.out.println(column.toString());
-        System.out.println("================");
+        System.out.println("================ Mapping Table Info\n");
         List<Column> MappingColumns = cloneMappingTable.getColumns();
         for (Column column : MappingColumns)
             System.out.println(column.toString());
-        System.out.println("================");
-        System.out.println(tcm.getSourceMappingTool().getCreateTableSQL(cloneMappingTable));
+
+        // 输出 在 CloneConfig 上建立映射表的语句
+        System.out.println("\n================ Create Table SQL in "+tcm.getCloneConfig().getDataSourceType().name()+" \n");
+        System.out.println(tcm.getCloneMappingTool().getCreateTableSQL(cloneMappingTable));
     }
 }

@@ -14,6 +14,7 @@ public enum DataSourceType {
  * e.g.{ORACLE DB2 MYSQL POSTGRES VOLTDB GREENPLUM MEMSQL RDP SPARK}
  */
 
+// should to specify define the field name to be queried, because the field names may not be uniform for different databases
     MYSQL(
             MySQLContent.TABLE_CATALOG,
             MySQLContent.TABLE_SCHEMA,
