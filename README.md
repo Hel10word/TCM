@@ -45,7 +45,7 @@ TableCloneManageContext tcmContext = tcmcBuilder
 TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmContext);
 ```
 
-3.  use the tcm to initialization table between MySQL and PgSQL
+3.  use the TCM to initialization table between MySQL and PgSQL
 
 ```java
 // get Table information by TableName in MySQL(SourceDataBase)
@@ -67,7 +67,7 @@ else
 
 
 
-The complete demo case can be viewed [.\src\main\java\com\boraydata\tcm\Test.java](.\src\main\java\com\boraydata\tcm\Test.java)
+The complete demo case can be viewed [.\src\main\java\com\boraydata\tcm\Test.java](.\src\branch\master\src\main\java\com\boraydata\tcm\Test.java)
 
 
 
@@ -97,18 +97,18 @@ The complete demo case can be viewed [.\src\main\java\com\boraydata\tcm\Test.jav
 
 ## Attention
 
--   MySQL Mapping TCM design by [Mapping in Relation](https://debezium.io/documentation/reference/1.0/connectors/mysql.html#how-the-mysql-connector-maps-data-types_cdc) or view [MysqlMappingTool.java](.\src\main\java\com\boraydata\tcm\mapping\MysqlMappingTool.java)
--   PgSQL Mapping TCM design by [Mapping in Relation](https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#data-types) or view [PgsqlMappingTool.java](.\src\main\java\com\boraydata\tcm\mapping\PgsqlMappingTool.java)
+-   MySQL Mapping TCM design by [Mapping in Relation](https://debezium.io/documentation/reference/1.0/connectors/mysql.html#how-the-mysql-connector-maps-data-types_cdc) or view [MysqlMappingTool.java](.\src\branch\master\src\main\java\com\boraydata\tcm\mapping\MysqlMappingTool.java)
+-   PgSQL Mapping TCM design by [Mapping in Relation](https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#data-types) or view [PgsqlMappingTool.java](.\src\branch\master\src\main\java\com\boraydata\tcm\mapping\PgsqlMappingTool.java)
 
 
 
--   TCM Mapping Database design by  [Mapping out Relation](https://docs.confluent.io/3.1.1/connect/connect-jdbc/docs/sink_connector.html#auto-creation-and-auto-evoluton) or view [DataTypeMapping.java](.\src\main\java\com\boraydata\tcm\core\DataTypeMapping.java)
+-   TCM Mapping Database design by  [Mapping out Relation](https://docs.confluent.io/3.1.1/connect/connect-jdbc/docs/sink_connector.html#auto-creation-and-auto-evoluton) or view [DataTypeMapping.java](.\src\branch\master\src\main\java\com\boraydata\tcm\core\DataTypeMapping.java)
 
 
 
 ## Other
 
--   work process or viewed [TableCloneManage.java](\src\main\java\com\boraydata\tcm\core\TableCloneManage.java)
+-   work process or viewed [TableCloneManage.java](.\src\branch\master\src\main\java\com\boraydata\tcm\core\TableCloneManage.java)
 
     ```java
     (1).use SQL ( by '*.core.DataSourceType' and TableName) query table info and save as Table ( name = 'sourceTable' ).
