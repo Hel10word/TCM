@@ -137,7 +137,7 @@ public class MysqlMappingTool implements MappingTool {
                 throw new TCMException("Create Table SQL is fail,Because unable use null type:"+column.getColumnInfo());
             stringBuilder.append(column.getColumnName()).append(" ").append(column.getDataType());
             if (Boolean.FALSE.equals(column.isNullAble()))
-                stringBuilder.append("not NULL");
+                stringBuilder.append(" not NULL");
             stringBuilder.append("\n,");
         }
         stringBuilder.deleteCharAt(stringBuilder.length()-1);
