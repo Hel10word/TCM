@@ -62,8 +62,6 @@ public class TableCloneManage {
         this.cloneMappingTool = cloneMappingTool;
     }
 
-
-
     //  try to get table struct from Metadata by table name,and find the mapping relationship of each field
     public Table getSourceTable(String tablename){
         Table databaseTable = getDatabaseTable(tablename, sourceConfig);

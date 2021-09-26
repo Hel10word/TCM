@@ -6,7 +6,13 @@ import com.boraydata.tcm.core.TableCloneManage;
 import com.boraydata.tcm.core.TableCloneManageContext;
 import com.boraydata.tcm.core.TableCloneManageFactory;
 import com.boraydata.tcm.entity.Table;
+import com.boraydata.tcm.exception.TCMException;
+import com.boraydata.tcm.utils.DatasourceConnectionFactory;
 import org.junit.jupiter.api.Test;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /** 测试 MySQL 与 PgSQL 间的表同步
  * @author bufan
@@ -15,19 +21,19 @@ import org.junit.jupiter.api.Test;
 public class MySQL_PgSQL_Test {
     DatabaseConfig.Builder mysql = new DatabaseConfig.Builder();
     DatabaseConfig mysqlConfig = mysql
-            .setDatabasename("test")
+            .setDatabasename("test_db")
             .setDataSourceType(DataSourceType.MYSQL)
-            .setHost("192.168.30.222")
+            .setHost("192.168.30.200")
             .setPort("3306")
             .setUsername("root")
-            .setPassword("bigdata")
+            .setPassword("root")
             .create();
 
     DatabaseConfig.Builder pgsql = new DatabaseConfig.Builder();
     DatabaseConfig pgsqlConfig = pgsql
-            .setDatabasename("test")
+            .setDatabasename("test_db")
             .setDataSourceType(DataSourceType.POSTGRES)
-            .setHost("192.168.30.202")
+            .setHost("192.168.30.155")
             .setPort("5432")
             .setUsername("postgres")
             .setPassword("postgres")
@@ -85,5 +91,23 @@ public class MySQL_PgSQL_Test {
             System.out.println("create "+tableName+" Success");
         else
             System.out.println("Create "+tableName+" Failure");
+    }
+
+@Test
+    public void testDB(){
+        try (
+                Connection conn = DatasourceConnectionFactory.createDataSourceConnection(pgsqlConfig);
+                PreparedStatement ps = conn.prepareStatement("copy (select * from lineitem_1 limit 5) to '/usr/local/lineitem_1_limit_5.csv' with csv;");
+        ){
+            ResultSet myResultSet = ps.executeQuery();
+            while (myResultSet.next())
+                System.out.println(
+                        myResultSet.getString(1)+"   |    "+
+                                myResultSet.getString(2)+"   |    "+
+                                myResultSet.getString(3));
+            myResultSet.close();
+        }catch (Exception e) {
+            throw new TCMException("Failed to create PostgreSQL connection");
+        }
     }
 }

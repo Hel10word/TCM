@@ -1,5 +1,6 @@
 package com.boraydata.tcm.utils;
 
+import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.exception.TCMException;
 import com.boraydata.tcm.configuration.DatabaseConfig;
 
@@ -60,10 +61,10 @@ public class DatasourceConnectionFactory {
         else
             properties.put("password",databaseConfig.getPassword());
 
-        String datasourceType = databaseConfig.getDataSourceType().toString();
+        DataSourceType dataSourceType = databaseConfig.getDataSourceType();
         if(databaseConfig.getUrl() == null){
             // get connect protocol   e.g: jdbc:mysql://
-            url.append(dscPropers.getProperty(datasourceType));
+            url.append(dscPropers.getProperty(dataSourceType.toString()));
             // get hostname、port      e.g:  192.168.1.1、3306
             if(databaseConfig.getHost() != null && databaseConfig.getPort() != null){
                 url.append(databaseConfig.getHost());
@@ -73,13 +74,13 @@ public class DatasourceConnectionFactory {
                 throw new TCMException("Create Datasource info error");
 
             // Add different rules    e.g:   "/" or "//"
-            url.append(dscPropers.getProperty(datasourceType + "_TAIL"));
+            url.append(dscPropers.getProperty(dataSourceType.toString() + "_TAIL"));
 
 
             // get connection databaseName
             if (databaseConfig.getDatabasename()!=null)
                 url.append(databaseConfig.getDatabasename());
-            if(datasourceType.equals("MYSQL"))
+            if(dataSourceType == DataSourceType.MYSQL)
                 url.append("?useSSL=false");
 
         }else
@@ -92,7 +93,7 @@ public class DatasourceConnectionFactory {
         try {
             Class<?> aClass = Class.forName(databaseConfig.getDriver() != null
                     ? databaseConfig.getDriver()
-                    : dscPropers.getProperty(datasourceType + "_Driver"));
+                    : dscPropers.getProperty(dataSourceType.toString() + "_Driver"));
             driver = (Driver)aClass.newInstance();
             return driver.connect(url.toString(),properties);
         }catch (ClassNotFoundException e){
