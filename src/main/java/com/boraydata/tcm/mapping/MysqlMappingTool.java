@@ -50,15 +50,15 @@ public class MysqlMappingTool implements MappingTool {
         mappingMap.put("SET",DataTypeMapping.STRING);
         // YEAR[(2|4)]
         mappingMap.put("YEAR",DataTypeMapping.INT32);
-        mappingMap.put("TIMESTAMP",DataTypeMapping.STRING);
+        mappingMap.put("TIMESTAMP",DataTypeMapping.TIMESTAMP);
 
-        mappingMap.put("DATE",DataTypeMapping.INT32);
-        mappingMap.put("TIME",DataTypeMapping.INT64);
+        mappingMap.put("DATE",DataTypeMapping.DATE);
+        mappingMap.put("TIME",DataTypeMapping.TIME);
         mappingMap.put("DATETIME",DataTypeMapping.INT64);
 
         // https://debezium.io/documentation/reference/1.0/connectors/mysql.html#_decimal_values
         mappingMap.put("NUMERIC",DataTypeMapping.BYTES);
-        mappingMap.put("DECIMAL",DataTypeMapping.FLOAT64);
+        mappingMap.put("DECIMAL",DataTypeMapping.DECIMAL);
 
         // https://debezium.io/documentation/reference/1.0/connectors/mysql.html#_spatial_data_types
         mappingMap.put("GEOMETRY",DataTypeMapping.STRUCT);

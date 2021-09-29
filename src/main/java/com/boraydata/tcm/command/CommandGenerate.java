@@ -21,7 +21,7 @@ import com.boraydata.tcm.configuration.DatabaseConfig;
  */
 public interface CommandGenerate {
     // need： DatabaseConfig、File Path、Table Name、SQL statements。
-    String exportCommand(DatabaseConfig config,String filePath,String tableName);
-    String exportCommand(DatabaseConfig config,String filePath,String tableName,String sql);
-    String loadCommand(DatabaseConfig config,String filePath,String tableName);
+    String exportCommand(DatabaseConfig config,String filePath,String tableName,String delimiter);
+    String exportCommand(DatabaseConfig config,String filePath,String tableName,String delimiter,String limit);
+    String loadCommand(DatabaseConfig config,String filePath,String tableName,String delimiter);
 }

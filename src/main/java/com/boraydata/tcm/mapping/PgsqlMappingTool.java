@@ -62,19 +62,19 @@ public class PgsqlMappingTool implements MappingTool {
         mappingMap.put("DATERANGE",DataTypeMapping.STRING);
         mappingMap.put("ENUM",DataTypeMapping.STRING);
 
-        mappingMap.put("DATE",DataTypeMapping.INT32);
+        mappingMap.put("DATE",DataTypeMapping.DATE);
 
         /*
          * TIME(1) and TIME(6) is not distinguished, so default is INT64;
          * */
-        mappingMap.put("TIME",DataTypeMapping.INT64);
-        mappingMap.put("TIMESTAMP",DataTypeMapping.INT64);
+        mappingMap.put("TIME",DataTypeMapping.TIME);
+        mappingMap.put("TIMESTAMP",DataTypeMapping.TIMESTAMP);
 
         /*
         * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#decimal-values
         * */
         mappingMap.put("NUMERIC",DataTypeMapping.BYTES);
-        mappingMap.put("DECIMAL",DataTypeMapping.FLOAT64);
+        mappingMap.put("DECIMAL",DataTypeMapping.DECIMAL);
 
 
         /*

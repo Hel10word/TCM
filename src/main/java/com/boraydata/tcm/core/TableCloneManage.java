@@ -117,10 +117,10 @@ public class TableCloneManage {
         return createTableInCloneDatasource(table,cloneConfig);
     }
     private boolean createTableInCloneDatasource(Table table,DatabaseConfig databaseConfig){
-        // get table create SQL
-        cloneMappingTool.getCreateTableSQL(table);
+
         try (Connection conn = DatasourceConnectionFactory.createDataSourceConnection(databaseConfig);
-             Statement statement = conn.createStatement();){
+             Statement statement = conn.createStatement()){
+            // get table create SQL
             String sql = cloneMappingTool.getCreateTableSQL(table);
 //            System.out.println(sql);
             int i = statement.executeUpdate(sql);
