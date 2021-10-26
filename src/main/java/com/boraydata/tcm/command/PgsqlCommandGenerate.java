@@ -1,15 +1,20 @@
 package com.boraydata.tcm.command;
 
 import com.boraydata.tcm.configuration.DatabaseConfig;
+import com.boraydata.tcm.core.DataTypeMapping;
+import com.boraydata.tcm.entity.Column;
+import com.boraydata.tcm.entity.Table;
+
+import java.util.List;
 
 /** Used to generate load and export shell statements in PgSQL
  * @author bufan
  * @data 2021/9/26
  */
 public class PgsqlCommandGenerate implements CommandGenerate {
-    // -- 导出
+    // -- export
     //psql postgres://postgres:postgres@192.168.30.155/test_db -c "\copy (select * from lineitem_1 limit 5) to '/usr/local/lineitem_1_limit_5.csv' with DELIMITER ',';"
-    //--导入
+    //-- load
     //psql postgres://postgres:postgres@192.168.30.155/test_db -c "\copy lineitem from '/usr/local/lineitem_1_limit_5.csv' with DELIMITER ',';"
 
     private String getConnectCommand(DatabaseConfig config){
@@ -31,17 +36,34 @@ public class PgsqlCommandGenerate implements CommandGenerate {
     }
 
     @Override
-    public String exportCommand(DatabaseConfig config, String filePath, String tableName, String delimiter) {
-        return exportCommand(config,filePath,tableName,delimiter,"");
+    public String exportCommand(DatabaseConfig config, String filePath, Table table, String delimiter) {
+        return exportCommand(config,filePath,table,delimiter,"");
     }
 
     @Override
-    public String exportCommand(DatabaseConfig config, String filePath, String tableName, String delimiter, String limit) {
-        String sql = "select * from "+tableName;
+    public String exportCommand(DatabaseConfig config, String filePath, Table table, String delimiter, String limit) {
+        List<Column> columns = table.getColumns();
+        StringBuffer sql = new StringBuffer("select ");
+        for(Column c : columns){
+            String columnName = c.getColumnName();
+            if(c.getDataTypeMapping() == DataTypeMapping.BOOLEAN){
+                // coalesce((pgboolean::boolean)::int,0) as pgboolean
+                sql.append("coalesce(("+columnName+"::boolean)::int,0) as "+columnName);
+            }else if (c.getDataType().equals("money")){
+                // pgmoney::money::numeric as pgmoney3
+                sql.append(columnName+"::money::numeric as "+columnName);
+            }else {
+                sql.append(columnName);
+            }
+            sql.append(",");
+        }
+        sql.deleteCharAt(sql.lastIndexOf(","));
+        sql.append(" from ");
+        sql.append(table.getTablename());
         if (limit.length() >0 && limit != null)
-            sql += " limit "+limit;
+            sql.append(" limit ").append(limit);
         return completeExportCommand(
-                getConnectCommand(config),sql,filePath,delimiter
+                getConnectCommand(config),sql.toString(),filePath,delimiter
         );
     }
 

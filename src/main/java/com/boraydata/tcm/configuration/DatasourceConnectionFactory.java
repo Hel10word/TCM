@@ -1,4 +1,4 @@
-package com.boraydata.tcm.utils;
+package com.boraydata.tcm.configuration;
 
 import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.exception.TCMException;

@@ -25,8 +25,8 @@ class PgsqlCommandGenerateTest {
     CommandGenerate commandGenerate = new PgsqlCommandGenerate();
     @Test
     public void exportCommandTest(){
-        String s = this.commandGenerate.exportCommand(pgsqlConfig, "/usr/local/lineitem_5_pgsql.csv", "select * from lineitem limit 5;",",");
-        System.out.println(s);
+//        String s = this.commandGenerate.exportCommand(pgsqlConfig, "/usr/local/lineitem_5_pgsql.csv", "select * from lineitem limit 5;",",");
+//        System.out.println(s);
     }
     @Test
     public void loadCommandTest(){

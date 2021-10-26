@@ -24,7 +24,7 @@ public class MysqlMappingTool implements MappingTool {
         mappingMap.put("BIT(1)",DataTypeMapping.BOOLEAN);
         mappingMap.put("BIT(>1)",DataTypeMapping.BYTES);
         mappingMap.put("BIT",DataTypeMapping.BYTES);
-        mappingMap.put("TINYINT",DataTypeMapping.INT16);
+        mappingMap.put("TINYINT",DataTypeMapping.INT8);
         mappingMap.put("SMALLINT",DataTypeMapping.INT16);
         mappingMap.put("MEDIUMINT",DataTypeMapping.INT32);
         mappingMap.put("INT",DataTypeMapping.INT32);
@@ -45,7 +45,7 @@ public class MysqlMappingTool implements MappingTool {
         mappingMap.put("MEDIUMTEXT",DataTypeMapping.STRING);
         mappingMap.put("LONGBLOB",DataTypeMapping.BYTES);
         mappingMap.put("LONGTEXT",DataTypeMapping.STRING);
-        mappingMap.put("JSON",DataTypeMapping.STRING);
+        mappingMap.put("JSON",DataTypeMapping.TEXT);
         mappingMap.put("ENUM",DataTypeMapping.STRING);
         mappingMap.put("SET",DataTypeMapping.STRING);
         // YEAR[(2|4)]
@@ -53,7 +53,7 @@ public class MysqlMappingTool implements MappingTool {
         mappingMap.put("TIMESTAMP",DataTypeMapping.TIMESTAMP);
 
         mappingMap.put("DATE",DataTypeMapping.DATE);
-        mappingMap.put("TIME",DataTypeMapping.TIME);
+        mappingMap.put("TIME",DataTypeMapping.INT64);
         mappingMap.put("DATETIME",DataTypeMapping.INT64);
 
         // https://debezium.io/documentation/reference/1.0/connectors/mysql.html#_decimal_values
@@ -136,6 +136,8 @@ public class MysqlMappingTool implements MappingTool {
             if(column.getDataType() == null)
                 throw new TCMException("Create Table SQL is fail,Because unable use null type:"+column.getColumnInfo());
             stringBuilder.append(column.getColumnName()).append(" ").append(column.getDataType());
+            if (column.getDataType().equals("TIMESTAMP(3)"))
+                stringBuilder.append(" DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)");
             if (Boolean.FALSE.equals(column.isNullAble()))
                 stringBuilder.append(" not NULL");
             stringBuilder.append("\n,");

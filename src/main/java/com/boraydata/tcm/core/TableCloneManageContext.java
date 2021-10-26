@@ -1,6 +1,7 @@
 package com.boraydata.tcm.core;
 
 import com.boraydata.tcm.configuration.DatabaseConfig;
+import com.boraydata.tcm.exception.TCMException;
 
 /** Initiates the connection information of the data sources
  * @author bufan
@@ -32,6 +33,8 @@ public class TableCloneManageContext {
         }
 
         public Builder setSourceConfig(DatabaseConfig sourceConfig) {
+            if (DataSourceType.SPARK.toString().equals(sourceConfig.getDataSourceType().toString()))
+                throw new TCMException(" now does not support Spark to DB ");
             this.sourceConfig = sourceConfig;
             return this;
         }

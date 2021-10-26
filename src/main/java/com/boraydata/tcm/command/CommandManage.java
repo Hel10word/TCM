@@ -1,6 +1,7 @@
 package com.boraydata.tcm.command;
 
 import com.boraydata.tcm.configuration.DatabaseConfig;
+import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.exception.TCMException;
 import com.boraydata.tcm.utils.FileUtil;
 
@@ -41,7 +42,8 @@ public class CommandManage {
 
 
     // sync the table data
-    public void syncTableDataByTableName(String tableName){
+    public void syncTableDataByTableName(Table table){
+        String tableName = table.getTablename();
         // e.g. : /usr/local/TableName_MSQL_to_PGSQL.csv
         String csvFilePath = this.dir+tableName+"_"+sourceDB+"_to_"+cloneDB+".csv";
 
@@ -52,7 +54,7 @@ public class CommandManage {
         String loadShellPath = this.dir+cloneConfig.getDataSourceType().toString()+"_Load_"+tableName+".sh";
 
 
-        String exportShell = sourceCommand.exportCommand(sourceConfig, csvFilePath, tableName, delimiter,limit);
+        String exportShell = sourceCommand.exportCommand(sourceConfig, csvFilePath, table, delimiter,limit);
         String loadShell = cloneCommand.loadCommand(cloneConfig, csvFilePath, tableName, delimiter);
 
         if(!FileUtil.WriteMsgToFile(exportShell, exportShellPath))
@@ -63,7 +65,7 @@ public class CommandManage {
 
         if(FileUtil.Exists(csvFilePath))
             FileUtil.DeleteFile(csvFilePath);
-        System.out.println("\n\t(2.1).Create script files success.\n\t\t Export:'"+exportShellPath+"' \n\t\tLoad:'"+loadShellPath+"'");
+        System.out.println("\n\t(2.1).Create script files success.\n\t\tExport:'"+exportShellPath+"' \n\t\tLoad:'"+loadShellPath+"'");
 
         Long start,end;
 

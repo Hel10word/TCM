@@ -6,8 +6,7 @@ import com.boraydata.tcm.core.TableCloneManage;
 import com.boraydata.tcm.core.TableCloneManageContext;
 import com.boraydata.tcm.core.TableCloneManageFactory;
 import com.boraydata.tcm.entity.Table;
-import com.boraydata.tcm.exception.TCMException;
-import com.boraydata.tcm.utils.DatasourceConnectionFactory;
+import com.boraydata.tcm.configuration.DatasourceConnectionFactory;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -23,7 +22,7 @@ public class MySQL_PgSQL_Test {
     DatabaseConfig mysqlConfig = mysql
             .setDatabasename("test_db")
             .setDataSourceType(DataSourceType.MYSQL)
-            .setHost("192.168.30.200")
+            .setHost("192.168.30.148")
             .setPort("3306")
             .setUsername("root")
             .setPassword("root")
@@ -45,27 +44,27 @@ public class MySQL_PgSQL_Test {
     public void test() {
         System.out.println("Clone table mysql_pg_table in PgSQL from MySQL.lineitem");
         start = System.currentTimeMillis();
-        foo(mysqlConfig,pgsqlConfig,"mysql_pg_table");
+        foo(mysqlConfig,pgsqlConfig,"string_types_mysql");
         end = System.currentTimeMillis();
         System.out.println("Total time spent:" + (end - start)+"\n\n");
 
-        System.out.println("Clone table pg_mysql_table in MySQL from PgSQL.lineitem");
-        start = System.currentTimeMillis();
-        foo(pgsqlConfig,mysqlConfig,"pg_mysql_table");
-        end = System.currentTimeMillis();
-        System.out.println("Total time spent:" + (end - start)+"\n\n");
-
-        System.out.println("Clone table mysql_mysql_table in MySQL from MySQL.lineitem");
-        start = System.currentTimeMillis();
-        foo(mysqlConfig,mysqlConfig,"mysql_mysql_table");
-        end = System.currentTimeMillis();
-        System.out.println("Total time spent:" + (end - start)+"\n\n");
-
-        System.out.println("Clone table pg_pg_table in PgSQL from PgSQL.lineitem");
-        start = System.currentTimeMillis();
-        foo(pgsqlConfig,pgsqlConfig,"pg_pg_table");
-        end = System.currentTimeMillis();
-        System.out.println("Total time spent:" + (end - start)+"\n\n");
+//        System.out.println("Clone table pg_mysql_table in MySQL from PgSQL.lineitem");
+//        start = System.currentTimeMillis();
+//        foo(pgsqlConfig,mysqlConfig,"pg_mysql_table");
+//        end = System.currentTimeMillis();
+//        System.out.println("Total time spent:" + (end - start)+"\n\n");
+//
+//        System.out.println("Clone table mysql_mysql_table in MySQL from MySQL.lineitem");
+//        start = System.currentTimeMillis();
+//        foo(mysqlConfig,mysqlConfig,"mysql_mysql_table");
+//        end = System.currentTimeMillis();
+//        System.out.println("Total time spent:" + (end - start)+"\n\n");
+//
+//        System.out.println("Clone table pg_pg_table in PgSQL from PgSQL.lineitem");
+//        start = System.currentTimeMillis();
+//        foo(pgsqlConfig,pgsqlConfig,"pg_pg_table");
+//        end = System.currentTimeMillis();
+//        System.out.println("Total time spent:" + (end - start)+"\n\n");
     }
 
 
@@ -80,7 +79,7 @@ public class MySQL_PgSQL_Test {
                 .create();
         TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmContext);
 
-        Table sourceTable = tcm.getSourceTable("lineitem");
+        Table sourceTable = tcm.getSourceTable(tableName);
 
         Table cloneTable = tcm.mappingCloneTable(sourceTable);
 

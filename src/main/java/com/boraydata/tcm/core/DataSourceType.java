@@ -1,6 +1,7 @@
 package com.boraydata.tcm.core;
 
 
+import com.boraydata.tcm.exception.TCMException;
 
 /** Save or define some SQL to Select table info
  * @author bufan
@@ -9,7 +10,7 @@ package com.boraydata.tcm.core;
 public enum DataSourceType {
 
 /**
- * add new objects need to follow the naming convention com.boraydata.tcm.utils.DatasourceConnectionFactory
+ * add new objects need to follow the naming convention com.boraydata.tcm.configuration.DatasourceConnectionFactory
  * because the name is used to get the content protocol in *.utils.DatasourceConnectionFactory.dscPropers
  * e.g.{ORACLE DB2 MYSQL POSTGRES VOLTDB GREENPLUM MEMSQL RDP SPARK}
  */
@@ -34,7 +35,29 @@ public enum DataSourceType {
             PGSQLContent.ORDINAL_POSITION,
             PGSQLContent.IS_NULLABLE,
             PGSQLContent.SQL_TABLE_INFO_BY_TABLE_NAME
-            );
+            ),
+    SPARK(
+            PGSQLContent.TABLE_CATALOG,
+            PGSQLContent.TABLE_SCHEMA,
+            PGSQLContent.TABLE_NAME,
+            PGSQLContent.COLUMN_NAME,
+            PGSQLContent.DATA_TYPE,
+            PGSQLContent.ORDINAL_POSITION,
+            PGSQLContent.IS_NULLABLE,
+            PGSQLContent.SQL_TABLE_INFO_BY_TABLE_NAME
+    );
+
+
+
+    public static DataSourceType getTypeByStr(String str){
+        if(str.equals(DataSourceType.MYSQL.toString()))
+            return DataSourceType.MYSQL;
+        else if(str.equals(DataSourceType.POSTGRES.toString()))
+            return DataSourceType.POSTGRES;
+        else if(str.equals(DataSourceType.SPARK.toString()))
+            return DataSourceType.SPARK;
+        throw new TCMException("Failed to get DataSourceType, you must fill in the correct , are not "+str);
+    }
 
 //     Query table info by table name and table schema in different DB
 

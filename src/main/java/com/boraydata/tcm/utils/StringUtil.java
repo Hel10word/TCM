@@ -22,7 +22,8 @@ public class StringUtil {
             return string.replaceAll("\\d+",">1");
 
         // e.g. : varchar(16)  -->   varchar
-        return string.replaceAll("\\([\\d\\,]*\\)","");
+        return string.replaceAll("\\(.*\\)","");
+
     }
 
 //    public static boolean equalsIgnoreCase(String A,String B){

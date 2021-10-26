@@ -1,13 +1,17 @@
 package com.boraydata.tcm.core;
 
+import com.boraydata.tcm.command.SparkCommandGenerate;
 import com.boraydata.tcm.entity.Column;
 import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.exception.TCMException;
 import com.boraydata.tcm.mapping.MappingTool;
-import com.boraydata.tcm.utils.DatasourceConnectionFactory;
+import com.boraydata.tcm.configuration.DatasourceConnectionFactory;
 import com.boraydata.tcm.configuration.DatabaseConfig;
+import com.boraydata.tcm.utils.FileUtil;
 import com.boraydata.tcm.utils.StringUtil;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.LinkedList;
 
@@ -55,6 +59,8 @@ public class TableCloneManage {
         return cloneMappingTool;
     }
 
+    public TableCloneManage(){}
+
     public TableCloneManage(DatabaseConfig sourceConfig, DatabaseConfig cloneConfig, MappingTool sourceMappingTool, MappingTool cloneMappingTool) {
         this.sourceConfig = sourceConfig;
         this.cloneConfig = cloneConfig;
@@ -64,10 +70,10 @@ public class TableCloneManage {
 
     //  try to get table struct from Metadata by table name,and find the mapping relationship of each field
     public Table getSourceTable(String tablename){
-        Table databaseTable = getDatabaseTable(tablename, sourceConfig);
+        Table databaseTable = getDatabaseTable(sourceConfig,tablename);
         return sourceMappingTool.createSourceMappingTable(databaseTable);
     }
-    private Table getDatabaseTable(String tablename, DatabaseConfig databaseConfig){
+    public Table getDatabaseTable(DatabaseConfig databaseConfig,String tablename){
         DataSourceType dsType = databaseConfig.getDataSourceType();
         try (
                 Connection con =DatasourceConnectionFactory.createDataSourceConnection(databaseConfig);
@@ -100,12 +106,15 @@ public class TableCloneManage {
             table.setSchemaname(tableSchema);
             table.setTablename(tablename);
             table.setColumns(columns);
+            if(StringUtil.isNullOrEmpty(tablecatalog)&&StringUtil.isNullOrEmpty(tableSchema))
+                throw new TCMException("Not Found Table '"+tablename+"' in "
+                        +databaseConfig.getDataSourceType().toString()+"."
+                +databaseConfig.getDatabasename()+" , you should sure it exist.");
             return table;
         }catch (SQLException e) {
             throw new TCMException("Failed create table('"+tablename+"') information use connection : *.core.TableCloneManage.getDatabaseTable");
         }
     }
-
 
     // Clone Table
     public Table mappingCloneTable(Table table){
@@ -114,28 +123,63 @@ public class TableCloneManage {
 
     // cleart table in clone datasource
     public boolean createTableInCloneDatasource(Table table){
-        return createTableInCloneDatasource(table,cloneConfig);
+        return createTableInCloneDatasource(table,cloneConfig,false);
     }
-    private boolean createTableInCloneDatasource(Table table,DatabaseConfig databaseConfig){
+    public boolean createTableInCloneDatasource(Table table,boolean outSqlFlag){
+        return createTableInCloneDatasource(table,cloneConfig,outSqlFlag);
+    }
+    private boolean createTableInCloneDatasource(Table table,DatabaseConfig databaseConfig,boolean outSqlFlag){
+
+        if(DataSourceType.SPARK.toString().equals(databaseConfig.getDataSourceType().toString()))
+            return createTableInSpark(table,databaseConfig);
 
         try (Connection conn = DatasourceConnectionFactory.createDataSourceConnection(databaseConfig);
              Statement statement = conn.createStatement()){
             // get table create SQL
             String sql = cloneMappingTool.getCreateTableSQL(table);
-//            System.out.println(sql);
-            int i = statement.executeUpdate(sql);
-            if (i == 0)
-                return true;
-            else
-                throw new TCMException(" create table in "
+            if(outSqlFlag)
+                FileUtil.WriteMsgToFile(sql,"./createCloneTableIn"+table.getDataSourceType().toString()+".sql");
+            try {
+                int i = statement.executeUpdate(sql);
+                if (i == 0)
+                    return true;
+            }catch (TCMException e){
+                throw new TCMException("pls check SQL!! create table in "
                         +databaseConfig.getDataSourceType().name()+"."
                         +databaseConfig.getDataSourceType().TableCatalog+"."
                         +databaseConfig.getDataSourceType().TableSchema+"."
                         +table.getTablename()+" is FAILED !!!");
+            }
         }catch (Exception e){
-            throw new TCMException("Failed to create clone table,maybe datasource connection unable use. in ->"+databaseConfig.getDataSourceType().name());
+            throw new TCMException("Failed to create clone table,maybe datasource connection unable use!!! -> "+databaseConfig.getDataSourceType().toString());
         }
+        return false;
     }
 
+    private boolean createTableInSpark(Table table,DatabaseConfig databaseConfig){
+        SparkCommandGenerate generate = new SparkCommandGenerate();
+        String createShell = generate.getConnectCommand(databaseConfig).replace("?",
+                cloneMappingTool.getCreateTableSQL(table));
+
+        String createTableShellPath = "/usr/local/createTableInSpark.sh";
+        if(!FileUtil.WriteMsgToFile(createShell, createTableShellPath))
+            throw new TCMException("create createShell failed");
+        try {
+            ProcessBuilder pb = new ProcessBuilder();
+            pb.command("/bin/sh",createTableShellPath);
+            Process start = pb.start();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(start.getInputStream()))) {
+                String line;
+                System.out.println("\t  Excuet Shell : "+createTableShellPath);
+                while ((line = reader.readLine()) != null)
+                    System.out.println("\t Shell Out:"+line);
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+
+    }
 
 }

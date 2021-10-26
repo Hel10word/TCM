@@ -12,6 +12,7 @@ import com.boraydata.tcm.exception.TCMException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 
 /** TCM - Table Clone Manage and Table Data Sync
@@ -20,8 +21,55 @@ import java.util.Properties;
  */
 public class DoIt {
 
+    private static String SOURCE_DATABASE_NAME;
+    private static String SOURCE_DATA_TYPE;
+    private static String SOURCE_HOST;
+    private static String SOURCE_PORT;
+    private static String SOURCE_USER;
+    private static String SOURCE_PASSWORD;
+
+    private static String CLONE_DATABASE_NAME;
+    private static String CLONE_DATA_TYPE;
+    private static String CLONE_HOST;
+    private static String CLONE_PORT;
+    private static String CLONE_USER;
+    private static String CLONE_PASSWORD;
+
+    private static String TABLE_NAME;
+    private static String TEMP_DIRECTORY;
+    private static String SELECT_LIMIT;
+    private static String DELIMITER;
+
+    private static Boolean DEBUG;
+
+
     private static Properties properties;
     private static long start,end = 0;
+
+    private static void init(){
+
+        SOURCE_DATABASE_NAME = getValue("sourceDatabaseName");
+        SOURCE_DATA_TYPE = getValue("sourceDataType");
+        SOURCE_HOST = getValue("sourceHost");
+        SOURCE_PORT = getValue("sourcePort");
+        SOURCE_USER = getValue("sourceUser");
+        SOURCE_PASSWORD = getValue("sourcePassword");
+
+        CLONE_DATABASE_NAME = getValue("cloneDatabaseName");
+        CLONE_DATA_TYPE = getValue("cloneDataType");
+        CLONE_HOST = getValue("cloneHost");
+        CLONE_PORT = getValue("clonePort");
+        CLONE_USER = getValue("cloneUser");
+        CLONE_PASSWORD = getValue("clonePassword");
+
+        TABLE_NAME = getValue("tableName");
+        TEMP_DIRECTORY = getValue("tempDirectory");
+        SELECT_LIMIT = getValue("selectLimit","");
+        DELIMITER = getValue("delimiter",",");
+
+
+        DEBUG = "true".equals(getValue("debug",""));
+    }
 
     private static String getValue(String key){
         return getValue(key,"");
@@ -34,42 +82,32 @@ public class DoIt {
         }
         return value;
     }
-    private static DataSourceType getTypeByStr(String str){
-        if(str.equals(DataSourceType.MYSQL.toString()))
-            return DataSourceType.MYSQL;
-        else if(str.equals(DataSourceType.POSTGRES.toString()))
-            return DataSourceType.POSTGRES;
-        return null;
-    }
-
-
-
-
-
-
 
     public static void main(String[] args) {
         try {
             properties = new Properties();
-            // use ClassLoader load properties file
+            //  use ClassLoader load properties file
             FileInputStream in = new FileInputStream("./config.properties");
-//            InputStream in = DoIt.class.getClassLoader().getResourceAsStream("./config.properties");
-            // use properties object load file inputStream
+            //  InputStream in = DoIt.class.getClassLoader().getResourceAsStream("./config.properties");
+            //  use properties object load file inputStream
             properties.load(in);
         } catch (IOException e) {
             throw new TCMException("load the 'config.properties' is not found",e);
         }
 
+        // read the properties file and initialize the information.
+        init();
+
 
         // 1、创建 Source 数据源信息
         DatabaseConfig.Builder sourceBuilder = new DatabaseConfig.Builder();
         DatabaseConfig sourceConfig = sourceBuilder
-                .setDatabasename(getValue("sourceDatabaseName"))
-                .setDataSourceType(getTypeByStr(getValue("sourceDataType")))
-                .setHost(getValue("sourceHost"))
-                .setPort(getValue("sourcePort"))
-                .setUsername(getValue("sourceUser"))
-                .setPassword(getValue("sourcePassword"))
+                .setDatabasename(SOURCE_DATABASE_NAME)
+                .setDataSourceType(DataSourceType.getTypeByStr(SOURCE_DATA_TYPE))
+                .setHost(SOURCE_HOST)
+                .setPort(SOURCE_PORT)
+                .setUsername(SOURCE_USER)
+                .setPassword(SOURCE_PASSWORD)
                 .create();
 
         //2、 创建 Clone 数据源信息
@@ -77,12 +115,12 @@ public class DoIt {
         DatabaseConfig cloneConfig = cloneBuilder
                 // you can also set URL instead of Databasename、Host、Port
                 //.setUrl("jdbc:postgresql://192.168.30.192:5432/test_db")
-                .setDatabasename(getValue("cloneDatabaseName"))
-                .setDataSourceType(getTypeByStr(getValue("cloneDataType")))
-                .setHost(getValue("cloneHost"))
-                .setPort(getValue("clonePort"))
-                .setUsername(getValue("cloneUser"))
-                .setPassword(getValue("clonePassword"))
+                .setDatabasename(CLONE_DATABASE_NAME)
+                .setDataSourceType(DataSourceType.getTypeByStr(CLONE_DATA_TYPE))
+                .setHost(CLONE_HOST)
+                .setPort(CLONE_PORT)
+                .setUsername(CLONE_USER)
+                .setPassword(CLONE_PASSWORD)
                 .create();
 
         //3、 创建管理器上下文 设置 相关信息
@@ -92,33 +130,43 @@ public class DoIt {
                 .setCloneConfig(cloneConfig)
                 .create();
 
+        if (DEBUG){
+            System.out.println("====  sourceConfig  ====\n"+sourceConfig.getCofInfo());
+            System.out.println("\n====  cloneConfig  ====\n"+cloneConfig.getCofInfo());
+        }
+
         //4、 创建管理器
         TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmContext);
 
         System.out.println("\n(1).Read to initialization table in "
-                +getValue("cloneDataType")+" ,from "
-                +getValue("sourceDataType")+"."+getValue("tableName"));
+                +CLONE_DATA_TYPE+" ,from "
+                +SOURCE_DATA_TYPE+"."+TABLE_NAME);
 
-        String TableName = getValue("tableName");
-
-        System.out.println("\n\t(1.1).get '"+TableName+"' info from "+getValue("sourceDataType"));
+        System.out.println("\n\t(1.1).get '"+TABLE_NAME+"' info from "+SOURCE_DATA_TYPE);
         start = System.currentTimeMillis();
         //5、 使用 tcm 通过 表名 来获取表数据
-        Table sourceTable = tcm.getSourceTable(TableName);
+        Table sourceTable = tcm.getSourceTable(TABLE_NAME);
+
+        if (DEBUG)
+            sourceTable.getTableInfo();
+
         end = System.currentTimeMillis();
         System.out.println("\t----get table info total time spent:" + (end - start)+"\n");
 
 
+
         //6、 将该表映射为 Clone Datasource 类型
         Table cloneTable = tcm.mappingCloneTable(sourceTable);
+        if (DEBUG)
+            cloneTable.getTableInfo();
 
 //        可以修改表名
 //        cloneTable.setTablename("colume_type_copy");
 
         start = System.currentTimeMillis();
-        System.out.println("\t(1.2).create '"+TableName+"' in "+getValue("cloneDataType"));
+        System.out.println("\t(1.2).create '"+TABLE_NAME+"' in "+CLONE_DATA_TYPE);
 //       7、将 该表在 Clone Datasource 上创建，并获得 执行结果
-        boolean flag = tcm.createTableInCloneDatasource(cloneTable);
+        boolean flag = tcm.createTableInCloneDatasource(cloneTable,DEBUG);
         if(!flag)
             throw new TCMException("Create table Failure!!!!!");
 
@@ -131,19 +179,14 @@ public class DoIt {
 //=====================================  Table Data SYNC   =====================================
 
         System.out.println("(2).Read to Sync table data, export "
-                +getValue("sourceDataType")+"."+getValue("tableName")
-                +" ,load to "+getValue("cloneDataType"));
+                +SOURCE_DATA_TYPE+"."+TABLE_NAME
+                +" ,load to "+CLONE_DATA_TYPE);
 
-        String dir = getValue("tempDirectory");
-        String delimiter = ",";
-        if (getValue("delimiter") != null)
-            delimiter = getValue("delimiter");
-        String selectLimit = ""+getValue("selectLimit");
+
         start = System.currentTimeMillis();
 
-        CommandManage commandManage = CommandManageFactory.create(sourceConfig,cloneConfig,dir,delimiter,selectLimit);
-        commandManage.syncTableDataByTableName(TableName);
-
+        CommandManage commandManage = CommandManageFactory.create(sourceConfig,cloneConfig,TEMP_DIRECTORY,DELIMITER,SELECT_LIMIT);
+        commandManage.syncTableDataByTableName(sourceTable);
 
         end = System.currentTimeMillis();
         System.out.println("\t----Sync table data total time spent:" + (end - start)+"\n");

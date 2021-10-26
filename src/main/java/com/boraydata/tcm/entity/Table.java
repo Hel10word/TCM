@@ -76,6 +76,15 @@ public class Table implements Cloneable {
         this.columns = columns;
         return this;
     }
+    public void getTableInfo(){
+        System.out.println("DataSourceType:"+this.dataSourceType.toString()+"\n"
+        +"CatalogName:"+this.catalogname+"\n"
+        +"SchemaName:"+this.schemaname+"\n"
+        +"TableName:"+this.tablename+"\n========== columns info ============="
+        );
+        for(Column column : columns)
+            column.outInfo();
+    }
 
     @Override
     public String toString() {

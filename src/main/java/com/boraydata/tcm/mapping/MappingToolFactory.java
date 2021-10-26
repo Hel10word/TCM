@@ -9,10 +9,12 @@ import com.boraydata.tcm.core.DataSourceType;
 public class MappingToolFactory {
 
     public static MappingTool create(DataSourceType dataSourceType){
-        if(DataSourceType.MYSQL.name().equals(dataSourceType.name()))
+        if(DataSourceType.MYSQL.toString().equals(dataSourceType.name()))
             return new MysqlMappingTool();
-        if(DataSourceType.POSTGRES.name().equals(dataSourceType.name()))
+        if(DataSourceType.POSTGRES.toString().equals(dataSourceType.name()))
             return new PgsqlMappingTool();
+        if(DataSourceType.SPARK.toString().equals(dataSourceType.name()))
+            return new SparkMappingTool();
         return null;
     }
 

@@ -1,5 +1,4 @@
-package com.boraydata.tcm;
-
+package com.boraydata.tcm.command;
 
 import java.io.*;
 
@@ -10,7 +9,9 @@ import java.io.*;
  * refer:
  * https://blog.csdn.net/whatday/article/details/107082238
  */
-public class RuntimeTest {
+
+public class CommandExecuetTest {
+
     // E:\environment\javaJDK\jdk1.8.0_144\bin
     static String envp[] = {"Path=E:\\environment\\javaJDK\\jdk1.8.0_144;E:\\environment\\javaJDK\\jdk1.8.0_144\\bin;E:\\environment\\javaJDK\\jdk1.8.0_144\\jre\\bin;"};
 

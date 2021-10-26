@@ -1,5 +1,6 @@
 package com.boraydata.tcm.utils;
 
+import com.boraydata.tcm.core.DataSourceType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,6 +16,11 @@ class StringUtilTest {
         String[] strArray = {"Bit(1)","bit(232)","bits(232)","bit(255,0,0)","BIT(12)"};
         for (String s : strArray)
             System.out.println(s+" --> "+StringUtil.dataTypeFormat(s));
+    }
+
+    @Test
+    public void testString(){
+        System.out.println(DataSourceType.SPARK.toString());
     }
 
 

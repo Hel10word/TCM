@@ -26,6 +26,8 @@ public class CommandManageFactory {
             return new MysqlCommandGenerate();
         else if (type == DataSourceType.POSTGRES)
             return new PgsqlCommandGenerate();
+        else if (type == DataSourceType.SPARK)
+            return new SparkCommandGenerate();
         return null;
     }
 }

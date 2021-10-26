@@ -6,6 +6,7 @@ package com.boraydata.tcm.command;
  */
 
 import com.boraydata.tcm.configuration.DatabaseConfig;
+import com.boraydata.tcm.entity.Table;
 
 /**
  * MySQL Export
@@ -21,7 +22,7 @@ import com.boraydata.tcm.configuration.DatabaseConfig;
  */
 public interface CommandGenerate {
     // need： DatabaseConfig、File Path、Table Name、SQL statements。
-    String exportCommand(DatabaseConfig config,String filePath,String tableName,String delimiter);
-    String exportCommand(DatabaseConfig config,String filePath,String tableName,String delimiter,String limit);
+    String exportCommand(DatabaseConfig config, String filePath,Table table,String delimiter);
+    String exportCommand(DatabaseConfig config,String filePath,Table table,String delimiter,String limit);
     String loadCommand(DatabaseConfig config,String filePath,String tableName,String delimiter);
 }

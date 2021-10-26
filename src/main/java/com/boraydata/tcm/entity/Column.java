@@ -117,6 +117,9 @@ public class Column implements Cloneable {
                 ", dataTypeMapping=" + dataTypeMapping +
                 '}';
     }
+    public void outInfo(){
+        System.out.printf("ColumnName=%-20s DataType=%-20s Position=%-6d dataTypeMapping=%s\n",ColumnName,DataType,OrdinalPosition,dataTypeMapping);
+    }
 
     public Column clone(){
         Column column = null;

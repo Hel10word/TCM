@@ -133,4 +133,15 @@ public class DatabaseConfig {
         }
     }
 
+
+    public String getCofInfo(){
+        return "host:"+host+"\n"+
+                "port:"+port+"\n"+
+                "username:'"+username+"'\n"+
+                "password:'"+password+"'\n"+
+                "dataSourceType:"+dataSourceType.toString()+"\n"+
+                "databasename:"+databasename+"\n"+
+                "url:"+url+"\n";
+    }
+
 }

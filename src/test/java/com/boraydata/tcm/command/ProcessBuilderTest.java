@@ -1,4 +1,4 @@
-package com.boraydata.tcm;
+package com.boraydata.tcm.command;
 
 
 import java.io.BufferedReader;

@@ -23,8 +23,8 @@ class MysqlCommandGenerateTest {
     CommandGenerate commandGenerate = new MysqlCommandGenerate();
     @Test
     public void exportCommandTest(){
-        String s = this.commandGenerate.exportCommand(mysqlConfig, "/usr/local/lineitem_10_mysql.csv", "select * from lineitem limit 10;",",");
-        System.out.println(s);
+//        String s = this.commandGenerate.exportCommand(mysqlConfig, "/usr/local/lineitem_10_mysql.csv", "select * from lineitem limit 10;",",");
+//        System.out.println(s);
     }
     @Test
     public void loadCommandTest(){

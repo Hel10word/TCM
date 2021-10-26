@@ -22,7 +22,7 @@ public class PgsqlMappingTool implements MappingTool {
     static Map<String, DataTypeMapping> mappingMap = new HashMap<>();
     static {
         mappingMap.put("BOOLEAN",DataTypeMapping.BOOLEAN);
-        mappingMap.put("BIT(1)",DataTypeMapping.BOOLEAN);
+        mappingMap.put("BIT(1)",DataTypeMapping.BYTES);
         mappingMap.put("BIT(>1)",DataTypeMapping.BYTES);
         mappingMap.put("SMALLINT",DataTypeMapping.INT16);
         mappingMap.put("SMALLSERIAL",DataTypeMapping.INT16);
@@ -31,24 +31,31 @@ public class PgsqlMappingTool implements MappingTool {
         mappingMap.put("BIGINT",DataTypeMapping.INT64);
         mappingMap.put("BIGSERIAL",DataTypeMapping.INT64);
         mappingMap.put("REAL",DataTypeMapping.FLOAT32);
-        mappingMap.put("REAL",DataTypeMapping.FLOAT32);
         mappingMap.put("DOUBLE",DataTypeMapping.FLOAT64);
         mappingMap.put("PRECISION",DataTypeMapping.FLOAT64);
         mappingMap.put("CHAR",DataTypeMapping.STRING);
         mappingMap.put("VARCHAR",DataTypeMapping.STRING);
         mappingMap.put("CHARACTER",DataTypeMapping.STRING);
         mappingMap.put("CHARACTERVARYING",DataTypeMapping.STRING);
-        mappingMap.put("TIMESTAMPTZ",DataTypeMapping.STRING);
-        mappingMap.put("TIMESTAMPWITHTIMEZONE",DataTypeMapping.STRING);
-        mappingMap.put("TIMETZ",DataTypeMapping.STRING);
-        mappingMap.put("TIMEWITHTIMEZONE",DataTypeMapping.STRING);
 
-        mappingMap.put("INTERVAL",DataTypeMapping.INT64);
+        /*
+         * TIME(1) and TIME(6) is not distinguished, so default is INT64;
+         * */
+        mappingMap.put("TIMESTAMP",DataTypeMapping.TIMESTAMP);
+        mappingMap.put("TIMESTAMPWITHTIMEZONE",DataTypeMapping.TIMESTAMP);
+        mappingMap.put("TIMESTAMPWITHOUTTIMEZONE",DataTypeMapping.TIMESTAMP);
+
+
+        mappingMap.put("TIME",DataTypeMapping.TIME);
+        mappingMap.put("TIMEWITHTIMEZONE",DataTypeMapping.TIME);
+        mappingMap.put("TIMEWITHOUTTIMEZONE",DataTypeMapping.TIME);
+
+        mappingMap.put("INTERVAL",DataTypeMapping.STRING);
 
         mappingMap.put("BYTEA",DataTypeMapping.BYTES);
-        mappingMap.put("JSON",DataTypeMapping.STRING);
-        mappingMap.put("JSONB",DataTypeMapping.STRING);
-        mappingMap.put("XML",DataTypeMapping.STRING);
+        mappingMap.put("JSON",DataTypeMapping.TEXT);
+        mappingMap.put("JSONB",DataTypeMapping.TEXT);
+        mappingMap.put("XML",DataTypeMapping.TEXT);
         mappingMap.put("UUID",DataTypeMapping.STRING);
         mappingMap.put("POINT",DataTypeMapping.STRING);
         mappingMap.put("LTREE",DataTypeMapping.STRING);
@@ -64,16 +71,12 @@ public class PgsqlMappingTool implements MappingTool {
 
         mappingMap.put("DATE",DataTypeMapping.DATE);
 
-        /*
-         * TIME(1) and TIME(6) is not distinguished, so default is INT64;
-         * */
-        mappingMap.put("TIME",DataTypeMapping.TIME);
-        mappingMap.put("TIMESTAMP",DataTypeMapping.TIMESTAMP);
+
 
         /*
         * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#decimal-values
         * */
-        mappingMap.put("NUMERIC",DataTypeMapping.BYTES);
+        mappingMap.put("NUMERIC",DataTypeMapping.DECIMAL);
         mappingMap.put("DECIMAL",DataTypeMapping.DECIMAL);
 
 
@@ -106,18 +109,18 @@ public class PgsqlMappingTool implements MappingTool {
         mappingMap.put("DOUBLEPRECISION",DataTypeMapping.FLOAT64);
         mappingMap.put("LINE",DataTypeMapping.STRUCT);
         mappingMap.put("LSEG",DataTypeMapping.STRUCT);
-        mappingMap.put("MONEY",DataTypeMapping.FLOAT32);
+        mappingMap.put("MONEY",DataTypeMapping.MONEY);
         mappingMap.put("PATH",DataTypeMapping.STRUCT);
-        mappingMap.put("TEXT",DataTypeMapping.STRING);
+        mappingMap.put("TEXT",DataTypeMapping.TEXT);
         mappingMap.put("POLYGON",DataTypeMapping.STRING);
-        mappingMap.put("TIMEWITHOUTTIMEZONE",DataTypeMapping.STRING);
-        mappingMap.put("TIMESTAMPWITHOUTTIMEZONE",DataTypeMapping.STRING);
-        mappingMap.put("TSQUERY",DataTypeMapping.STRUCT);
-        mappingMap.put("TSVECTOR",DataTypeMapping.STRUCT);
+
+        mappingMap.put("TSQUERY",DataTypeMapping.TEXT);
+        mappingMap.put("TSVECTOR",DataTypeMapping.TEXT);
         mappingMap.put("TXID_SNAPSHOT",DataTypeMapping.STRUCT);
 
-        mappingMap.put("BITVARYING",DataTypeMapping.STRING);
-        mappingMap.put("DOUBLEPRECISION",DataTypeMapping.FLOAT64);
+        mappingMap.put("BITVARYING",DataTypeMapping.BYTES);
+
+        mappingMap.put("ARRAY",DataTypeMapping.TEXT);
     }
 
 

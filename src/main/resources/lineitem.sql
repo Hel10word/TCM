@@ -18,3 +18,9 @@ CREATE TABLE lineitem ( l_orderkey    integer not null,
                              L_SHIPINSTRUCT CHAR(25) NOT NULL,
                              L_SHIPMODE     CHAR(10) NOT NULL,
                              L_COMMENT      VARCHAR(44) NOT NULL);
+
+-- mysql 导入数据
+mysql -uroot -proot --database=test_db -e "LOAD DATA INFILE '/usr/local/download/sf1/lineitem.tbl' INTO TABLE lineitem_sf1_mysql FIELDS TERMINATED BY '|' LINES TERMINATED BY '|\n';"
+mysql -uroot -proot --database=test_db -e "LOAD DATA INFILE '/usr/local/download/sf10/lineitem.tbl' INTO TABLE lineitem_sf10_mysql FIELDS TERMINATED BY '|' LINES TERMINATED BY '|\n';"
+
+-- PgSQL 导入数据

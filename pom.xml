@@ -51,13 +51,13 @@
 
     <dependencies>
 
-            <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
-            <!--    MySQL 5.7    -->
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.47</version>
-            </dependency>
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <!--    MySQL 5.7    -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.47</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
         <!--    PostGreSQL 13    -->
@@ -66,17 +66,20 @@
             <artifactId>postgresql</artifactId>
             <version>42.2.18</version>
         </dependency>
-
+        <!--   连接 Hive 需要的依赖     -->
+        <!-- https://mvnrepository.com/artifact/org.apache.hive/hive-jdbc -->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.hive</groupId>-->
+<!--            <artifactId>hive-jdbc</artifactId>-->
+<!--            <version>3.1.2</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
+        <!--    Test    -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.7.2</version>
             <scope>test</scope>
         </dependency>
-
-
-
     </dependencies>
-
-
 </project>
