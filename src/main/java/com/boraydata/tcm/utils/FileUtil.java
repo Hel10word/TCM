@@ -25,6 +25,11 @@ public class FileUtil {
         return file.exists();
     }
 
+    public static boolean Mkdirs(String path){
+        File file = new File(path);
+        return file.mkdirs();
+    }
+
     // write file , if shell exists , will delete .
     public static boolean WriteMsgToFile(String msg,String path){
         File file = new File(path);

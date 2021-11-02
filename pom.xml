@@ -9,7 +9,6 @@
     <version>1</version>
     <description>Clone Table And Sync Data</description>
 
-
     <build>
         <plugins>
             <plugin>

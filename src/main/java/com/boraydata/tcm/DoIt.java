@@ -10,8 +10,10 @@ import com.boraydata.tcm.core.TableCloneManageFactory;
 import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.exception.TCMException;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -35,12 +37,17 @@ public class DoIt {
     private static String CLONE_USER;
     private static String CLONE_PASSWORD;
 
-    private static String TABLE_NAME;
+//    private static String TABLE_NAME;
     private static String TEMP_DIRECTORY;
     private static String SELECT_LIMIT;
     private static String DELIMITER;
 
     private static Boolean DEBUG;
+
+
+    private static String SOURCE_TABLE;
+    private static String CLONE_TABLE;
+
 
 
     private static Properties properties;
@@ -62,13 +69,27 @@ public class DoIt {
         CLONE_USER = getValue("cloneUser");
         CLONE_PASSWORD = getValue("clonePassword");
 
-        TABLE_NAME = getValue("tableName");
-        TEMP_DIRECTORY = getValue("tempDirectory");
+//        TABLE_NAME = getValue("tableName");
+        TEMP_DIRECTORY = getValue("tempDirectory","./TCMTemp");
         SELECT_LIMIT = getValue("selectLimit","");
-        DELIMITER = getValue("delimiter",",");
-
+        DELIMITER = getValue("delimiter","|");
 
         DEBUG = "true".equals(getValue("debug",""));
+
+        SOURCE_TABLE = getValue("sourceTable");
+        CLONE_TABLE = getValue("cloneTable");
+
+
+        // 'mysql', 'postgresql', 'hive'
+        if(SOURCE_DATA_TYPE.equals("mysql"))
+            SOURCE_DATA_TYPE = DataSourceType.MYSQL.toString();
+        else if (SOURCE_DATA_TYPE.equals("postgresql"))
+            SOURCE_DATA_TYPE = DataSourceType.POSTGRES.toString();
+
+        if(CLONE_DATA_TYPE.equals("mysql"))
+            CLONE_DATA_TYPE = DataSourceType.MYSQL.toString();
+        else if (CLONE_DATA_TYPE.equals("postgresql"))
+            CLONE_DATA_TYPE = DataSourceType.POSTGRES.toString();
     }
 
     private static String getValue(String key){
@@ -84,10 +105,16 @@ public class DoIt {
     }
 
     public static void main(String[] args) {
+        String configFilePath = args[0];
+        if(configFilePath == null)
+            throw new TCMException("you should incoming properties File.");
+        if(!new File(configFilePath).exists())
+            throw new TCMException("the '"+configFilePath+"' properties File is not found.");
+
         try {
             properties = new Properties();
             //  use ClassLoader load properties file
-            FileInputStream in = new FileInputStream("./config.properties");
+            FileInputStream in = new FileInputStream(configFilePath);
             //  InputStream in = DoIt.class.getClassLoader().getResourceAsStream("./config.properties");
             //  use properties object load file inputStream
             properties.load(in);
@@ -140,12 +167,12 @@ public class DoIt {
 
         System.out.println("\n(1).Read to initialization table in "
                 +CLONE_DATA_TYPE+" ,from "
-                +SOURCE_DATA_TYPE+"."+TABLE_NAME);
+                +SOURCE_DATA_TYPE+"."+SOURCE_TABLE);
 
-        System.out.println("\n\t(1.1).get '"+TABLE_NAME+"' info from "+SOURCE_DATA_TYPE);
+        System.out.println("\n\t(1.1).get '"+SOURCE_TABLE+"' info from "+SOURCE_DATA_TYPE);
         start = System.currentTimeMillis();
         //5、 使用 tcm 通过 表名 来获取表数据
-        Table sourceTable = tcm.getSourceTable(TABLE_NAME);
+        Table sourceTable = tcm.getSourceTable(SOURCE_TABLE);
 
         if (DEBUG)
             sourceTable.getTableInfo();
@@ -156,7 +183,7 @@ public class DoIt {
 
 
         //6、 将该表映射为 Clone Datasource 类型
-        Table cloneTable = tcm.mappingCloneTable(sourceTable);
+        Table cloneTable = tcm.mappingCloneTable(sourceTable,CLONE_TABLE);
         if (DEBUG)
             cloneTable.getTableInfo();
 
@@ -164,7 +191,7 @@ public class DoIt {
 //        cloneTable.setTablename("colume_type_copy");
 
         start = System.currentTimeMillis();
-        System.out.println("\t(1.2).create '"+TABLE_NAME+"' in "+CLONE_DATA_TYPE);
+        System.out.println("\t(1.2).create '"+CLONE_TABLE+"' in "+CLONE_DATA_TYPE);
 //       7、将 该表在 Clone Datasource 上创建，并获得 执行结果
         boolean flag = tcm.createTableInCloneDatasource(cloneTable,DEBUG);
         if(!flag)
@@ -179,19 +206,18 @@ public class DoIt {
 //=====================================  Table Data SYNC   =====================================
 
         System.out.println("(2).Read to Sync table data, export "
-                +SOURCE_DATA_TYPE+"."+TABLE_NAME
-                +" ,load to "+CLONE_DATA_TYPE);
+                +SOURCE_DATA_TYPE+"."+SOURCE_TABLE
+                +" ,load to "+CLONE_DATA_TYPE+"."+CLONE_TABLE);
 
 
         start = System.currentTimeMillis();
 
         CommandManage commandManage = CommandManageFactory.create(sourceConfig,cloneConfig,TEMP_DIRECTORY,DELIMITER,SELECT_LIMIT);
-        commandManage.syncTableDataByTableName(sourceTable);
+        commandManage.syncTableDataByTableName(sourceTable,cloneTable);
 
         end = System.currentTimeMillis();
         System.out.println("\t----Sync table data total time spent:" + (end - start)+"\n");
         System.out.println("----Sync the table success !!!!");
-
 
     }
 }

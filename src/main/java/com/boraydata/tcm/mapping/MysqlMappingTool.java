@@ -21,7 +21,7 @@ public class MysqlMappingTool implements MappingTool {
     static {
         mappingMap.put("BOOLEAN",DataTypeMapping.BOOLEAN);
         mappingMap.put("BOOL",DataTypeMapping.BOOLEAN);
-        mappingMap.put("BIT(1)",DataTypeMapping.BOOLEAN);
+        mappingMap.put("BIT(1)",DataTypeMapping.BYTES);
         mappingMap.put("BIT(>1)",DataTypeMapping.BYTES);
         mappingMap.put("BIT",DataTypeMapping.BYTES);
         mappingMap.put("TINYINT",DataTypeMapping.INT8);
@@ -99,6 +99,11 @@ public class MysqlMappingTool implements MappingTool {
      */
     @Override
     public Table createCloneMappingTable(Table table) {
+        return createCloneMappingTable(table,table.getTablename());
+    }
+
+    @Override
+    public Table createCloneMappingTable(Table table, String tableName) {
         Table cloneTable = table.clone();
         List<Column> sourceCols = cloneTable.getColumns();
         List<Column> cloneCols = new LinkedList<>();
@@ -111,6 +116,7 @@ public class MysqlMappingTool implements MappingTool {
         cloneTable.setSchemaname(null);
         cloneTable.setColumns(cloneCols);
         cloneTable.setDataSourceType(DataSourceType.MYSQL);
+        cloneTable.setTablename(tableName);
         return cloneTable;
     }
 

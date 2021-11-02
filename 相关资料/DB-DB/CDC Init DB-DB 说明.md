@@ -144,7 +144,7 @@ CREATE TABLE enumerated_types_pgsql (
 
 ColumnName='pgenumerated_mood', DataType='USER-DEFINED'
 
--   该类型为用户自定义类型，暂时不支持该类型。
+-   该类型为用户自定义类型，**暂时不支持该类型**。
 
 
 
@@ -164,7 +164,7 @@ https://www.postgresql.org/docs/13/datatype-geometric.html
 | polygon    | Polygon (similar to closed path)            |          |       |
 | circle     | Circle                                      |          |       |
 
--   暂时不考虑 几何 类型的数据
+-   **暂时不考虑** 几何 类型的数据
 
 
 
@@ -201,7 +201,7 @@ https://www.postgresql.org/docs/13/datatype-bit.html
 | ==BIT VARYING(n) ;n>1== | BYTES    | VARBINARY(1024) |
 
 -   在PgSQL中查询官方手册，暂未发现 n 的定义范围。
--   由于Mapping到MySQL中，为  VARBINARY(1024) ，同步长度大于 1024 的数据会丢失，而且在MySQL中， VARBINARY(n) 0<=n<=21845。
+-   由于Mapping到MySQL中，为  VARBINARY(1024) ，同步长度大于 1024 的**数据会丢失**，而且在MySQL中， VARBINARY(n) 0<=n<=21845。
 
 
 
@@ -313,7 +313,7 @@ INSERT INTO composite_types_pgsql VALUES (ROW('fuzzy dice', 42, 1.99), 1000);
 
 
 -   这是一种符合类型，可以自定义一些结构体。
--   根据 Metadata 查出来为 DataType= USER-DEFINED ，因此不支持此类型。
+-   根据 Metadata 查出来为 DataType= USER-DEFINED ，因此**不支持此类型**。
 
 
 
@@ -380,7 +380,7 @@ https://www.postgresql.org/docs/13/datatype-oid.html
 | regrole       | role name                    |          |       |
 | regtype       | data type name               |          |       |
 
--   暂不支持该类型，debezium 中也没找到该类型的Mapping。
+-   **暂不支持该类型**，debezium 中也没找到该类型的Mapping。
 
 
 
@@ -447,7 +447,7 @@ https://dev.mysql.com/doc/refman/5.7/en/numeric-types.html
 | DEC              | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
 | FIXED[(M,D)]     | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
 | DOUBLE           | as a synonym for DOUBLE PRECISION                            | FLOAT64  | DOUBLE PRECISION |
-| ==BIT(1)==       |                                                              | BOOLEAN  | BOOLEAN          |
+| ==BIT(1)==       |                                                              | BYTES    | BYTES            |
 | ==BIT(M)==       | 1<=M<=64;default 1;                                          | BYTES    | BYTEA            |
 | TINYINT          | -128 ~ 127                                                   | INT8     | SMALLINT         |
 | MEDIUMINT        | -8388608 ~ 8388607                                           | INT32    | INT              |
@@ -462,8 +462,7 @@ https://dev.mysql.com/doc/refman/5.7/en/numeric-types.html
 the optional (nonstandard) `ZEROFILL` attribute, the default padding of spaces is replaced with zeros. For example, for a column declared as [`INT(4) ZEROFILL`](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html), a value of `5` is retrieved as `0005`.
 
 -   [`BOOL`](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html), [`BOOLEAN`](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html) These types are synonyms for [`TINYINT(1)`](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html). A value of zero is considered false. Nonzero values are considered true:
--   ==MySQL BIT(1)== ，Values ‘1’ export to csv become ‘AQ\==’，Values ‘0’ export to csv become ‘AA\==’。
--   该类型需要反复测试几遍。
+-   ==MySQL BIT(1)==与==MySQL BIT(M)==导出为十六进制 ，写入为PgSQL的BYTEA类型。
 
 
 
@@ -535,7 +534,7 @@ https://dev.mysql.com/doc/refman/5.7/en/spatial-types.html
 |     MULTIPOLYGON       | STRUCT | POLYGON |
 |     GEOMETRYCOLLECTION       | STRUCT | POLYGON |
 
--   暂不支持该数据类型。
+-   **暂不支持该数据类型**。
 
 
 

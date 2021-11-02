@@ -42,20 +42,21 @@ public class CommandManage {
 
 
     // sync the table data
-    public void syncTableDataByTableName(Table table){
-        String tableName = table.getTablename();
+    public void syncTableDataByTableName(Table sourceTable,Table cloneTable){
+        String sourceTableName = sourceTable.getTablename();
+        String cloneTableName = cloneTable.getTablename();
         // e.g. : /usr/local/TableName_MSQL_to_PGSQL.csv
-        String csvFilePath = this.dir+tableName+"_"+sourceDB+"_to_"+cloneDB+".csv";
+        String csvFilePath = this.dir+sourceTableName+"_"+sourceDB+"_to_"+cloneDB+"_"+cloneTableName+".csv";
 
         // e.g. : /usr/local/MSQL_Export_TableName.sh
-        String exportShellPath = this.dir+sourceConfig.getDataSourceType().toString()+"_Export_"+tableName+".sh";
+        String exportShellPath = this.dir+sourceConfig.getDataSourceType().toString()+"_Export_"+sourceTableName+".sh";
 
         // e.g. : /usr/local/PGSQL_Load_TableName.sh
-        String loadShellPath = this.dir+cloneConfig.getDataSourceType().toString()+"_Load_"+tableName+".sh";
+        String loadShellPath = this.dir+cloneConfig.getDataSourceType().toString()+"_Load_"+cloneTableName+".sh";
 
 
-        String exportShell = sourceCommand.exportCommand(sourceConfig, csvFilePath, table, delimiter,limit);
-        String loadShell = cloneCommand.loadCommand(cloneConfig, csvFilePath, tableName, delimiter);
+        String exportShell = sourceCommand.exportCommand(sourceConfig, csvFilePath, sourceTable, delimiter,limit);
+        String loadShell = cloneCommand.loadCommand(cloneConfig, csvFilePath, cloneTableName, delimiter);
 
         if(!FileUtil.WriteMsgToFile(exportShell, exportShellPath))
             throw new TCMException("create export shell failed");

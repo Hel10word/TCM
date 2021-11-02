@@ -14,7 +14,7 @@ import java.io.File;
 public class CommandManageFactory {
 
     public static CommandManage create(DatabaseConfig sourceConfig,DatabaseConfig cloneConfig,String dir,String delimiter,String selectLimit){
-        if(!FileUtil.IsDirectory(dir)||!FileUtil.Exists(dir))
+        if(!FileUtil.Exists(dir)&&!FileUtil.Mkdirs(dir)&&!FileUtil.IsDirectory(dir))
             throw new TCMException("the '"+dir+"' is not exist,you should make sure the Directory Path can reach.");
         CommandGenerate sourceCom = getCommandGenerate(sourceConfig.getDataSourceType());
         CommandGenerate cloneCom = getCommandGenerate(cloneConfig.getDataSourceType());

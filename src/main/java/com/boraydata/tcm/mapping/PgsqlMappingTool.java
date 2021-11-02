@@ -153,6 +153,11 @@ public class PgsqlMappingTool implements MappingTool {
      */
     @Override
     public Table createCloneMappingTable(Table table) {
+        return createCloneMappingTable(table,table.getTablename());
+    }
+
+    @Override
+    public Table createCloneMappingTable(Table table, String tableName) {
         Table cloneTable = table.clone();
         List<Column> sourceCols = cloneTable.getColumns();
         List<Column> cloneCols = new LinkedList<>();
@@ -165,9 +170,9 @@ public class PgsqlMappingTool implements MappingTool {
         cloneTable.setSchemaname(null);
         cloneTable.setColumns(cloneCols);
         cloneTable.setDataSourceType(DataSourceType.POSTGRES);
+        cloneTable.setTablename(tableName);
         return cloneTable;
     }
-
 
 
     /**

@@ -1,6 +1,8 @@
 package com.boraydata.tcm.command;
 
 import com.boraydata.tcm.configuration.DatabaseConfig;
+import com.boraydata.tcm.core.DataTypeMapping;
+import com.boraydata.tcm.entity.Column;
 import com.boraydata.tcm.entity.Table;
 
 
@@ -51,6 +53,10 @@ public class MysqlCommandGenerate implements CommandGenerate{
 
     @Override
     public String exportCommand(DatabaseConfig config, String filePath, Table table, String delimiter, String limit) {
+        for (Column column : table.getColumns()){
+                if(column.getDataType().equals("bit(1)") || column.getDataTypeMapping() == DataTypeMapping.BYTES)
+                    return ExportByMysqlCli(config,filePath,table.getTablename(),delimiter);
+        }
         return completeExportCommand(getConnectCommand(config),filePath,table.getTablename(),delimiter);
     }
 
@@ -62,13 +68,20 @@ public class MysqlCommandGenerate implements CommandGenerate{
 
     public String LoadByMysqlCli(DatabaseConfig config,String filePath, String tableName, String delimiter){
 //mysql -h 192.168.30.200 -P 3306 -uroot -proot --database test_db -e "load data local infile '/usr/local/lineitem_1_limit_10.csv' into table lineitem fields terminated by ',' lines terminated by '\n';"
-
         return String.format("mysql -h "+config.getHost()+" -P "+config.getPort()+" -u"+config.getUsername()+" -p"+config.getPassword()+" --database "+config.getDatabasename()+" -e \"load data local infile '%s' into table %s fields terminated by '%s' ;\""
                 ,filePath
                 ,tableName
                 ,delimiter);
-
     }
+    public String ExportByMysqlCli(DatabaseConfig config,String filePath, String tableName, String delimiter){
+// mysql -h 192.168.30.200 -P 3306 -uroot -proot --database test_db -sN -e "select * from lineitem_1 limit 10"  | sed 's/"/""/g;s/\t/,/g;s/\n//g' > /usr/local/lineitem_1_limit_10.csv
+        return String.format("mysql -h "+config.getHost()+" -P "+config.getPort()+" -u"+config.getUsername()+" -p"+config.getPassword()+" --database "+config.getDatabasename()+" --binary-as-hex -sN -e \"select * from %s;\" " +
+                        "| sed 's/\"/\"\"/g;s/\\t/%s/g;s/\\n//g' > %s"
+                ,tableName
+                ,delimiter
+                ,filePath);
+    }
+
 
 
 }

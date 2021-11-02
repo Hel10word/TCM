@@ -12,6 +12,8 @@ public interface MappingTool {
     Table createSourceMappingTable(Table table);
     // Create a new mapping table
     Table createCloneMappingTable(Table table);
+    // Create a new mapping table
+    Table createCloneMappingTable(Table table,String tableName);
     // According to the table generate SQL
     String getCreateTableSQL(Table table);
 

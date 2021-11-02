@@ -40,9 +40,9 @@ public class GetTableInfoByJDBCMetadataTest {
             .setPassword("postgres")
             .create();
 
-    String tableName = "domain_types_pgsql";
-//    DatabaseConfig config = mysqlConfig;
-    DatabaseConfig config = pgsqlConfig;
+    String tableName = "numeric_types_mysql";
+    DatabaseConfig config = mysqlConfig;
+//    DatabaseConfig config = pgsqlConfig;
     @Test
     public void test(){
         showTableInfo(config,tableName);

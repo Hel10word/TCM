@@ -25,6 +25,11 @@ public class SparkMappingTool implements MappingTool {
 //    TCM Type to Spark
     @Override
     public Table createCloneMappingTable(Table table) {
+        return createCloneMappingTable(table,table.getTablename());
+    }
+
+    @Override
+    public Table createCloneMappingTable(Table table, String tableName) {
         Table cloneTable = table.clone();
         List<Column> sourceCols = cloneTable.getColumns();
         List<Column> cloneCols = new LinkedList<>();
@@ -37,6 +42,7 @@ public class SparkMappingTool implements MappingTool {
         cloneTable.setSchemaname(null);
         cloneTable.setColumns(cloneCols);
         cloneTable.setDataSourceType(DataSourceType.SPARK);
+        cloneTable.setTablename(tableName);
         return cloneTable;
     }
 

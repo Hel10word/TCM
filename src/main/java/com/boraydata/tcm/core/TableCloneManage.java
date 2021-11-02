@@ -117,6 +117,10 @@ public class TableCloneManage {
     }
 
     // Clone Table
+    public Table mappingCloneTable(Table table,String tableName){
+        return cloneMappingTool.createCloneMappingTable(table,tableName);
+    }
+    // Clone Table
     public Table mappingCloneTable(Table table){
         return cloneMappingTool.createCloneMappingTable(table);
     }
