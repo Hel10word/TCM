@@ -7,11 +7,11 @@ package com.boraydata.tcm.core;
 class DataTypeMappingTest {
 
     public static void main(String[] args) {
-        System.out.println(DataTypeMapping.BOOLEAN);
-        System.out.println(DataTypeMapping.BOOLEAN.name());
-        System.out.println(DataTypeMapping.BOOLEAN.value);
-        System.out.println(DataTypeMapping.BOOLEAN.getOutDataType(DataSourceType.MYSQL));
-        System.out.println(DataTypeMapping.BOOLEAN.getOutDataType(DataSourceType.POSTGRES));
+        System.out.println(TableCloneManageType.BOOLEAN);
+        System.out.println(TableCloneManageType.BOOLEAN.name());
+        System.out.println(TableCloneManageType.BOOLEAN.value);
+        System.out.println(TableCloneManageType.BOOLEAN.getOutDataType(DataSourceType.MYSQL));
+        System.out.println(TableCloneManageType.BOOLEAN.getOutDataType(DataSourceType.POSTGRES));
     }
 
 }

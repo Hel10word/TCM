@@ -8,13 +8,11 @@ import com.boraydata.tcm.entity.Table;
  */
 public interface MappingTool {
 
-    // Complete the Table.columns.DataTypeMapping
+    // Complete the Table.columns.TableCloneManageType。
     Table createSourceMappingTable(Table table);
     // Create a new mapping table
     Table createCloneMappingTable(Table table);
-    // Create a new mapping table
-    Table createCloneMappingTable(Table table,String tableName);
-    // According to the table generate SQL
+    // According to the table generate SQL Statement
     String getCreateTableSQL(Table table);
 
 }

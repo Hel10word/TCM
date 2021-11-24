@@ -3,6 +3,8 @@ package com.boraydata.tcm.utils;
 import com.boraydata.tcm.core.DataSourceType;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -19,8 +21,8 @@ class StringUtilTest {
     }
 
     @Test
-    public void testString(){
-        System.out.println(DataSourceType.SPARK.toString());
+    public void testSearchArray(){
+        System.out.println(Arrays.binarySearch(new String[]{"asd","Asd"},"Asd"));
     }
 
 

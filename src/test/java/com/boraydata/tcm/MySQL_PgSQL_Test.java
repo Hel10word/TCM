@@ -80,13 +80,13 @@ public class MySQL_PgSQL_Test {
                 .create();
         TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmContext);
 
-        Table sourceTable = tcm.getSourceTable(tableName);
+        Table sourceTable = tcm.createSourceMappingTable(tableName);
 
-        Table cloneTable = tcm.mappingCloneTable(sourceTable);
+        Table cloneTable = tcm.createCloneTable(sourceTable);
 
         cloneTable.setTablename(tableName);
 
-        boolean flag = tcm.createTableInCloneDatasource(cloneTable);
+        boolean flag = tcm.createTableInDatasource();
         if(flag)
             System.out.println("create "+tableName+" Success");
         else

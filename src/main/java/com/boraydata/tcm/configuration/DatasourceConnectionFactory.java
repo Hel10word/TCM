@@ -2,17 +2,16 @@ package com.boraydata.tcm.configuration;
 
 import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.exception.TCMException;
-import com.boraydata.tcm.configuration.DatabaseConfig;
 
 import java.sql.*;
-import java.util.Properties;
+import java.util.*;
 
 /** Used to create some database connection objects
  * @author bufan
  * @data 2021/8/25
  */
 public class DatasourceConnectionFactory {
-    static Properties dscPropers = null;
+    static Properties dscPropers;
     // define create datasource info
     static {
         dscPropers = new Properties();
@@ -48,9 +47,37 @@ public class DatasourceConnectionFactory {
         throw new IllegalStateException("DatasourceConnectionFactory Is Utility Class");
     }
 
+    public static String getJDBCUrl(DatabaseConfig databaseConfig){
+        if (databaseConfig.getUrl() != null)
+            return databaseConfig.getUrl();
+        StringBuilder url = new StringBuilder();
+//        DataSourceType dataSourceType = databaseConfig.getDataSourceType();
+        String dbType = databaseConfig.getDataSourceType().toString();
+        if(DataSourceType.HUDI.toString().equals(dbType))
+            dbType = "SPARK";
+        url.append(dscPropers.getProperty(dbType));
+        // get hostname、port      e.g:  192.168.1.1、3306
+        if(databaseConfig.getHost() != null && databaseConfig.getPort() != null){
+            url.append(databaseConfig.getHost());
+            url.append(":");
+            url.append(databaseConfig.getPort());
+        }else
+            throw new TCMException("Create JDBCUrl error,pls check host and port.");
+
+        // Add different rules    e.g:   "/" or "//"
+        url.append(dscPropers.getProperty(dbType + "_TAIL"));
+
+        // get connection databaseName
+        if (databaseConfig.getDatabasename()!=null)
+            url.append(databaseConfig.getDatabasename());
+        if(DataSourceType.MYSQL.toString().equals(dbType))
+            url.append("?useSSL=false");
+
+        return url.toString();
+    }
+
     // use DatabaseConfig to create connection
     public static Connection createDataSourceConnection(DatabaseConfig databaseConfig){
-        StringBuilder url = new StringBuilder();
         Driver driver = null;
         Properties properties = new Properties();
         // appending user
@@ -62,40 +89,18 @@ public class DatasourceConnectionFactory {
             properties.put("password",databaseConfig.getPassword());
 
         DataSourceType dataSourceType = databaseConfig.getDataSourceType();
-        if(databaseConfig.getUrl() == null){
-            // get connect protocol   e.g: jdbc:mysql://
-            url.append(dscPropers.getProperty(dataSourceType.toString()));
-            // get hostname、port      e.g:  192.168.1.1、3306
-            if(databaseConfig.getHost() != null && databaseConfig.getPort() != null){
-                url.append(databaseConfig.getHost());
-                url.append(":");
-                url.append(databaseConfig.getPort());
-            }else
-                throw new TCMException("Create Datasource info error");
 
-            // Add different rules    e.g:   "/" or "//"
-            url.append(dscPropers.getProperty(dataSourceType.toString() + "_TAIL"));
-
-
-            // get connection databaseName
-            if (databaseConfig.getDatabasename()!=null)
-                url.append(databaseConfig.getDatabasename());
-            if(dataSourceType == DataSourceType.MYSQL)
-                url.append("?useSSL=false");
-
-        }else
-            url.append(databaseConfig.getUrl());
-
-
+        String jdbcUrl = getJDBCUrl(databaseConfig);
         if (databaseConfig.getUrl() == null)
-            databaseConfig.setUrl(url.toString());
+            databaseConfig.setUrl(jdbcUrl);
+
         // Get the load path of the driver
         try {
             Class<?> aClass = Class.forName(databaseConfig.getDriver() != null
                     ? databaseConfig.getDriver()
                     : dscPropers.getProperty(dataSourceType.toString() + "_Driver"));
             driver = (Driver)aClass.newInstance();
-            return driver.connect(url.toString(),properties);
+            return driver.connect(jdbcUrl,properties);
         }catch (ClassNotFoundException e){
             // in Class.forName()
             throw new TCMException("Create datasource connection fail,Please make sure to find the correct driver !!!",e);
@@ -109,14 +114,23 @@ public class DatasourceConnectionFactory {
     }
 
     // execute the SQL and return the result set
-    public static ResultSet executeQuerySQL(DatabaseConfig databaseConfig, String sql){
-        ResultSet resultSet = null;
+    public static List executeQuerySQL(DatabaseConfig databaseConfig, String sql){
+        List list = new LinkedList();
         try(
                 Connection conn = createDataSourceConnection(databaseConfig);
-                Statement statement = conn.createStatement();
+                Statement statement = conn.createStatement()
         ) {
-            resultSet = statement.executeQuery(sql);
-            return statement.executeQuery(sql);
+            ResultSet rs = statement.executeQuery(sql);
+            ResultSetMetaData md = rs.getMetaData();
+            int columnCount = md.getColumnCount();
+            System.out.println("columnCount:"+columnCount);
+            while (rs.next()){
+                Map rowData = new LinkedHashMap();
+                for (int i = 1;i <= columnCount;i++)
+                    rowData.put(md.getColumnName(i),rs.getString(i));
+                list.add(rowData);
+            }
+            return list;
         }catch (SQLException e){
             throw new TCMException("executeQuery is fail, in "+databaseConfig.getUrl());
         }

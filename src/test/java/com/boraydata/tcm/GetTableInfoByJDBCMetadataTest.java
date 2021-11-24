@@ -4,7 +4,6 @@ import com.boraydata.tcm.configuration.DatabaseConfig;
 import com.boraydata.tcm.configuration.DatasourceConnectionFactory;
 import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.core.TableCloneManage;
-import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.mapping.MappingTool;
 import com.boraydata.tcm.mapping.MappingToolFactory;
 import org.junit.jupiter.api.Test;
@@ -40,7 +39,7 @@ public class GetTableInfoByJDBCMetadataTest {
             .setPassword("postgres")
             .create();
 
-    String tableName = "numeric_types_mysql";
+    String tableName = "string_types_mysql";
     DatabaseConfig config = mysqlConfig;
 //    DatabaseConfig config = pgsqlConfig;
     @Test
@@ -50,7 +49,7 @@ public class GetTableInfoByJDBCMetadataTest {
         System.out.println();
         MappingTool tool = MappingToolFactory.create(config.getDataSourceType());
         assert tool != null;
-        tool.createSourceMappingTable(tcm.getDatabaseTable(config,tableName)).getTableInfo();
+        tool.createSourceMappingTable(tcm.getSourceTableByTablename(config,tableName)).outTableInfo();
     }
 
 
@@ -69,7 +68,9 @@ public class GetTableInfoByJDBCMetadataTest {
                 String columnName = colRet.getString("COLUMN_NAME");
                 String columnType = colRet.getString("TYPE_NAME");
                 int datasize = colRet.getInt("COLUMN_SIZE");
-                System.out.printf("COLUMN_NAME:%-20s TYPE_NAME:%-20s COLUMN_SIZE:%-10d\n",columnName,columnType,datasize);
+                int decimal_digits = colRet.getInt("DECIMAL_DIGITS");
+                int num_prec_radix = colRet.getInt("NUM_PREC_RADIX");
+                System.out.printf("COLUMN_NAME:%-20s TYPE_NAME:%-20s COLUMN_SIZE:%-10d DECIMAL_DIGITS:%-10d NUM_PREC_RADIX:%-10d\n",columnName,columnType,datasize,decimal_digits,num_prec_radix);
             }
         } catch (SQLException e) {
             e.printStackTrace();

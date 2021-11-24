@@ -24,14 +24,6 @@ public class Table implements Cloneable {
     public Table() {
     }
 
-    public Table(DataSourceType dataSourceType, String catalogname, String schemaname, String tablename, List<Column> columns) {
-        this.dataSourceType = dataSourceType;
-        this.catalogname = catalogname;
-        this.schemaname = schemaname;
-        this.tablename = tablename;
-        this.columns = columns;
-    }
-
     public DataSourceType getDataSourceType() {
         return dataSourceType;
     }
@@ -76,8 +68,8 @@ public class Table implements Cloneable {
         this.columns = columns;
         return this;
     }
-    public void getTableInfo(){
-        System.out.println("DataSourceType:"+this.dataSourceType.toString()+"\n"
+    public void outTableInfo(){
+        System.out.println("DataSourceType:"+this.dataSourceType+"\n"
         +"CatalogName:"+this.catalogname+"\n"
         +"SchemaName:"+this.schemaname+"\n"
         +"TableName:"+this.tablename+"\n========== columns info ============="
@@ -101,10 +93,12 @@ public class Table implements Cloneable {
         Table table = null;
         try {
             table = (Table) super.clone();
-            List<Column> cloneList = new LinkedList<>();;
+            List<Column> cloneList = new LinkedList<>();
             for(Column column : columns)
-                cloneList.add((Column) column.clone());
+                cloneList.add(column.clone());
             table.setColumns(cloneList);
+            table.setCatalogname(null);
+            table.setSchemaname(null);
         }catch (CloneNotSupportedException e){
             e.printStackTrace();
         }

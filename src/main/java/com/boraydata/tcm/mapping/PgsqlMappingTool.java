@@ -1,14 +1,15 @@
 package com.boraydata.tcm.mapping;
 
 import com.boraydata.tcm.core.DataSourceType;
-import com.boraydata.tcm.core.DataTypeMapping;
+import com.boraydata.tcm.core.TableCloneManageType;
 import com.boraydata.tcm.entity.Column;
 import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.exception.TCMException;
 import com.boraydata.tcm.utils.StringUtil;
+import com.sun.prism.PixelFormat;
 
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,108 +20,106 @@ import java.util.Map;
  */
 public class PgsqlMappingTool implements MappingTool {
 
-    static Map<String, DataTypeMapping> mappingMap = new HashMap<>();
+    static Map<String, TableCloneManageType> mappingMap = new HashMap<>();
     static {
-        mappingMap.put("BOOLEAN",DataTypeMapping.BOOLEAN);
-        mappingMap.put("BIT(1)",DataTypeMapping.BYTES);
-        mappingMap.put("BIT(>1)",DataTypeMapping.BYTES);
-        mappingMap.put("SMALLINT",DataTypeMapping.INT16);
-        mappingMap.put("SMALLSERIAL",DataTypeMapping.INT16);
-        mappingMap.put("INTEGER",DataTypeMapping.INT32);
-        mappingMap.put("SERIAL",DataTypeMapping.INT32);
-        mappingMap.put("BIGINT",DataTypeMapping.INT64);
-        mappingMap.put("BIGSERIAL",DataTypeMapping.INT64);
-        mappingMap.put("REAL",DataTypeMapping.FLOAT32);
-        mappingMap.put("DOUBLE",DataTypeMapping.FLOAT64);
-        mappingMap.put("PRECISION",DataTypeMapping.FLOAT64);
-        mappingMap.put("CHAR",DataTypeMapping.STRING);
-        mappingMap.put("VARCHAR",DataTypeMapping.STRING);
-        mappingMap.put("CHARACTER",DataTypeMapping.STRING);
-        mappingMap.put("CHARACTERVARYING",DataTypeMapping.STRING);
+        mappingMap.put("BOOLEAN", TableCloneManageType.BOOLEAN);
+        mappingMap.put("SMALLINT", TableCloneManageType.INT16);
+        mappingMap.put("SMALLSERIAL", TableCloneManageType.INT16);
+        mappingMap.put("INTEGER", TableCloneManageType.INT32);
+        mappingMap.put("SERIAL", TableCloneManageType.INT32);
+        mappingMap.put("BIGINT", TableCloneManageType.INT64);
+        mappingMap.put("BIGSERIAL", TableCloneManageType.INT64);
+        mappingMap.put("REAL", TableCloneManageType.FLOAT32);
+        mappingMap.put("DOUBLE", TableCloneManageType.FLOAT64);
+        mappingMap.put("PRECISION", TableCloneManageType.FLOAT64);
+        mappingMap.put("CHAR", TableCloneManageType.STRING);
+        mappingMap.put("VARCHAR", TableCloneManageType.STRING);
+        mappingMap.put("CHARACTER", TableCloneManageType.STRING);
+        mappingMap.put("CHARACTERVARYING", TableCloneManageType.STRING);
 
         /*
          * TIME(1) and TIME(6) is not distinguished, so default is INT64;
          * */
-        mappingMap.put("TIMESTAMP",DataTypeMapping.TIMESTAMP);
-        mappingMap.put("TIMESTAMPWITHTIMEZONE",DataTypeMapping.TIMESTAMP);
-        mappingMap.put("TIMESTAMPWITHOUTTIMEZONE",DataTypeMapping.TIMESTAMP);
+        mappingMap.put("TIMESTAMP", TableCloneManageType.TIMESTAMP);
+        mappingMap.put("TIMESTAMPWITHTIMEZONE", TableCloneManageType.TIMESTAMP);
+        mappingMap.put("TIMESTAMPWITHOUTTIMEZONE", TableCloneManageType.TIMESTAMP);
 
 
-        mappingMap.put("TIME",DataTypeMapping.TIME);
-        mappingMap.put("TIMEWITHTIMEZONE",DataTypeMapping.TIME);
-        mappingMap.put("TIMEWITHOUTTIMEZONE",DataTypeMapping.TIME);
+        mappingMap.put("TIME", TableCloneManageType.TIME);
+        mappingMap.put("TIMEWITHTIMEZONE", TableCloneManageType.TIME);
+        mappingMap.put("TIMEWITHOUTTIMEZONE", TableCloneManageType.TIME);
 
-        mappingMap.put("INTERVAL",DataTypeMapping.STRING);
+        mappingMap.put("INTERVAL", TableCloneManageType.STRING);
 
-        mappingMap.put("BYTEA",DataTypeMapping.BYTES);
-        mappingMap.put("JSON",DataTypeMapping.TEXT);
-        mappingMap.put("JSONB",DataTypeMapping.TEXT);
-        mappingMap.put("XML",DataTypeMapping.TEXT);
-        mappingMap.put("UUID",DataTypeMapping.STRING);
-        mappingMap.put("POINT",DataTypeMapping.STRING);
-        mappingMap.put("LTREE",DataTypeMapping.STRING);
-        mappingMap.put("CITEXT",DataTypeMapping.STRING);
-        mappingMap.put("INET",DataTypeMapping.STRING);
-        mappingMap.put("INT4RANGE",DataTypeMapping.STRING);
-        mappingMap.put("INT8RANGE",DataTypeMapping.STRING);
-        mappingMap.put("NUMRANGE",DataTypeMapping.STRING);
-        mappingMap.put("TSRANGE",DataTypeMapping.STRING);
-        mappingMap.put("TSTZRANGE",DataTypeMapping.STRING);
-        mappingMap.put("DATERANGE",DataTypeMapping.STRING);
-        mappingMap.put("ENUM",DataTypeMapping.STRING);
+        mappingMap.put("BYTEA", TableCloneManageType.BYTES);
+        mappingMap.put("JSON", TableCloneManageType.TEXT);
+        mappingMap.put("JSONB", TableCloneManageType.TEXT);
+        mappingMap.put("XML", TableCloneManageType.TEXT);
+        mappingMap.put("UUID", TableCloneManageType.STRING);
+        mappingMap.put("POINT", TableCloneManageType.STRING);
+        mappingMap.put("LTREE", TableCloneManageType.STRING);
+        mappingMap.put("CITEXT", TableCloneManageType.STRING);
+        mappingMap.put("INET", TableCloneManageType.STRING);
+        mappingMap.put("INT4RANGE", TableCloneManageType.STRING);
+        mappingMap.put("INT8RANGE", TableCloneManageType.STRING);
+        mappingMap.put("NUMRANGE", TableCloneManageType.STRING);
+        mappingMap.put("TSRANGE", TableCloneManageType.STRING);
+        mappingMap.put("TSTZRANGE", TableCloneManageType.STRING);
+        mappingMap.put("DATERANGE", TableCloneManageType.STRING);
+        mappingMap.put("ENUM", TableCloneManageType.STRING);
 
-        mappingMap.put("DATE",DataTypeMapping.DATE);
+        mappingMap.put("DATE", TableCloneManageType.DATE);
 
 
 
         /*
         * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#decimal-values
         * */
-        mappingMap.put("NUMERIC",DataTypeMapping.DECIMAL);
-        mappingMap.put("DECIMAL",DataTypeMapping.DECIMAL);
+        mappingMap.put("NUMERIC", TableCloneManageType.DECIMAL);
+        mappingMap.put("DECIMAL", TableCloneManageType.DECIMAL);
 
 
         /*
          * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#hstore-values
          * */
-        mappingMap.put("HSTORE",DataTypeMapping.STRING);
+        mappingMap.put("HSTORE", TableCloneManageType.STRING);
 
         /*
          * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#network-address-types
          * */
-        mappingMap.put("INET",DataTypeMapping.STRING);
-        mappingMap.put("CIDR",DataTypeMapping.STRING);
-        mappingMap.put("MACADDR",DataTypeMapping.STRING);
-        mappingMap.put("MACADDR8",DataTypeMapping.STRING);
+        mappingMap.put("INET", TableCloneManageType.STRING);
+        mappingMap.put("CIDR", TableCloneManageType.STRING);
+        mappingMap.put("MACADDR", TableCloneManageType.STRING);
+        mappingMap.put("MACADDR8", TableCloneManageType.STRING);
 
         /*
          * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#_postgis_types
          * */
-        mappingMap.put("GEOMETRY",DataTypeMapping.STRUCT);
+        mappingMap.put("GEOMETRY", TableCloneManageType.STRUCT);
 
 
         /*
          * The following are self-defined
          * If have other data types that need to be mapped, please define below
          * */
-        mappingMap.put("BIT",DataTypeMapping.BYTES);
-        mappingMap.put("BOX",DataTypeMapping.STRUCT);
-        mappingMap.put("CIRCLE",DataTypeMapping.STRUCT);
-        mappingMap.put("DOUBLEPRECISION",DataTypeMapping.FLOAT64);
-        mappingMap.put("LINE",DataTypeMapping.STRUCT);
-        mappingMap.put("LSEG",DataTypeMapping.STRUCT);
-        mappingMap.put("MONEY",DataTypeMapping.MONEY);
-        mappingMap.put("PATH",DataTypeMapping.STRUCT);
-        mappingMap.put("TEXT",DataTypeMapping.TEXT);
-        mappingMap.put("POLYGON",DataTypeMapping.STRING);
+        mappingMap.put("BIT", TableCloneManageType.BYTES);
+        mappingMap.put("BOX", TableCloneManageType.STRUCT);
+        mappingMap.put("CIRCLE", TableCloneManageType.STRUCT);
+        mappingMap.put("DOUBLEPRECISION", TableCloneManageType.FLOAT64);
+        mappingMap.put("LINE", TableCloneManageType.STRUCT);
+        mappingMap.put("LSEG", TableCloneManageType.STRUCT);
+        mappingMap.put("MONEY", TableCloneManageType.MONEY);
+        mappingMap.put("PATH", TableCloneManageType.STRUCT);
+        mappingMap.put("TEXT", TableCloneManageType.TEXT);
+        mappingMap.put("POLYGON", TableCloneManageType.STRING);
 
-        mappingMap.put("TSQUERY",DataTypeMapping.TEXT);
-        mappingMap.put("TSVECTOR",DataTypeMapping.TEXT);
-        mappingMap.put("TXID_SNAPSHOT",DataTypeMapping.STRUCT);
+        mappingMap.put("TSQUERY", TableCloneManageType.TEXT);
+        mappingMap.put("TSVECTOR", TableCloneManageType.TEXT);
+        mappingMap.put("TXID_SNAPSHOT", TableCloneManageType.STRUCT);
 
-        mappingMap.put("BITVARYING",DataTypeMapping.BYTES);
+        mappingMap.put("BITVARYING", TableCloneManageType.BYTES);
 
-        mappingMap.put("ARRAY",DataTypeMapping.TEXT);
+        mappingMap.put("ARRAY", TableCloneManageType.TEXT);
     }
 
 
@@ -135,11 +134,15 @@ public class PgsqlMappingTool implements MappingTool {
         for (Column column : columns){
             if (StringUtil.isNullOrEmpty(column.getDataType()))
                 throw new TCMException("not found DataType value in "+column.getColumnInfo());
-            DataTypeMapping relation = StringUtil.findRelation(mappingMap,column.getDataType(),null);
+            TableCloneManageType relation = StringUtil.findRelation(mappingMap,column.getDataType(),null);
 //            if (relation == null){
 //                    throw new TCMException("not found DataType relation in "+column.getColumnInfo());
 //            }
-            column.setDataTypeMapping(relation);
+            column.setTableCloneManageType(relation);
+            if(relation.equals(TableCloneManageType.MONEY))
+                column.setNumericPrecisionM(65).setNumericPrecisionD(2);
+            if(relation.equals(TableCloneManageType.BOOLEAN))
+                column.setCharMaxLength(1L);
         }
         table.setColumns(columns);
         return table;
@@ -147,30 +150,22 @@ public class PgsqlMappingTool implements MappingTool {
 
 
     /**
-     * return table provides the mapping table to the PgSQL data type, according "*.core.DataTypeMapping"
+     * return table provides the mapping table to the PgSQL data type, according "*.core.TableCloneManageType"
      * @Param null :    table={...,MYSQL,..,columns={...,...,col_int,DataType=mediumint,dataTypeMapping=INT32}}
      * @Return: null :  table={null,PGSQL,..,columns={null,null,col_int,DataType=INT,dataTypeMapping=INT32}}
      */
-    @Override
-    public Table createCloneMappingTable(Table table) {
-        return createCloneMappingTable(table,table.getTablename());
-    }
+//    @Override
+//    public Table createCloneMappingTable(Table table) {
+//        return createCloneMappingTable(table,table.getTablename());
+//    }
 
     @Override
-    public Table createCloneMappingTable(Table table, String tableName) {
+    public Table createCloneMappingTable(Table table) {
         Table cloneTable = table.clone();
-        List<Column> sourceCols = cloneTable.getColumns();
-        List<Column> cloneCols = new LinkedList<>();
-        for (Column col : sourceCols){
-            Column c = col.clone();
-            c.setDataType(col.getDataTypeMapping().getOutDataType(DataSourceType.POSTGRES));
-            cloneCols.add(c);
+        for (Column col : cloneTable.getColumns()){
+            col.setDataType(col.getTableCloneManageType().getOutDataType(DataSourceType.POSTGRES));
         }
-        cloneTable.setCatalogname(null);
-        cloneTable.setSchemaname(null);
-        cloneTable.setColumns(cloneCols);
         cloneTable.setDataSourceType(DataSourceType.POSTGRES);
-        cloneTable.setTablename(tableName);
         return cloneTable;
     }
 
@@ -202,7 +197,25 @@ public class PgsqlMappingTool implements MappingTool {
             if(column.getDataType() == null)
                 throw new TCMException("Create Table SQL is fail,Because unable use null datatype:"+column.getColumnInfo());
             stringBuilder.append(column.getColumnName()).append(" ").append(column.getDataType());
-            if (Boolean.FALSE.equals(column.isNullAble()))
+//            if (Arrays.binarySearch(new String[]{"bin","bit varying","character","character varying"},column.getDataType()) >= 0)
+            if (
+                    "bit".equalsIgnoreCase(column.getDataType()) ||
+                    "bit varying".equalsIgnoreCase(column.getDataType()) ||
+                    "character".equalsIgnoreCase(column.getDataType()) ||
+                    "character varying".equalsIgnoreCase(column.getDataType())
+            )
+                stringBuilder.append("("+column.getCharMaxLength()+")");
+            if ("numeric".equalsIgnoreCase(column.getDataType())){
+                if(column.getNumericPrecisionM()>0){
+                    stringBuilder.append("("+column.getNumericPrecisionM());
+                    if(column.getNumericPrecisionD()>0)
+                        stringBuilder.append(","+column.getNumericPrecisionD());
+                    stringBuilder.append(")");
+
+                }
+            }
+
+            if (Boolean.FALSE.equals(column.getNullAble()))
                 stringBuilder.append(" NOT NULL");
             stringBuilder.append("\n,");
         }

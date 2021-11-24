@@ -1,6 +1,7 @@
 package com.boraydata.tcm.entity;
 
-import com.boraydata.tcm.core.DataTypeMapping;
+import com.boraydata.tcm.core.DataSourceType;
+import com.boraydata.tcm.core.TableCloneManageType;
 
 
 /** 用来记录一些列的信息
@@ -8,10 +9,11 @@ import com.boraydata.tcm.core.DataTypeMapping;
  * @data 2021/8/25
  */
 public class Column implements Cloneable {
-
+    // 数据库类型
+    private DataSourceType dataSourceType;
     // Catalog
     private String TableCatalog;
-    //表的 Schema
+    // Schema
     private String TableSchema;
     // 表名
     private String TableName;
@@ -21,23 +23,40 @@ public class Column implements Cloneable {
     private String DataType;
     // 字段所在位置
     private Integer OrdinalPosition;
+    // Char 类型的 长度
+    private Long CharMaxLength;
+    // numeric 类型的长度
+    private Integer NumericPrecisionM;
+    // numeric 类型的精度
+    private Integer NumericPrecisionD;
+    // time 类型的精度
+    private Integer DatetimePrecision;
     // 字段是否允许为空
     private Boolean IsNullAble;
     // 映射到内部的字段
-    private DataTypeMapping dataTypeMapping;
+    private TableCloneManageType tableCloneManageType;
 
     public Column() {}
 
-    public DataTypeMapping getDataTypeMapping() {
-        return dataTypeMapping;
+    public DataSourceType getDataSourceType() {
+        return dataSourceType;
+    }
+
+    public Column setDataSourceType(DataSourceType dataSourceType) {
+        this.dataSourceType = dataSourceType;
+        return this;
+    }
+
+    public TableCloneManageType getTableCloneManageType() {
+        return tableCloneManageType;
     }
 
     public String getColumnInfo(){
         return this.TableCatalog+"."+this.TableSchema+"."+this.TableName+"  col: "+this.ColumnName+"  type:"+this.DataType;
     }
 
-    public Column setDataTypeMapping(DataTypeMapping dataTypeMapping) {
-        this.dataTypeMapping = dataTypeMapping;
+    public Column setTableCloneManageType(TableCloneManageType tableCloneManageType) {
+        this.tableCloneManageType = tableCloneManageType;
         return this;
     }
 
@@ -95,7 +114,7 @@ public class Column implements Cloneable {
         return this;
     }
 
-    public Boolean isNullAble() {
+    public Boolean getNullAble() {
         return IsNullAble;
     }
 
@@ -104,29 +123,74 @@ public class Column implements Cloneable {
         return this;
     }
 
+    public Long getCharMaxLength() {
+        return CharMaxLength;
+    }
+
+    public Column setCharMaxLength(Long charMaxLength) {
+        CharMaxLength = charMaxLength;
+        return this;
+    }
+
+    public Integer getNumericPrecisionM() {
+        return NumericPrecisionM;
+    }
+
+    public Column setNumericPrecisionM(Integer numericPrecisionM) {
+        NumericPrecisionM = numericPrecisionM;
+        return this;
+    }
+
+    public Integer getNumericPrecisionD() {
+        return NumericPrecisionD;
+    }
+
+    public Column setNumericPrecisionD(Integer numericPrecisionD) {
+        NumericPrecisionD = numericPrecisionD;
+        return this;
+    }
+
+    public Integer getDatetimePrecision() {
+        return DatetimePrecision;
+    }
+
+    public Column setDatetimePrecision(Integer datetimePrecision) {
+        DatetimePrecision = datetimePrecision;
+        return this;
+    }
+
+
     @Override
     public String toString() {
         return "Column{" +
-                "Catalog='" + TableCatalog + '\'' +
-                ", Schema='" + TableSchema + '\'' +
+                "dataSourceType=" + dataSourceType +
+                ", TableCatalog='" + TableCatalog + '\'' +
+                ", TableSchema='" + TableSchema + '\'' +
                 ", TableName='" + TableName + '\'' +
                 ", ColumnName='" + ColumnName + '\'' +
                 ", DataType='" + DataType + '\'' +
-                ", Position=" + OrdinalPosition +
+                ", OrdinalPosition=" + OrdinalPosition +
+                ", CharMaxLength=" + CharMaxLength +
+                ", NumericPrecisionM=" + NumericPrecisionM +
+                ", NumericPrecisionD=" + NumericPrecisionD +
+                ", DatetimePrecision=" + DatetimePrecision +
                 ", IsNullAble=" + IsNullAble +
-                ", dataTypeMapping=" + dataTypeMapping +
+                ", tableCloneManageType=" + tableCloneManageType +
                 '}';
     }
+
     public void outInfo(){
-        System.out.printf("ColumnName=%-20s DataType=%-20s Position=%-6d dataTypeMapping=%s\n",ColumnName,DataType,OrdinalPosition,dataTypeMapping);
+        System.out.printf("ColumnName=%-20s DataType=%-20s Position=%-4d CharMaxLength=%-10d NumericPrecisionM=%-4d NumericPrecisionD=%-4d DatetimePrecision=%-4d tableCLoneManageType=%s\n",ColumnName,DataType,OrdinalPosition,CharMaxLength,NumericPrecisionM,NumericPrecisionD,DatetimePrecision,tableCloneManageType);
     }
 
     public Column clone(){
         Column column = null;
         try {
             column = (Column) super.clone();
+            column.setDataSourceType(null);
             column.setTableCatalog(null);
             column.setTableSchema(null);
+            column.setTableName(null);
         }catch (CloneNotSupportedException e){
             e.printStackTrace();
         }

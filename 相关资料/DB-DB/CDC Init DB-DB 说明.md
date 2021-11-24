@@ -21,7 +21,7 @@ https://www.postgresql.org/docs/13/datatype-numeric.html
 | smallint         | -32768 to +32767                                             | INT16     | smallint       |
 | integer          | -2147483648 to +2147483647                                   | INT32     | int            |
 | bigint           | -9223372036854775808 to +9223372036854775807                 | INT64     | bigint         |
-| ==decimal==      | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point | 'Decimal' | decimal(65,30) |
+| ==decimal==      | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point | 'Decimal' | decimal        |
 | ==numeric==      | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point | 'Decimal' | decimal(65,30) |
 | real             | 6 decimal digits precision                                   | FLOAT32   | float          |
 | double precision | 15 decimal digits precision                                  | FLOAT64   | double         |
@@ -33,7 +33,6 @@ https://www.postgresql.org/docs/13/datatype-numeric.html
 
 -   decimal 与 numeric 类型 Mapping 到 MySQL DECIMAL(65,30)，若数据整体长度超过65或小数点后面大于30位会存在精度丢失。
 
--   由于 PgSQL 的Metadata 只能获取 Data Type，无法获取精度，则统一将其转换为decimal(65,30)
 
 
 
@@ -110,7 +109,7 @@ https://www.postgresql.org/docs/13/datatype-boolean.html
 
 | PgSQL Data | True/False in PgSQL                                        | TCM Type | MySQL      |
 | ---------- | ---------------------------------------------------------- | -------- | ---------- |
-| boolean    | ('true','yes','on','1',1)=>t;('false','no','off','0',0)=>f | BOOLEAN  | TINYINT(4) |
+| boolean    | ('true','yes','on','1',1)=>t;('false','no','off','0',0)=>f | BOOLEAN  | TINYINT(1) |
 
 [MySQL-boolean]:https://dev.mysql.com/doc/refman/5.7/en/numeric-type-syntax.html
 
@@ -275,7 +274,7 @@ https://www.postgresql.org/docs/13/arrays.html
 | text\[][]      | TEXT     | LONGTEXT |
 | integer\[3][3] | TEXT     | LONGTEXT |
 
--   ColumnName='pgintefer_[]', DataType='ARRAY', Position=2, dataTypeMapping=null
+-   ColumnName='pgintefer_[]', DataType='ARRAY', Position=2, tableCLoneManageType=null
 
 
 根据Metadata查询可得知，如论一维数组还是二维数组，查询结果都为： data_type=ARRAY；所以将其转换为 LONGTEXT 类型。
@@ -447,11 +446,12 @@ https://dev.mysql.com/doc/refman/5.7/en/numeric-types.html
 | DEC              | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
 | FIXED[(M,D)]     | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
 | DOUBLE           | as a synonym for DOUBLE PRECISION                            | FLOAT64  | DOUBLE PRECISION |
-| ==BIT(1)==       |                                                              | BYTES    | BYTES            |
-| ==BIT(M)==       | 1<=M<=64;default 1;                                          | BYTES    | BYTEA            |
+| BIT(M)           | 1<=M<=64;default 1;                                          | BYTES    | BYTES            |
 | TINYINT          | -128 ~ 127                                                   | INT8     | SMALLINT         |
 | MEDIUMINT        | -8388608 ~ 8388607                                           | INT32    | INT              |
 | BIGINT           | -2^63^ （-9223372036854775808）~ 2^63^-1（9223372036854775807） | INT64    | BIGINT           |
+| BOOL             | 0 and 1； the values `TRUE` and `FALSE` are merely aliases for `1` and `0`. | BOOLEAN  | BOOLEAN          |
+| BOOLEAN          | 0 and 1； the values `TRUE` and `FALSE` are merely aliases for `1` and `0`. | BOOLEAN  | BOOLEAN          |
 
 [MySQL-(M,D) ]:https://dev.mysql.com/doc/refman/5.7/en/floating-point-types.html
 
@@ -461,8 +461,7 @@ https://dev.mysql.com/doc/refman/5.7/en/numeric-types.html
 
 the optional (nonstandard) `ZEROFILL` attribute, the default padding of spaces is replaced with zeros. For example, for a column declared as [`INT(4) ZEROFILL`](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html), a value of `5` is retrieved as `0005`.
 
--   [`BOOL`](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html), [`BOOLEAN`](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html) These types are synonyms for [`TINYINT(1)`](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html). A value of zero is considered false. Nonzero values are considered true:
--   ==MySQL BIT(1)==与==MySQL BIT(M)==导出为十六进制 ，写入为PgSQL的BYTEA类型。
+-   [`BOOL`](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html), [`BOOLEAN`](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html) These types are synonyms for [`TINYINT(1)`](https://dev.mysql.com/doc/refman/5.7/en/integer-types.html). A value of zero is considered false. Nonzero values are considered true; [REFER TO](https://dev.mysql.com/doc/refman/5.7/en/numeric-type-syntax.html)
 
 
 
@@ -472,27 +471,19 @@ the optional (nonstandard) `ZEROFILL` attribute, the default padding of spaces i
 
 https://dev.mysql.com/doc/refman/5.7/en/date-and-time-types.html
 
-| MySQL Data         | Range                                                        | TCM Type  | PgSQL     |
-| ------------------ | ------------------------------------------------------------ | --------- | --------- |
-| DATE               | 1000-01-01 ~ 9999-12-31                                      | DATE      | DATE      |
-| ==TIME [fsp]==     | -838:59:59.000000 ~ 838:59:59.000000                         | INT64     | BIGINT    |
-| ==DATETIME [fsp]== | 1000-01-01 00:00:00.000000 ~ 9999-12-31 23:59:59.999999;     | INT64     | BIGINT    |
-| TIMESTAMP [fsp]    | 1970-01-01 00:00:01.000000 UTC ~ 2038-01-19 03:14:07.999999 UTC | TIMESTAMP | TIMESTAMP |
-| YEAR [(4)]         | 1901 ~ 2155 Or 0000                                          | INT32     | INT       |
+| MySQL Data      | Range                                                        | TCM Type  | PgSQL     |
+| --------------- | ------------------------------------------------------------ | --------- | --------- |
+| DATE            | 1000-01-01 ~ 9999-12-31                                      | DATE      | DATE      |
+| TIME [fsp]      | -838:59:59.000000 ~ 838:59:59.000000                         | TIME      | INTERVAL  |
+| DATETIME [fsp]  | 1000-01-01 00:00:00.000000 ~ 9999-12-31 23:59:59.999999;     | TIMESTAMP | TIMESTAMP |
+| TIMESTAMP [fsp] | 1970-01-01 00:00:01.000000 UTC ~ 2038-01-19 03:14:07.999999 UTC | TIMESTAMP | TIMESTAMP |
+| YEAR [(4)]      | 1901 ~ 2155 Or 0000                                          | INT32     | INT       |
 
 -   An optional *`fsp`* value in the range from 0 to 6 may be given to specify fractional seconds precision. A value of 0 signifies that there is no fractional part. If omitted, the default precision is 0.
 
--   在PgSQL中，Time 类型的时间范围 00:00:00 ~ 24:00:00，超出范围无法存储。
-
--   DATETIME in PgSQL not Mapping，因为 范围太大了。
-
--   debezium 中通过 time.precision.mode 的配置信息，将该值转为 微秒值，并存储在 BigInt 中。
 
 
-
-
-
-### string_data_types
+### ==string_data_types==
 
 https://dev.mysql.com/doc/refman/5.7/en/string-types.html
 
@@ -511,7 +502,8 @@ https://dev.mysql.com/doc/refman/5.7/en/string-types.html
 | ENUM              | maximum of 3000 distinct elements,                           | STRING   | TEXT  |
 | SET               | maximum of 3000 distinct elements,                           | STRING   | TEXT  |
 
--   除了二进制，与上面 BIT(1) 的问题一样，导出出现格式错误，其余的数据没有问题。
+-   ==BINARY==、==VARBINARY==、==BLOB==、==MEDIUMBLOB==、==LONGBLOB== 导出为十六进制 ，写入为PgSQL的BYTEA类型。
+    -   即 mysql 的 ’0‘ 导出为 ’0x30‘，写入到 PgSQL 为四个字节，’0‘、’x‘、’3‘、’0‘ 各占一个字节。
 
 
 
@@ -519,22 +511,22 @@ https://dev.mysql.com/doc/refman/5.7/en/string-types.html
 
 
 
-### ==spatial_data_types==
+### spatial_data_types
 
 https://dev.mysql.com/doc/refman/5.7/en/spatial-types.html
 
 | MySQL Data | TCM Type | PgSQL |
 | ---------- | -------- | ----- |
-|     GEOMETRY       | STRUCT | POLYGON |
-|     POINT       | STRUCT | POLYGON |
-|     LINESTRING       | STRUCT | POLYGON |
-|     POLYGON       | STRUCT | POLYGON |
-|     MULTIPOINT       | STRUCT | POLYGON |
-|     MULTILINESTRING       | STRUCT | POLYGON |
-|     MULTIPOLYGON       | STRUCT | POLYGON |
-|     GEOMETRYCOLLECTION       | STRUCT | POLYGON |
+|     GEOMETRY       | TEXT | TEXT |
+|     POINT       | TEXT | TEXT |
+|     LINESTRING       | TEXT | TEXT |
+|     POLYGON       | TEXT | TEXT |
+|     MULTIPOINT       | TEXT | TEXT |
+|     MULTILINESTRING       | TEXT | TEXT |
+|     MULTIPOLYGON       | TEXT | TEXT |
+|     GEOMETRYCOLLECTION       | TEXT | TEXT |
 
--   **暂不支持该数据类型**。
+-   由于不同数据库对，几何数据的支持不同，因此这儿统一转换为字符串。
 
 
 

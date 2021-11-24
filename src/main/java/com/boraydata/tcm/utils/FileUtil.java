@@ -36,6 +36,8 @@ public class FileUtil {
         try {
             if(Exists(path))
                 file.delete();
+            if (!file.getParentFile().exists())
+                file.getParentFile().mkdirs();
             file.createNewFile();
         }catch (IOException e){
             throw new TCMException("Create '"+path+"' failed");

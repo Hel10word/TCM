@@ -2,7 +2,7 @@ package com.boraydata.tcm.mapping;
 
 
 import com.boraydata.tcm.core.DataSourceType;
-import com.boraydata.tcm.core.DataTypeMapping;
+import com.boraydata.tcm.core.TableCloneManageType;
 import com.boraydata.tcm.entity.Column;
 import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.exception.TCMException;
@@ -11,64 +11,70 @@ import com.boraydata.tcm.utils.StringUtil;
 import java.util.*;
 
 /** deal with the mapping relationship between Mysql Type and TCM Type
- * design by https://debezium.io/documentation/reference/1.0/connectors/mysql.html#how-the-mysql-connector-maps-data-types_cdc
+ * design by :
+ * https://debezium.io/documentation/reference/1.0/connectors/mysql.html#how-the-mysql-connector-maps-data-types_cdc
+ * https://dev.mysql.com/doc/refman/5.7/en/data-types.html
  * @author bufan
  * @data 2021/8/31
  */
 public class MysqlMappingTool implements MappingTool {
 
-    static Map<String,DataTypeMapping> mappingMap = new HashMap<>();
+    static Map<String, TableCloneManageType> mappingMap = new HashMap<>();
     static {
-        mappingMap.put("BOOLEAN",DataTypeMapping.BOOLEAN);
-        mappingMap.put("BOOL",DataTypeMapping.BOOLEAN);
-        mappingMap.put("BIT(1)",DataTypeMapping.BYTES);
-        mappingMap.put("BIT(>1)",DataTypeMapping.BYTES);
-        mappingMap.put("BIT",DataTypeMapping.BYTES);
-        mappingMap.put("TINYINT",DataTypeMapping.INT8);
-        mappingMap.put("SMALLINT",DataTypeMapping.INT16);
-        mappingMap.put("MEDIUMINT",DataTypeMapping.INT32);
-        mappingMap.put("INT",DataTypeMapping.INT32);
-        mappingMap.put("INTEGER",DataTypeMapping.INT32);
-        mappingMap.put("BIGINT",DataTypeMapping.INT64);
-        mappingMap.put("REAL",DataTypeMapping.FLOAT64);
-        mappingMap.put("FLOAT",DataTypeMapping.FLOAT64);
-        mappingMap.put("DOUBLE",DataTypeMapping.FLOAT64);
-        mappingMap.put("CHAR",DataTypeMapping.STRING);
-        mappingMap.put("VARCHAR",DataTypeMapping.STRING);
-        mappingMap.put("BINARY",DataTypeMapping.BYTES);
-        mappingMap.put("VARBINARY",DataTypeMapping.BYTES);
-        mappingMap.put("TINYBLOB",DataTypeMapping.BYTES);
-        mappingMap.put("TINYTEXT",DataTypeMapping.STRING);
-        mappingMap.put("BLOB",DataTypeMapping.BYTES);
-        mappingMap.put("TEXT",DataTypeMapping.STRING);
-        mappingMap.put("MEDIUMBLOB",DataTypeMapping.BYTES);
-        mappingMap.put("MEDIUMTEXT",DataTypeMapping.STRING);
-        mappingMap.put("LONGBLOB",DataTypeMapping.BYTES);
-        mappingMap.put("LONGTEXT",DataTypeMapping.STRING);
-        mappingMap.put("JSON",DataTypeMapping.TEXT);
-        mappingMap.put("ENUM",DataTypeMapping.STRING);
-        mappingMap.put("SET",DataTypeMapping.STRING);
-        // YEAR[(2|4)]
-        mappingMap.put("YEAR",DataTypeMapping.INT32);
-        mappingMap.put("TIMESTAMP",DataTypeMapping.TIMESTAMP);
+// https://dev.mysql.com/doc/refman/5.7/en/numeric-types.html
+        mappingMap.put("INTEGER", TableCloneManageType.INT32);
+        mappingMap.put("SMALLINT", TableCloneManageType.INT16);
+        mappingMap.put("DECIMAL", TableCloneManageType.DECIMAL);
+        mappingMap.put("NUMERIC", TableCloneManageType.DECIMAL);
+        mappingMap.put("FLOAT", TableCloneManageType.FLOAT64);
+        mappingMap.put("REAL", TableCloneManageType.FLOAT64);
+        mappingMap.put("DOUBLE", TableCloneManageType.FLOAT64);
+        mappingMap.put("INT", TableCloneManageType.INT32);
+        mappingMap.put("BIT", TableCloneManageType.BYTES);
+        mappingMap.put("TINYINT(1)", TableCloneManageType.BOOLEAN);
+        mappingMap.put("TINYINT", TableCloneManageType.INT8);
+        mappingMap.put("MEDIUMINT", TableCloneManageType.INT32);
+        mappingMap.put("BIGINT", TableCloneManageType.INT64);
+        mappingMap.put("BOOL", TableCloneManageType.BOOLEAN);
+        mappingMap.put("BOOLEAN", TableCloneManageType.BOOLEAN);
 
-        mappingMap.put("DATE",DataTypeMapping.DATE);
-        mappingMap.put("TIME",DataTypeMapping.INT64);
-        mappingMap.put("DATETIME",DataTypeMapping.INT64);
+// https://dev.mysql.com/doc/refman/5.7/en/date-and-time-types.html
+        mappingMap.put("DATE", TableCloneManageType.DATE);
+        mappingMap.put("TIME", TableCloneManageType.TIME);
+        mappingMap.put("DATETIME", TableCloneManageType.TIMESTAMP);
+        mappingMap.put("TIMESTAMP", TableCloneManageType.TIMESTAMP);
+        mappingMap.put("YEAR", TableCloneManageType.INT32);
 
-        // https://debezium.io/documentation/reference/1.0/connectors/mysql.html#_decimal_values
-        mappingMap.put("NUMERIC",DataTypeMapping.BYTES);
-        mappingMap.put("DECIMAL",DataTypeMapping.DECIMAL);
 
-        // https://debezium.io/documentation/reference/1.0/connectors/mysql.html#_spatial_data_types
-        mappingMap.put("GEOMETRY",DataTypeMapping.STRUCT);
-        mappingMap.put("LINESTRING",DataTypeMapping.STRUCT);
-        mappingMap.put("POINT",DataTypeMapping.STRUCT);
-        mappingMap.put("POLYGON",DataTypeMapping.STRUCT);
-        mappingMap.put("MULTIPOINT",DataTypeMapping.STRUCT);
-        mappingMap.put("MULTILINESTRING",DataTypeMapping.STRUCT);
-        mappingMap.put("MULTIPOLYGON",DataTypeMapping.STRUCT);
-        mappingMap.put("GEOMETRYCOLLECTION",DataTypeMapping.STRUCT);
+// https://dev.mysql.com/doc/refman/5.7/en/string-types.html
+        mappingMap.put("CHAR", TableCloneManageType.STRING);
+        mappingMap.put("VARCHAR", TableCloneManageType.STRING);
+        mappingMap.put("BINARY", TableCloneManageType.BYTES);
+        mappingMap.put("VARBINARY", TableCloneManageType.BYTES);
+        mappingMap.put("BLOB", TableCloneManageType.BYTES);
+        mappingMap.put("TEXT", TableCloneManageType.STRING);
+        mappingMap.put("TINYBLOB", TableCloneManageType.BYTES);
+        mappingMap.put("TINYTEXT", TableCloneManageType.STRING);
+        mappingMap.put("MEDIUMBLOB", TableCloneManageType.BYTES);
+        mappingMap.put("MEDIUMTEXT", TableCloneManageType.STRING);
+        mappingMap.put("LONGBLOB", TableCloneManageType.BYTES);
+        mappingMap.put("LONGTEXT", TableCloneManageType.STRING);
+        mappingMap.put("ENUM", TableCloneManageType.STRING);
+        mappingMap.put("SET", TableCloneManageType.STRING);
+
+
+// https://dev.mysql.com/doc/refman/5.7/en/spatial-types.html
+        mappingMap.put("GEOMETRY", TableCloneManageType.TEXT);
+        mappingMap.put("POINT", TableCloneManageType.TEXT);
+        mappingMap.put("LINESTRING", TableCloneManageType.TEXT);
+        mappingMap.put("POLYGON", TableCloneManageType.TEXT);
+        mappingMap.put("MULTIPOINT", TableCloneManageType.TEXT);
+        mappingMap.put("MULTILINESTRING", TableCloneManageType.TEXT);
+        mappingMap.put("MULTIPOLYGON", TableCloneManageType.TEXT);
+        mappingMap.put("GEOMETRYCOLLECTION", TableCloneManageType.TEXT);
+
+// https://dev.mysql.com/doc/refman/5.7/en/json.html
+        mappingMap.put("JSON", TableCloneManageType.TEXT);
     }
 
     /**
@@ -82,41 +88,31 @@ public class MysqlMappingTool implements MappingTool {
         for (Column column : columns){
             if (StringUtil.isNullOrEmpty(column.getDataType()))
                 throw new TCMException("not found DataType value in "+column.getColumnInfo());
-            DataTypeMapping relation = StringUtil.findRelation(mappingMap,column.getDataType(),null);
+            TableCloneManageType relation = StringUtil.findRelation(mappingMap,column.getDataType(),null);
 //            if (relation == null)
 //                throw new TCMException("not found DataType relation in "+column.getColumnInfo());
-            column.setDataTypeMapping(relation);
+            column.setTableCloneManageType(relation);
         }
-        table.setColumns(columns);
         return table;
     }
 
 
     /**
-     * return table provides the mapping table to the PgSQL data type, according "*.core.DataTypeMapping"
+     * return table provides the mapping table to the PgSQL data type, according "*.core.TableCloneManageType"
      * @Param null :    table={...,PGSQL,..,columns={...,...,col_int,DataType=serial,dataTypeMapping=INT32}}
      * @Return: null :  table={null,MYSQL,..,columns={null,null,col_int,DataType=INT,dataTypeMapping=INT32}}
      */
-    @Override
-    public Table createCloneMappingTable(Table table) {
-        return createCloneMappingTable(table,table.getTablename());
-    }
+//    @Override
+//    public Table createCloneMappingTable(Table table, String tableName) {
+//        return createCloneMappingTable(table,table.getTablename());
+//    }
 
     @Override
-    public Table createCloneMappingTable(Table table, String tableName) {
+    public Table createCloneMappingTable(Table table) {
         Table cloneTable = table.clone();
-        List<Column> sourceCols = cloneTable.getColumns();
-        List<Column> cloneCols = new LinkedList<>();
-        for (Column col : sourceCols){
-            Column c = col.clone();
-            c.setDataType(col.getDataTypeMapping().getOutDataType(DataSourceType.MYSQL));
-            cloneCols.add(c);
-        }
-        cloneTable.setCatalogname(null);
-        cloneTable.setSchemaname(null);
-        cloneTable.setColumns(cloneCols);
+        for (Column col : cloneTable.getColumns())
+            col.setDataType(col.getTableCloneManageType().getOutDataType(DataSourceType.MYSQL));
         cloneTable.setDataSourceType(DataSourceType.MYSQL);
-        cloneTable.setTablename(tableName);
         return cloneTable;
     }
 
@@ -141,10 +137,44 @@ public class MysqlMappingTool implements MappingTool {
         for(Column column : columns){
             if(column.getDataType() == null)
                 throw new TCMException("Create Table SQL is fail,Because unable use null type:"+column.getColumnInfo());
-            stringBuilder.append(column.getColumnName()).append(" ").append(column.getDataType());
-            if (column.getDataType().equals("TIMESTAMP(3)"))
-                stringBuilder.append(" DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)");
-            if (Boolean.FALSE.equals(column.isNullAble()))
+            String colName = StringUtil.dataTypeFormat(column.getDataType());
+            stringBuilder.append(column.getColumnName()).append(" ");
+            if("DECIMAL".equalsIgnoreCase(colName)){
+                stringBuilder.append(colName);
+                if(column.getNumericPrecisionM()>0){
+                    stringBuilder.append("("+column.getNumericPrecisionM());
+                    if(column.getNumericPrecisionD()>0)
+                        stringBuilder.append(","+column.getNumericPrecisionD());
+                    stringBuilder.append(")");
+                }else
+                    stringBuilder.append("(65,30)");
+            }else if ("VARBINARY".equalsIgnoreCase(colName)){
+                stringBuilder.append(colName);
+                if(column.getCharMaxLength() > 0)
+                    stringBuilder.append("("+column.getCharMaxLength()+")");
+                else
+                    stringBuilder.append("(1024)");
+            }else if ("VARCHAR".equalsIgnoreCase(colName) || "CHAR".equalsIgnoreCase(colName)){
+                stringBuilder.append(colName);
+                if(column.getCharMaxLength() > 0)
+                    stringBuilder.append("("+column.getCharMaxLength()+")");
+                else
+                    stringBuilder.append("(255)");
+            }else if("TIMESTAMP".equalsIgnoreCase(colName)){
+                stringBuilder.append(colName);
+                String tempStr = "/ DEFAULT CURRENT_TIMESTAMP/ ON UPDATE CURRENT_TIMESTAMP/";
+                if(column.getDatetimePrecision()>0)
+                    stringBuilder.append(tempStr.replaceAll("/","("+column.getDatetimePrecision()+")"));
+                else
+                    stringBuilder.append(tempStr.replaceAll("/",""));
+            }else if("DATETIME".equalsIgnoreCase(colName)||"TIME".equalsIgnoreCase(colName)){
+                stringBuilder.append(colName);
+                if(column.getDatetimePrecision()>0)
+                    stringBuilder.append("("+column.getDatetimePrecision()+")");
+            }else
+                stringBuilder.append(column.getDataType());
+
+            if (Boolean.FALSE.equals(column.getNullAble()))
                 stringBuilder.append(" not NULL");
             stringBuilder.append("\n,");
         }
