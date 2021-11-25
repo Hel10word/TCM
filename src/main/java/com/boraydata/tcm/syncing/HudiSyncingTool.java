@@ -28,11 +28,13 @@ public class HudiSyncingTool implements SyncingTool {
     private boolean putToHDFS(AttachConfig attachConfig){
         String command = "";
         String localCsvPath = attachConfig.getLocalCsvPath();
-        attachConfig.setHdfsCsvPath(new File(attachConfig.getHdfsCsvDir(),attachConfig.getCsvFileName()).getPath().replaceFirst(":/","://"));
+//        attachConfig.setHdfsCsvPath(new File(attachConfig.getHdfsCsvDir(),attachConfig.getCsvFileName()).getPath().replaceFirst(":/","://"));
+        attachConfig.setHdfsCsvPath(attachConfig.getHdfsCsvDir()+attachConfig.getCsvFileName());
         if(!FileUtil.Exists(localCsvPath))
                 throw new TCMException("unable put CSV file to HDFS,check the CSV file is exists in '"+localCsvPath+'\'');
         command += "\nhdfs dfs -rm "+attachConfig.getHiveHdfsPath();
         command += "\nhdfs dfs -rm "+attachConfig.getHdfsCsvPath();
+        command += "\nmkdir -p "+attachConfig.getTempDirectory()+"/init/";
 //        command += "\nrm -f ./*.avsc";
         command += "\nhdfs dfs -put "+localCsvPath+" "+attachConfig.getHdfsCsvDir();
 
@@ -74,6 +76,7 @@ public class HudiSyncingTool implements SyncingTool {
         Boolean hiveMultiPartitionKeys = atCfg.getHiveMultiPartitionKeys();
         String parallel = atCfg.getParallel();
 //        String cdcHome = props.getProperty("cdc.home", null);
+        String cdcHome = atCfg.getTempDirectory();
 //        String tempDirectory = atCfg.getTempDirectory();
 
         if (hivePrimaryKey == null || hivePrimaryKey.length() < 1) {
@@ -85,7 +88,7 @@ public class HudiSyncingTool implements SyncingTool {
                 configPath,sourceJdbcConnect, sourceUser, sourcePassword, sourceDatabaseName, sourceTableName,
                 parallel, hivePrimaryKey,hivePartitionKey, hdfsCsvPath, hiveHdfsPath, cloneTableName, hoodieTableType,
                 cloneJdbcConnect, cloneUser, clonePassword, cloneDatabaseName,
-                hiveNonPartitioned, hiveMultiPartitionKeys, null);
+                hiveNonPartitioned, hiveMultiPartitionKeys, cdcHome);
 
 //        Parameter parameter = new Parameter(
 //                sourceJdbcConnect, sourceUser, sourcePassword, sourceDatabaseName, sourceTableName,
@@ -142,9 +145,9 @@ public class HudiSyncingTool implements SyncingTool {
         config+="\nhive.non.partitioned="+nonPartitioned;
         config+="\nhive.multi.partition.keys="+hiveMultiPartitionKeys;
         config+="\nparallel="+parallel;
+        config+="\ncdcHome="+cdcHome;
 
         return FileUtil.WriteMsgToFile(config,configPath);
-
     }
 
 

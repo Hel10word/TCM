@@ -41,16 +41,17 @@ class TableCloneManageTest {
     // create the table clone manager
     TableCloneManageContext.Builder tcmcBuilder = new TableCloneManageContext.Builder();
     TableCloneManageContext tcmc = tcmcBuilder
-//            .setSourceConfig(configPGSQL)
-            .setSourceConfig(configMySQL)
+            .setSourceConfig(configPGSQL)
+//            .setSourceConfig(configMySQL)
 //            .setCloneConfig(configSpark)
-            .setCloneConfig(configMySQL)
-//            .setCloneConfig(configPGSQL)
+//            .setCloneConfig(configMySQL)
+            .setCloneConfig(configPGSQL)
             .setAttachConfig(TestDataProvider.getDefAttCfg())
             .create();
     TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmc);
-    String sourceName = "string_types_mysql";
-    String cloneName = "string_types_mysql_clone";
+    String sourceName = "pg_lsn_types_pgsql";
+    String cloneName = sourceName+"_clone";
+//    String cloneName = "numeric_types_pgsql_clone";
 
     // 获取 在 CreateConfig 上创建表的语句
     @Test
@@ -66,13 +67,13 @@ class TableCloneManageTest {
             tempTableSQL = MappingToolFactory.create(tcmc.getSourceConfig().getDataSourceType()).getCreateTableSQL(tempTable);
         String cloneTableSQL = MappingToolFactory.create(tcmc.getCloneConfig().getDataSourceType()).getCreateTableSQL(cloneTable);
 
-//        sourceTable.outTableInfo();
+        sourceTable.outTableInfo();
 //        if(tempTable != null)
 //            tempTable.outTableInfo();
 //        cloneTable.outTableInfo();
 
-        System.out.println("sourceTableSQL:\n"+sourceTableSQL);
-        System.out.println("\n\ntempTableSQL:\n"+tempTableSQL);
+//        System.out.println("sourceTableSQL:\n"+sourceTableSQL);
+//        System.out.println("\n\ntempTableSQL:\n"+tempTableSQL);
         System.out.println("\n\ncloneTableSQL:\n"+cloneTableSQL);
     }
 

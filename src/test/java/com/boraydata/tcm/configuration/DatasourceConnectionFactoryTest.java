@@ -46,7 +46,7 @@ class DatasourceConnectionFactoryTest {
     @Test
     public void executeQuerySQLTest(){
         // http://www.postgres.cn/docs/12/infoschema-columns.html
-        String sql = "select * from information_schema.COLUMNS where table_name in ('string_types_mysql')";
+        String sql = "select * from information_schema.COLUMNS where table_name in ('object_types_pgsql')";
 //        String sql = configMySQL.getDataSourceType().SQL_AllTableInfo;
 //        String sql = configMySQL.getDataSourceType().SQL_TableInfoByTableName.replace("?","'boolean_mysql'");
 //        String sql = "select * from lineitem_mysql";

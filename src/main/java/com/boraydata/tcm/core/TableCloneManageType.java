@@ -16,7 +16,7 @@ public enum TableCloneManageType {
     INT64       ("INT64",       "BIGINT",           "BIGINT",           "BIGINT"),
     FLOAT32     ("FLOAT32",     "FLOAT",            "REAL",             "FLOAT"),
     FLOAT64     ("FLOAT64",     "DOUBLE",           "DOUBLE PRECISION", "DOUBLE"),
-    BOOLEAN     ("BOOLEAN",     "TINYINT",          "BOOLEAN",          "BOOLEAN"),
+    BOOLEAN     ("BOOLEAN",     "TINYINT(1)",          "BOOLEAN",          "BOOLEAN"),
     STRING      ("STRING",      "VARCHAR",          "TEXT",             "STRING"),
     BYTES       ("BYTES",       "VARBINARY",        "BYTEA",            "BINARY"),
     DECIMAL     ("'Decimal'",   "DECIMAL",          "DECIMAL",          "DECIMAL"),
@@ -24,11 +24,12 @@ public enum TableCloneManageType {
     TIME        ("'Time'",      "TIME",             "INTERVAL",         "TIMESTAMP"),
     TIMESTAMP   ("'Timestamp'", "TIMESTAMP",        "TIMESTAMP",        "TIMESTAMP"),
     TEXT        ("TEXT",        "LONGTEXT",         "TEXT",             "STRING"),
-    MONEY       ("MONEY",       "DECIMAL(65,2)",    "MONEY",            "DECIMAL"),
+    MONEY       ("MONEY",       "DECIMAL(65,2)",    "MONEY",            "DECIMAL")
 
     // the STRUCT usually used to represent {GEOMETRY, LINESTRING, POLYGON....}
     // This part is TCM self-defined, if the database does not support this datatype, please explain in the README.md
-    STRUCT      ("STRUCT",      "MULTIPOLYGON",     "POLYGON",          "STRUCT");
+//    STRUCT      ("STRUCT",      "MULTIPOLYGON",     "POLYGON",          "STRUCT");
+    ;
 
     String value;
     String mysql;

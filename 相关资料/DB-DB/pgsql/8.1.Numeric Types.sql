@@ -2,7 +2,7 @@
 -- https://www.postgresql.org/docs/13/datatype-numeric.html
 
 CREATE TABLE numeric_types_pgsql (
-  "pgsmallint" smallint PRIMARY KEY,
+  "pgsmallint" smallint,
   "pginteger" integer,
   "pgbigint" bigint,
   "pgdecimal" decimal ,

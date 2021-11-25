@@ -68,7 +68,7 @@ public class PgsqlSyncingTool implements SyncingTool {
 
     public String exportCommand(DatabaseConfig config,AttachConfig attachConfig) {
         if(!StringUtil.isNullOrEmpty(attachConfig.getTempTableSQL())){
-            return completeExportCommand(getConnectCommand(config),"("+attachConfig.getTempTableSQL()+")",attachConfig.getLocalCsvPath(),attachConfig.getDelimiter());
+            return completeExportCommand(getConnectCommand(config),"("+attachConfig.getTempTableSQL().replaceAll(";","")+")",attachConfig.getLocalCsvPath(),attachConfig.getDelimiter());
         }else
             return completeExportCommand(getConnectCommand(config),attachConfig.getSourceTableName(),attachConfig.getLocalCsvPath(),attachConfig.getDelimiter());
     }

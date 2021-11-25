@@ -6,15 +6,15 @@ import com.boraydata.tcm.entity.Column;
 import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.exception.TCMException;
 import com.boraydata.tcm.utils.StringUtil;
-import com.sun.prism.PixelFormat;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /** deal with the mapping relationship between PostgreSQL Type and TCM Type
- * design by https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#data-types
+ * design by
+ * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#data-types
+ * https://www.postgresql.org/docs/13/datatype.html 
  * @author bufan
  * @data 2021/9/1
  */
@@ -22,104 +22,117 @@ public class PgsqlMappingTool implements MappingTool {
 
     static Map<String, TableCloneManageType> mappingMap = new HashMap<>();
     static {
-        mappingMap.put("BOOLEAN", TableCloneManageType.BOOLEAN);
+
+//        https://www.postgresql.org/docs/13/datatype-numeric.html
         mappingMap.put("SMALLINT", TableCloneManageType.INT16);
-        mappingMap.put("SMALLSERIAL", TableCloneManageType.INT16);
         mappingMap.put("INTEGER", TableCloneManageType.INT32);
-        mappingMap.put("SERIAL", TableCloneManageType.INT32);
         mappingMap.put("BIGINT", TableCloneManageType.INT64);
-        mappingMap.put("BIGSERIAL", TableCloneManageType.INT64);
+        mappingMap.put("DECIMAL", TableCloneManageType.DECIMAL);
+        mappingMap.put("NUMERIC", TableCloneManageType.DECIMAL);
         mappingMap.put("REAL", TableCloneManageType.FLOAT32);
-        mappingMap.put("DOUBLE", TableCloneManageType.FLOAT64);
-        mappingMap.put("PRECISION", TableCloneManageType.FLOAT64);
-        mappingMap.put("CHAR", TableCloneManageType.STRING);
+        mappingMap.put("DOUBLE PRECISION", TableCloneManageType.FLOAT64);
+        mappingMap.put("SMALLSERIAL", TableCloneManageType.INT16);
+        mappingMap.put("SERIAL", TableCloneManageType.INT32);
+        mappingMap.put("BIGSERIAL", TableCloneManageType.INT64);
+
+//        https://www.postgresql.org/docs/13/datatype-money.html
+        mappingMap.put("MONEY", TableCloneManageType.MONEY);
+
+//        https://www.postgresql.org/docs/13/datatype-character.html
+        mappingMap.put("CHARACTER VARYING", TableCloneManageType.STRING);
         mappingMap.put("VARCHAR", TableCloneManageType.STRING);
         mappingMap.put("CHARACTER", TableCloneManageType.STRING);
-        mappingMap.put("CHARACTERVARYING", TableCloneManageType.STRING);
+        mappingMap.put("CHAR", TableCloneManageType.STRING);
+        mappingMap.put("TEXT", TableCloneManageType.TEXT);
 
-        /*
-         * TIME(1) and TIME(6) is not distinguished, so default is INT64;
-         * */
+//        https://www.postgresql.org/docs/13/datatype-binary.html
+        mappingMap.put("BYTEA", TableCloneManageType.BYTES);
+
+//        https://www.postgresql.org/docs/13/datatype-datetime.html
         mappingMap.put("TIMESTAMP", TableCloneManageType.TIMESTAMP);
-        mappingMap.put("TIMESTAMPWITHTIMEZONE", TableCloneManageType.TIMESTAMP);
-        mappingMap.put("TIMESTAMPWITHOUTTIMEZONE", TableCloneManageType.TIMESTAMP);
-
-
+        mappingMap.put("TIMESTAMP WITH TIME ZONE", TableCloneManageType.TIMESTAMP);
+        mappingMap.put("TIMESTAMP WITHOUT TIME ZONE", TableCloneManageType.TIMESTAMP);
+        mappingMap.put("DATE", TableCloneManageType.DATE);
         mappingMap.put("TIME", TableCloneManageType.TIME);
-        mappingMap.put("TIMEWITHTIMEZONE", TableCloneManageType.TIME);
-        mappingMap.put("TIMEWITHOUTTIMEZONE", TableCloneManageType.TIME);
-
+        mappingMap.put("TIME WITH TIME ZONE", TableCloneManageType.TIME);
+        mappingMap.put("TIME WITHOUT TIME ZONE", TableCloneManageType.TIME);
         mappingMap.put("INTERVAL", TableCloneManageType.STRING);
 
-        mappingMap.put("BYTEA", TableCloneManageType.BYTES);
+//        https://www.postgresql.org/docs/13/datatype-boolean.html
+        mappingMap.put("BOOLEAN", TableCloneManageType.BOOLEAN);
+
+//        https://www.postgresql.org/docs/13/datatype-enum.html
+        // unable support
+
+//        https://www.postgresql.org/docs/13/datatype-geometric.html
+        mappingMap.put("POINT", TableCloneManageType.TEXT);
+        mappingMap.put("LINE", TableCloneManageType.TEXT);
+        mappingMap.put("LSEG", TableCloneManageType.TEXT);
+        mappingMap.put("BOX", TableCloneManageType.TEXT);
+        mappingMap.put("PATH", TableCloneManageType.TEXT);
+        mappingMap.put("POLYGON", TableCloneManageType.TEXT);
+        mappingMap.put("CIRCLE", TableCloneManageType.TEXT);
+
+//        https://www.postgresql.org/docs/13/datatype-net-types.html
+        mappingMap.put("CIDR", TableCloneManageType.TEXT);
+        mappingMap.put("INET", TableCloneManageType.TEXT);
+        mappingMap.put("MACADDR", TableCloneManageType.TEXT);
+        mappingMap.put("MACADDR8", TableCloneManageType.TEXT);
+
+//        https://www.postgresql.org/docs/13/datatype-bit.html
+        mappingMap.put("BIT", TableCloneManageType.BYTES);
+        mappingMap.put("BIT VARYING", TableCloneManageType.BYTES);
+
+//        https://www.postgresql.org/docs/13/datatype-textsearch.html
+        mappingMap.put("TSVECTOR", TableCloneManageType.TEXT);
+        mappingMap.put("TSQUERY", TableCloneManageType.TEXT);
+
+//        https://www.postgresql.org/docs/13/datatype-uuid.html
+        mappingMap.put("UUID", TableCloneManageType.STRING);
+
+//        https://www.postgresql.org/docs/13/datatype-xml.html
+        mappingMap.put("XML", TableCloneManageType.TEXT);
+
+//        https://www.postgresql.org/docs/13/datatype-json.html
         mappingMap.put("JSON", TableCloneManageType.TEXT);
         mappingMap.put("JSONB", TableCloneManageType.TEXT);
-        mappingMap.put("XML", TableCloneManageType.TEXT);
-        mappingMap.put("UUID", TableCloneManageType.STRING);
-        mappingMap.put("POINT", TableCloneManageType.STRING);
-        mappingMap.put("LTREE", TableCloneManageType.STRING);
-        mappingMap.put("CITEXT", TableCloneManageType.STRING);
-        mappingMap.put("INET", TableCloneManageType.STRING);
-        mappingMap.put("INT4RANGE", TableCloneManageType.STRING);
-        mappingMap.put("INT8RANGE", TableCloneManageType.STRING);
-        mappingMap.put("NUMRANGE", TableCloneManageType.STRING);
-        mappingMap.put("TSRANGE", TableCloneManageType.STRING);
-        mappingMap.put("TSTZRANGE", TableCloneManageType.STRING);
-        mappingMap.put("DATERANGE", TableCloneManageType.STRING);
-        mappingMap.put("ENUM", TableCloneManageType.STRING);
 
-        mappingMap.put("DATE", TableCloneManageType.DATE);
-
-
-
-        /*
-        * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#decimal-values
-        * */
-        mappingMap.put("NUMERIC", TableCloneManageType.DECIMAL);
-        mappingMap.put("DECIMAL", TableCloneManageType.DECIMAL);
-
-
-        /*
-         * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#hstore-values
-         * */
-        mappingMap.put("HSTORE", TableCloneManageType.STRING);
-
-        /*
-         * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#network-address-types
-         * */
-        mappingMap.put("INET", TableCloneManageType.STRING);
-        mappingMap.put("CIDR", TableCloneManageType.STRING);
-        mappingMap.put("MACADDR", TableCloneManageType.STRING);
-        mappingMap.put("MACADDR8", TableCloneManageType.STRING);
-
-        /*
-         * https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#_postgis_types
-         * */
-        mappingMap.put("GEOMETRY", TableCloneManageType.STRUCT);
-
-
-        /*
-         * The following are self-defined
-         * If have other data types that need to be mapped, please define below
-         * */
-        mappingMap.put("BIT", TableCloneManageType.BYTES);
-        mappingMap.put("BOX", TableCloneManageType.STRUCT);
-        mappingMap.put("CIRCLE", TableCloneManageType.STRUCT);
-        mappingMap.put("DOUBLEPRECISION", TableCloneManageType.FLOAT64);
-        mappingMap.put("LINE", TableCloneManageType.STRUCT);
-        mappingMap.put("LSEG", TableCloneManageType.STRUCT);
-        mappingMap.put("MONEY", TableCloneManageType.MONEY);
-        mappingMap.put("PATH", TableCloneManageType.STRUCT);
-        mappingMap.put("TEXT", TableCloneManageType.TEXT);
-        mappingMap.put("POLYGON", TableCloneManageType.STRING);
-
-        mappingMap.put("TSQUERY", TableCloneManageType.TEXT);
-        mappingMap.put("TSVECTOR", TableCloneManageType.TEXT);
-        mappingMap.put("TXID_SNAPSHOT", TableCloneManageType.STRUCT);
-
-        mappingMap.put("BITVARYING", TableCloneManageType.BYTES);
-
+//        https://www.postgresql.org/docs/13/arrays.html
         mappingMap.put("ARRAY", TableCloneManageType.TEXT);
+
+//        https://www.postgresql.org/docs/13/rowtypes.html
+        // unable support
+
+
+//        https://www.postgresql.org/docs/13/rangetypes.html
+        mappingMap.put("INT4RANGE", TableCloneManageType.TEXT);
+        mappingMap.put("INT8RANGE", TableCloneManageType.TEXT);
+        mappingMap.put("NUMRANGE", TableCloneManageType.TEXT);
+        mappingMap.put("TSRANGE", TableCloneManageType.TEXT);
+        mappingMap.put("TSTZRANGE", TableCloneManageType.TEXT);
+        mappingMap.put("DATERANGE", TableCloneManageType.TEXT);
+
+//        https://www.postgresql.org/docs/13/domains.html
+        mappingMap.put("OID", TableCloneManageType.TEXT);
+        mappingMap.put("REGCLASS", TableCloneManageType.TEXT);
+        mappingMap.put("REGCOLLATION", TableCloneManageType.TEXT);
+        mappingMap.put("REGCONFIG", TableCloneManageType.TEXT);
+        mappingMap.put("REGDICTIONARY", TableCloneManageType.TEXT);
+        mappingMap.put("REGNAMESPACE", TableCloneManageType.TEXT);
+        mappingMap.put("REGOPER", TableCloneManageType.TEXT);
+        mappingMap.put("REGOPERATOR", TableCloneManageType.TEXT);
+        mappingMap.put("REGPROC", TableCloneManageType.TEXT);
+        mappingMap.put("REGPROCEDURE", TableCloneManageType.TEXT);
+        mappingMap.put("REGROLE", TableCloneManageType.TEXT);
+        mappingMap.put("REGTYPE", TableCloneManageType.TEXT);
+
+
+//        https://www.postgresql.org/docs/13/datatype-oid.html
+        mappingMap.put("PG_LSN", TableCloneManageType.TEXT);
+
+//        https://www.postgresql.org/docs/13/datatype-pg-lsn.html
+        // unable support
+
     }
 
 
@@ -135,14 +148,22 @@ public class PgsqlMappingTool implements MappingTool {
             if (StringUtil.isNullOrEmpty(column.getDataType()))
                 throw new TCMException("not found DataType value in "+column.getColumnInfo());
             TableCloneManageType relation = StringUtil.findRelation(mappingMap,column.getDataType(),null);
-//            if (relation == null){
-//                    throw new TCMException("not found DataType relation in "+column.getColumnInfo());
-//            }
-            column.setTableCloneManageType(relation);
-            if(relation.equals(TableCloneManageType.MONEY))
+            if (relation == null){
+                    throw new TCMException("not found DataType relation in "+column.getColumnInfo());
+            }
+            String colDataType = StringUtil.dataTypeFormat(column.getDataType());
+            if(relation != null && "MONEY".equalsIgnoreCase(colDataType))
                 column.setNumericPrecisionM(65).setNumericPrecisionD(2);
-            if(relation.equals(TableCloneManageType.BOOLEAN))
+            if(relation != null && "BOOLEAN".equalsIgnoreCase(colDataType))
                 column.setCharMaxLength(1L);
+            if(relation != null && "INTERVAL".equalsIgnoreCase(colDataType))
+                column.setCharMaxLength(255L);
+            if(relation != null && "UUID".equalsIgnoreCase(colDataType))
+                column.setCharMaxLength(255L);
+//            if(relation != null && "ARRAY".equalsIgnoreCase(colDataType))
+//                column.setDataType(column.getUdtType());
+
+            column.setTableCloneManageType(relation);
         }
         table.setColumns(columns);
         return table;
@@ -196,27 +217,51 @@ public class PgsqlMappingTool implements MappingTool {
         for(Column column : columns){
             if(column.getDataType() == null)
                 throw new TCMException("Create Table SQL is fail,Because unable use null datatype:"+column.getColumnInfo());
-            stringBuilder.append(column.getColumnName()).append(" ").append(column.getDataType());
-//            if (Arrays.binarySearch(new String[]{"bin","bit varying","character","character varying"},column.getDataType()) >= 0)
+            String colDataType = StringUtil.dataTypeFormat(column.getDataType());
+            stringBuilder.append(column.getColumnName()).append(" ");
             if (
-                    "bit".equalsIgnoreCase(column.getDataType()) ||
-                    "bit varying".equalsIgnoreCase(column.getDataType()) ||
-                    "character".equalsIgnoreCase(column.getDataType()) ||
-                    "character varying".equalsIgnoreCase(column.getDataType())
-            )
-                stringBuilder.append("("+column.getCharMaxLength()+")");
-            if ("numeric".equalsIgnoreCase(column.getDataType())){
-                if(column.getNumericPrecisionM()>0){
-                    stringBuilder.append("("+column.getNumericPrecisionM());
-                    if(column.getNumericPrecisionD()>0)
-                        stringBuilder.append(","+column.getNumericPrecisionD());
+                    "BIT".equalsIgnoreCase(colDataType) ||
+                    "BIT VARYING".equalsIgnoreCase(colDataType) ||
+                    "CHARACTER".equalsIgnoreCase(colDataType) ||
+                    "CHARACTER VARYING".equalsIgnoreCase(colDataType)
+            ){
+                stringBuilder.append(colDataType);
+                if(column.getCharMaxLength() != null && column.getCharMaxLength() > 0)
+                    stringBuilder.append("(").append(column.getCharMaxLength()).append(")");
+            }else if ("NUMERIC".equalsIgnoreCase(colDataType)){
+                stringBuilder.append(colDataType);
+                if(column.getNumericPrecisionM() != null && column.getNumericPrecisionM() > 0){
+                    stringBuilder.append("(").append(column.getNumericPrecisionM());
+                    if(column.getNumericPrecisionD() != null &&column.getNumericPrecisionD() > 0)
+                        stringBuilder.append(",").append(column.getNumericPrecisionD());
                     stringBuilder.append(")");
-
                 }
-            }
+            }else if ("ARRAY".equalsIgnoreCase(colDataType)){
+                if(column.getUdtType() != null)
+                    colDataType = column.getUdtType();
+                stringBuilder.append(colDataType);
+            }else if (
+                    "TIMESTAMP".equalsIgnoreCase(colDataType) ||
+                    "TIMESTAMP WITHOUT TIME ZONE".equalsIgnoreCase(colDataType) ||
+                    "TIMESTAMP WITH TIME ZONE".equalsIgnoreCase(colDataType) ||
+                    "TIME".equalsIgnoreCase(colDataType) ||
+                    "TIME WITHOUT TIME ZONE".equalsIgnoreCase(colDataType) ||
+                    "TIME WITH TIME ZONE".equalsIgnoreCase(colDataType)
+            ){
+                if(column.getDatetimePrecision() != null && column.getDatetimePrecision() >= 0 && column.getDatetimePrecision() <= 6){
+                    String fsp = "("+column.getDatetimePrecision()+")";
+                    if(!colDataType.contains(" "))
+                        colDataType += fsp;
+                    else
+                        colDataType = colDataType.replaceFirst(" ",fsp+" ");
+                }
+                stringBuilder.append(colDataType);
+            }else
+                stringBuilder.append(colDataType);
 
-            if (Boolean.FALSE.equals(column.getNullAble()))
+             if (Boolean.FALSE.equals(column.getNullAble()))
                 stringBuilder.append(" NOT NULL");
+
             stringBuilder.append("\n,");
         }
         stringBuilder.deleteCharAt(stringBuilder.length()-1);

@@ -21,6 +21,8 @@ public class Column implements Cloneable {
     private String ColumnName;
     // 字段类型
     private String DataType;
+    // 标准的字段类型
+    private String UdtType;
     // 字段所在位置
     private Integer OrdinalPosition;
     // Char 类型的 长度
@@ -105,6 +107,15 @@ public class Column implements Cloneable {
         return this;
     }
 
+    public String getUdtType() {
+        return UdtType;
+    }
+
+    public Column setUdtType(String udtType) {
+        UdtType = udtType;
+        return this;
+    }
+
     public Integer getOrdinalPosition() {
         return OrdinalPosition;
     }
@@ -169,6 +180,7 @@ public class Column implements Cloneable {
                 ", TableName='" + TableName + '\'' +
                 ", ColumnName='" + ColumnName + '\'' +
                 ", DataType='" + DataType + '\'' +
+                ", UdtType='" + UdtType + '\'' +
                 ", OrdinalPosition=" + OrdinalPosition +
                 ", CharMaxLength=" + CharMaxLength +
                 ", NumericPrecisionM=" + NumericPrecisionM +
@@ -180,7 +192,7 @@ public class Column implements Cloneable {
     }
 
     public void outInfo(){
-        System.out.printf("ColumnName=%-20s DataType=%-20s Position=%-4d CharMaxLength=%-10d NumericPrecisionM=%-4d NumericPrecisionD=%-4d DatetimePrecision=%-4d tableCLoneManageType=%s\n",ColumnName,DataType,OrdinalPosition,CharMaxLength,NumericPrecisionM,NumericPrecisionD,DatetimePrecision,tableCloneManageType);
+        System.out.printf("ColumnName=%-20s DataType=%-20s UdtType=%-20s Position=%-4d CharMaxLength=%-10d NumericPrecisionM=%-4d NumericPrecisionD=%-4d DatetimePrecision=%-4d tableCLoneManageType=%s\n",ColumnName,DataType,UdtType,OrdinalPosition,CharMaxLength,NumericPrecisionM,NumericPrecisionD,DatetimePrecision,tableCloneManageType);
     }
 
     public Column clone(){

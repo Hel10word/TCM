@@ -12,27 +12,26 @@
 
 
 
-### numeric_types_pgsql
+### ==numeric_types_pgsql==
 
 https://www.postgresql.org/docs/13/datatype-numeric.html
 
-| PgSQL Data Type  | Range                                                        | TCM Type  | MySQL          |
-| ---------------- | ------------------------------------------------------------ | --------- | -------------- |
-| smallint         | -32768 to +32767                                             | INT16     | smallint       |
-| integer          | -2147483648 to +2147483647                                   | INT32     | int            |
-| bigint           | -9223372036854775808 to +9223372036854775807                 | INT64     | bigint         |
-| ==decimal==      | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point | 'Decimal' | decimal        |
-| ==numeric==      | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point | 'Decimal' | decimal(65,30) |
-| real             | 6 decimal digits precision                                   | FLOAT32   | float          |
-| double precision | 15 decimal digits precision                                  | FLOAT64   | double         |
-| smallserial      | 1 to 32767                                                   | INT16     | smallint       |
-| serial           | 1 to 2147483647                                              | INT32     | int            |
-| bigserial        | 1 to 9223372036854775807                                     | INT64     | bigint         |
+| PgSQL Data Type  | Range                                                        | TCM Type  | MySQL    |
+| ---------------- | ------------------------------------------------------------ | --------- | -------- |
+| smallint         | -32768 to +32767                                             | INT16     | smallint |
+| integer          | -2147483648 to +2147483647                                   | INT32     | int      |
+| bigint           | -9223372036854775808 to +9223372036854775807                 | INT64     | bigint   |
+| ==decimal==      | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point | 'Decimal' | decimal  |
+| ==numeric==      | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point | 'Decimal' | decimal  |
+| real             | 6 decimal digits precision                                   | FLOAT32   | float    |
+| double precision | 15 decimal digits precision                                  | FLOAT64   | double   |
+| smallserial      | 1 to 32767                                                   | INT16     | smallint |
+| serial           | 1 to 2147483647                                              | INT32     | int      |
+| bigserial        | 1 to 9223372036854775807                                     | INT64     | bigint   |
 
 [mysql-decimal ]:https://dev.mysql.com/doc/refman/5.7/en/precision-math-decimal-characteristics.html
 
--   decimal 与 numeric 类型 Mapping 到 MySQL DECIMAL(65,30)，若数据整体长度超过65或小数点后面大于30位会存在精度丢失。
-
+-   ==decimal== 与 ==numeric== 类型 Mapping 到 MySQL DECIMAL，若数据整体长度超过65或小数点后面大于30位会存在精度丢失。
 
 
 
@@ -54,50 +53,53 @@ https://www.postgresql.org/docs/13/datatype-money.html
 
 https://www.postgresql.org/docs/13/datatype-character.html
 
-| PgSQL Data Type          | Description                | TCM Type | MySQL        |
-| ------------------------ | -------------------------- | -------- | ------------ |
-| character varying(*`n`*) | variable-length with limit | String   | VARCHAR(256) |
-| varchar(*`n`*)           | variable-length with limit | String   | VARCHAR(256) |
-| character(*`n`*)         | fixed-length, blank padded | String   | VARCHAR(256) |
-| char(*`n`*)              | fixed-length, blank padded | String   | VARCHAR(256) |
-| text                     | variable unlimited length  | TEXT     | LONGTEXT     |
+| PgSQL Data Type          | Description                | TCM Type | MySQL    |
+| ------------------------ | -------------------------- | -------- | -------- |
+| character varying(*`n`*) | variable-length with limit | String   | VARCHAR  |
+| varchar(*`n`*)           | variable-length with limit | String   | VARCHAR  |
+| character(*`n`*)         | fixed-length, blank padded | String   | VARCHAR  |
+| char(*`n`*)              | fixed-length, blank padded | String   | VARCHAR  |
+| text                     | variable unlimited length  | TEXT     | LONGTEXT |
 
 -   需要注意 text 类型，在 pgsql 中是可以存放无限长度的,转到 MySQL 中会存在丢弃末尾长度。
 
 
 
-### binary_types_pgsql
+### ==binary_types_pgsql==
 
 https://www.postgresql.org/docs/13/datatype-binary.html
 
-| PgSQL Data | Description                   | TCM Type | MySQL           |
-| ---------- | ----------------------------- | -------- | --------------- |
-| ==bytea==  | variable-length binary string | BYTES    | VARBINARY(1024) |
+| PgSQL Data | Description                   | TCM Type | MySQL     |
+| ---------- | ----------------------------- | -------- | --------- |
+| ==bytea==  | variable-length binary string | BYTES    | VARBINARY |
 
--   由于 pgsql 在该字段导出时 默认使用 Hex（十六进制） 进行编码保存，因此写入 MySQL 的都是 Hex（十六进制）类型的值。
-
-
+-   由于 pgsql 在对==bytea==字段导出时 默认使用 Hex（十六进制） 进行编码保存，因此写入 MySQL 的都是 Hex（十六进制）类型的值，且MySQL有行限制  [参考](https://dev.mysql.com/doc/refman/8.0/en/column-count-limit.html) 因此默认导入为VARBINARY（8192）类型。
 
 
 
 
 
-### datatime_types_pgsql
+
+
+### ==datatime_types_pgsql==
 
 https://www.postgresql.org/docs/13/datatype-datetime.html
 
 | PgSQL Data               | Range | TCM Type | MySQL |
 | ------------------------ | ----------------------- | -------- | ----- |
-| timestamp                | 4713 BC ~ 294276 AD     | 'Timestamp' | TIMESTAMP(3) |
-| timestamp with time zone | 4713 BC ~ 294276 AD     | 'Timestamp' | TIMESTAMP(3) |
+| timestamp                | 4713 BC ~ 294276 AD     | 'Timestamp' | TIMESTAMP |
+| timestamp with time zone | 4713 BC ~ 294276 AD     | 'Timestamp' | TIMESTAMP |
 | date                     | 4713 BC ~ 5874897 AD    | DATE | DATE |
-| time                     | 00:00:00 ~ 24:00:00               | 'Time' |TIME(3)|
-| time with time zone      | 00:00:00+1559 ~ 24:00:00-1559 | 'Time' | TIME(3) |
-| interval             | -178000000 years ~ 178000000 years | String | VARCHAR(256) |
+| time                     | 00:00:00 ~ 24:00:00               | 'Time' |TIME|
+| time with time zone      | 00:00:00+1559 ~ 24:00:00-1559 | 'Time' | TIME |
+| ==interval==       | -178000000 years ~ 178000000 years | String | VARCHAR(255) |
 
 [mysql-timestamp]:https://dev.mysql.com/doc/refman/5.7/en/timestamp-initialization.html
 
--   MySQL 使用 `TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)` 定义 timestamp 类型。
+-   MySQL ==TIMESTAMP== 类型存储范围为 1970-01-01 00:00:01.000000 UTC ~ 2038-01-19 03:14:07.999999 UTC。若 PgSQL 中的数据大于此范围，则到 MySQL 中为 `0000-00-00 00:00:00.000000`。
+-   MySQL ==DATE== 类型存储范围为 1000-01-01~9999-12-31。若PgSQL中的数据大于此范围，则到 MySQL 中为 `0000-00-00`。
+-   MySQL ==TIME== 类型存储范围为 00:00:00.000000~24:00:00.000000。若PgSQL中的数据大于此范围，则到 MySQL 中为 `00:00:00.000000`。
+-   由于 MySQL 中没有找到与 ==interval== 对应的时间类型，因此用 VARCHAR(255) 存储。
 
 
 
@@ -127,9 +129,9 @@ select *,coalesce((pgboolean::boolean)::int,0) as pgboolean from boolean_types_p
 
 https://www.postgresql.org/docs/13/datatype-enum.html
 
-| PgSQL Data |      | TCM Type | MySQL        |
-| ---------- | ---- | -------- | ------------ |
-| ENUM       |      | STRING   | VARCHAR(256) |
+| PgSQL Data | TCM Type | MySQL |
+| ---------- | -------- | ----- |
+| ENUM       |          |       |
 
 ```sql
 CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
@@ -149,22 +151,21 @@ ColumnName='pgenumerated_mood', DataType='USER-DEFINED'
 
 
 
-### ==geometric_types_pgsql==
+### geometric_types_pgsql
 
 https://www.postgresql.org/docs/13/datatype-geometric.html
 
-| PgSQL Data | Description                                 | TCM Type | MySQL |
-| ---------- | ------------------------------------------- | -------- | ----- |
-| point      | Point on a plane                            |          |       |
-| line       | Infinite line                               |          |       |
-| lseg       | Finite line segment                         |          |       |
-| box        | Rectangular box                             |          |       |
-| path       | Closed path (similar to polygon)；Open path |          |       |
-| polygon    | Polygon (similar to closed path)            |          |       |
-| circle     | Circle                                      |          |       |
+| PgSQL Data | Description                                 | TCM Type | MySQL    |
+| ---------- | ------------------------------------------- | -------- | -------- |
+| point      | Point on a plane                            | TEXT     | LONGTEXT |
+| line       | Infinite line                               | TEXT     | LONGTEXT |
+| lseg       | Finite line segment                         | TEXT     | LONGTEXT |
+| box        | Rectangular box                             | TEXT     | LONGTEXT |
+| path       | Closed path (similar to polygon)；Open path | TEXT     | LONGTEXT |
+| polygon    | Polygon (similar to closed path)            | TEXT     | LONGTEXT |
+| circle     | Circle                                      | TEXT     | LONGTEXT |
 
--   **暂时不考虑** 几何 类型的数据
-
+-   由于不同数据库对几何数据的支持不同，因此这儿统一转换为长字符串。
 
 
 
@@ -175,14 +176,14 @@ https://www.postgresql.org/docs/13/datatype-geometric.html
 
 https://www.postgresql.org/docs/13/datatype-net-types.html
 
-| PgSQL Data | TCM Type | MySQL        |
-| ---------- | -------- | ------------ |
-| cidr       | String   | VARCHAR(256) |
-| inet       | String   | VARCHAR(256) |
-| macaddr    | String   | VARCHAR(256) |
-| macaddr8   | String   | VARCHAR(256) |
+| PgSQL Data | TCM Type | MySQL    |
+| ---------- | -------- | -------- |
+| cidr       | TEXT     | LONGTEXT |
+| inet       | TEXT     | LONGTEXT |
+| macaddr    | TEXT     | LONGTEXT |
+| macaddr8   | TEXT     | LONGTEXT |
 
--   由于 MySQL 中没有与之对应的 字段类型，因此所有的数据都存为 VARCHAR(256)。
+-   由于 MySQL 中没有与之对应的 字段类型，因此这儿统一转换为长字符串。
 
 
 
@@ -192,15 +193,13 @@ https://www.postgresql.org/docs/13/datatype-net-types.html
 
 https://www.postgresql.org/docs/13/datatype-bit.html
 
-| PgSQL Data              | TCM Type | MySQL           |
-| ----------------------- | -------- | --------------- |
-| BIT(1)                  | BYTES    | VARBINARY(1024) |
-| ==BIT(n) ;n>1==         | BYTES    | VARBINARY(1024) |
-| BIT VARYING(1)          | BYTES    | VARBINARY(1024) |
-| ==BIT VARYING(n) ;n>1== | BYTES    | VARBINARY(1024) |
+| PgSQL Data     | TCM Type | MySQL     |
+| -------------- | -------- | --------- |
+| BIT[M]         | BYTES    | VARBINARY |
+| BIT VARYING[M] | BYTES    | VARBINARY |
 
--   在PgSQL中查询官方手册，暂未发现 n 的定义范围。
--   由于Mapping到MySQL中，为  VARBINARY(1024) ，同步长度大于 1024 的**数据会丢失**，而且在MySQL中， VARBINARY(n) 0<=n<=21845。
+-   在PgSQL中查询官方手册，暂未发现 M 的定义范围。
+-   由于Mapping 到MySQL中，为  VARBINARY[M] 0<=M<=21845，数据过长会丢失。
 
 
 
@@ -227,7 +226,9 @@ https://www.postgresql.org/docs/13/datatype-uuid.html
 
 | PgSQL Data | TCM Type | MySQL        |
 | ---------- | -------- | ------------ |
-| uuid       | String   | VARCHAR(256) |
+| uuid       | STRING   | VARCHAR(255) |
+
+-   默认转为 MySQL：VARCHAR(255)；
 
 
 
@@ -241,7 +242,7 @@ https://www.postgresql.org/docs/13/datatype-xml.html
 | ---------- | -------- | -------- |
 | xml        | TEXT     | LONGTEXT |
 
--   PgSQL 中的 XML 类型没有限定长度，因此转为 varchar(256) 可能会溢出，所以将其转换为 LONGTEXT 类型。
+-   PgSQL 中的 XML 类型没有限定长度，因此转为 varchar(255) 可能会溢出，所以将其转换为 LONGTEXT 类型。
 
 
 
@@ -256,7 +257,7 @@ https://www.postgresql.org/docs/13/datatype-json.html
 | json       | TEXT     | LONGTEXT |
 | jsonb      | TEXT     | LONGTEXT |
 
--   由于 PgSQL 中的 json 类型也可以存储 text 类型的数据，如果在 MySQL 中使用 varchar (256) 存储会有数据丢失，所以将其转换为 LONGTEXT 类型。 
+-   由于 PgSQL 中的 json 类型也可以存储 text 类型的数据，如果在 MySQL 中使用 varchar (255) 存储会有数据丢失，所以将其转换为 LONGTEXT 类型。 
 
 
 
@@ -324,14 +325,16 @@ INSERT INTO composite_types_pgsql VALUES (ROW('fuzzy dice', 42, 1.99), 1000);
 
 https://www.postgresql.org/docs/13/rangetypes.html
 
-| PgSQL Data | Description                            | TCM Type | MySQL        |
-| ---------- | -------------------------------------- | -------- | ------------ |
-| int4range  | Range of `integer`                     | String   | VARCHAR(256) |
-| int8range  | Range of `bigint`                      | String   | VARCHAR(256) |
-| numrange   | Range of `numeric`                     | String   | VARCHAR(256) |
-| tsrange    | Range of `timestamp without time zone` | String   | VARCHAR(256) |
-| tstzrange  | Range of `timestamp with time zone`    | String   | VARCHAR(256) |
-| daterange  | Range of `date`                        | String   | VARCHAR(256) |
+| PgSQL Data | Description                            | TCM Type | MySQL    |
+| ---------- | -------------------------------------- | -------- | -------- |
+| int4range  | Range of `integer`                     | TEXT     | LONGTEXT |
+| int8range  | Range of `bigint`                      | TEXT     | LONGTEXT |
+| numrange   | Range of `numeric`                     | TEXT     | LONGTEXT |
+| tsrange    | Range of `timestamp without time zone` | TEXT     | LONGTEXT |
+| tstzrange  | Range of `timestamp with time zone`    | TEXT     | LONGTEXT |
+| daterange  | Range of `date`                        | TEXT     | LONGTEXT |
+
+-   由于 MySQL 中没有与之对应的类型，因此转为 LONGTEXT 类型存储。
 
 
 
@@ -340,8 +343,7 @@ https://www.postgresql.org/docs/13/rangetypes.html
 
 
 
-
-### domain_types_pgsql
+### ==domain_types_pgsql==
 
 https://www.postgresql.org/docs/13/domains.html
 
@@ -352,7 +354,7 @@ INSERT INTO domain_types_pgsql VALUES(1);   -- works
 INSERT INTO domain_types_pgsql VALUES(-1);  -- fails
 ```
 
--   该类型与其他类型一致，域类型，仅仅是起到限定作用，如上代码，表中的字段类型为 integer 。
+-   该类型与其他类型一致，域类型，仅仅是起到限定作用，如上代码，表中的字段类型为 integer ，因此**不支持此类型**。
 
 
 
@@ -360,42 +362,42 @@ INSERT INTO domain_types_pgsql VALUES(-1);  -- fails
 
 
 
-### ==object_types_pgsql==
+### object_types_pgsql
 
 https://www.postgresql.org/docs/13/datatype-oid.html
 
-| PgSQL Data    | Description                  | TCM Type | MySQL |
-| ------------- | ---------------------------- | -------- | ----- |
-| oid           | numeric object identifier    |          |       |
-| regclass      | relation name                |          |       |
-| regcollation  | collation name               |          |       |
-| regconfig     | text search configuration    |          |       |
-| regdictionary | text search dictionary       |          |       |
-| regnamespace  | namespace name               |          |       |
-| regoper       | operator name                |          |       |
-| regoperator   | operator with argument types |          |       |
-| regproc       | function name                |          |       |
-| regprocedure  | function with argument types |          |       |
-| regrole       | role name                    |          |       |
-| regtype       | data type name               |          |       |
+| PgSQL Data    | Description                  | TCM Type | MySQL    |
+| ------------- | ---------------------------- | -------- | -------- |
+| oid           | numeric object identifier    | TEXT     | LONGTEXT |
+| regclass      | relation name                | TEXT     | LONGTEXT |
+| regcollation  | collation name               | TEXT     | LONGTEXT |
+| regconfig     | text search configuration    | TEXT     | LONGTEXT |
+| regdictionary | text search dictionary       | TEXT     | LONGTEXT |
+| regnamespace  | namespace name               | TEXT     | LONGTEXT |
+| regoper       | operator name                | TEXT     | LONGTEXT |
+| regoperator   | operator with argument types | TEXT     | LONGTEXT |
+| regproc       | function name                | TEXT     | LONGTEXT |
+| regprocedure  | function with argument types | TEXT     | LONGTEXT |
+| regrole       | role name                    | TEXT     | LONGTEXT |
+| regtype       | data type name               | TEXT     | LONGTEXT |
 
--   **暂不支持该类型**，debezium 中也没找到该类型的Mapping。
-
-
+-   由于 MySQL 中没有与之对应的类型，因此转为 LONGTEXT 类型存储。
 
 
 
-### ==pg_lsn_types_pgsql==
+
+
+### pg_lsn_types_pgsql
 
 https://www.postgresql.org/docs/13/datatype-pg-lsn.html
 
-| PgSQL Data |      | TCM Type | MySQL |
-| ---------- | ---- | -------- | ----- |
-| pg_lsn     |      |          |       |
+| PgSQL Data | TCM Type | MySQL    |
+| ---------- | -------- | -------- |
+| pg_lsn     | TEXT     | LONGTEXT |
 
 [PgSQL-pg_lsn]:https://www.postgresql.org/docs/13/datatype-pg-lsn.html
 
--   暂时不支持该数据类型，由于 pg_lsn 是PgSQL的内部数据类型。
+-   由于 pg_lsn 是PgSQL的内部数据类型， MySQL 中没有与之对应的类型，因此转为 LONGTEXT 类型存储。
 
 
 
@@ -427,8 +429,6 @@ https://www.postgresql.org/docs/13/datatype-pg-lsn.html
 
 [refer to]:https://dev.mysql.com/doc/refman/5.7/en/data-types.html
 
-
-
 ### numeric_types_mysql
 
 https://dev.mysql.com/doc/refman/5.7/en/numeric-types.html
@@ -446,8 +446,9 @@ https://dev.mysql.com/doc/refman/5.7/en/numeric-types.html
 | DEC              | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
 | FIXED[(M,D)]     | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
 | DOUBLE           | as a synonym for DOUBLE PRECISION                            | FLOAT64  | DOUBLE PRECISION |
-| BIT(M)           | 1<=M<=64;default 1;                                          | BYTES    | BYTES            |
-| TINYINT          | -128 ~ 127                                                   | INT8     | SMALLINT         |
+| BIT[M]           | 1<=M<=64;default 1;                                          | BYTES    | BYTES            |
+| TINYINT(1)       |                                                              | BOOLEAN  | BOOLEAN          |
+| TINYINT[M]       | 1<=M<=225;default 4;                                         | INT8     | SMALLINT         |
 | MEDIUMINT        | -8388608 ~ 8388607                                           | INT32    | INT              |
 | BIGINT           | -2^63^ （-9223372036854775808）~ 2^63^-1（9223372036854775807） | INT64    | BIGINT           |
 | BOOL             | 0 and 1； the values `TRUE` and `FALSE` are merely aliases for `1` and `0`. | BOOLEAN  | BOOLEAN          |
@@ -489,23 +490,24 @@ https://dev.mysql.com/doc/refman/5.7/en/string-types.html
 
 | MySQL Data        | Range                                                        | TCM Type | PgSQL |
 | ----------------- | ------------------------------------------------------------ | -------- | ----- |
-| CHAR [M]          | 0 <= M <= 255                                                | STRING   | TEXT  |
-| VARCHAR [M]       | 0 <= M <= 21845 (65535/3)                                    | STRING   | TEXT  |
-| ==BINARY [M]==    | 0 <= M <= 255                                                | BYTES    | BYTEA |
-| ==VARBINARY [M]== | 0 <= M <= 21845 (65535/3)                                    | BYTES    | BYTEA |
-| ==BLOB [M]==      | 0 <= M <= 65535 （2^16^-1）                                  | BYTES    | BYTEA |
-| TEXT [M]          | 0 <= M <= 65535 （2^16^-1）                                  | STRING   | TEXT  |
-| ==MEDIUMBLOB==    | maximum length of 16,777,215（2^24^-1） characters           | BYTES    | BYTEA |
+| CHAR [M]          | 0 <= M <= 255;default 1;characters                           | STRING   | TEXT  |
+| VARCHAR [M]       | 0 <= M <= 65535;characters                                   | STRING   | TEXT  |
+| ==BINARY [M]==    | 0 <= M <= 255;default 1; stores binary byte                  | BYTES    | BYTEA |
+| ==VARBINARY [M]== | 0 <= M <= 65535; stores binary byte                          | BYTES    | BYTEA |
+| ==BLOB [M]==      | 0 <= M <= 65535 （2^16^-1）bytes                             | BYTES    | BYTEA |
+| TEXT [M]          | 0 <= M <= 65535 （2^16^-1）characters                        | STRING   | TEXT  |
+| ==TINYBLOB==      | maximum length of 255 (2^8^ − 1) bytes                       | BYTES    | BYTEA |
+| TINYTEXT          | maximum length of 255 (2^8^ − 1) characters                  | STRING   | TEXT  |
+| ==MEDIUMBLOB==    | maximum length of 16,777,215（2^24^-1）bytes                 | BYTES    | BYTEA |
 | MEDIUMTEXT        | maximum length of 16,777,215（2^24^-1） characters           | STRING   | TEXT  |
-| ==LONGBLOB==      | maximum length of 4,294,967,295（2^32^-1） or 4GB characters | BYTES    | BYTEA |
+| ==LONGBLOB==      | maximum length of 4,294,967,295（2^32^-1） or 4GB bytes      | BYTES    | BYTEA |
 | LONGTEXT          | maximum length of 4,294,967,295（2^32^-1） or 4GB characters | STRING   | TEXT  |
 | ENUM              | maximum of 3000 distinct elements,                           | STRING   | TEXT  |
 | SET               | maximum of 3000 distinct elements,                           | STRING   | TEXT  |
 
--   ==BINARY==、==VARBINARY==、==BLOB==、==MEDIUMBLOB==、==LONGBLOB== 导出为十六进制 ，写入为PgSQL的BYTEA类型。
-    -   即 mysql 的 ’0‘ 导出为 ’0x30‘，写入到 PgSQL 为四个字节，’0‘、’x‘、’3‘、’0‘ 各占一个字节。
-
-
+-   VARCHAR 与 VARBINARY  的存储长度是动态的 [参考](https://dev.mysql.com/doc/refman/8.0/en/column-count-limit.html) 与 [参考](https://dev.mysql.com/doc/refman/5.7/en/innodb-row-format.html#innodb-row-format-compact)，受当前数据库存储引擎不同以及数据库行大小限制的影响，为了避免创建表出错，Source 端不为MySQL时，VARCHAR (0)以及VARBINARY   (0) 都改为 (8192)。
+-   ==BINARY==、==VARBINARY==、==BLOB==、==TINYBLOB==、==MEDIUMBLOB==、==LONGBLOB== 导出为十六进制 ，写入为PgSQL的BYTEA类型。
+    -   即 mysql 的 `b'0'` 导出为 ’0x30‘，写入到 PgSQL 为四个字节，’0‘、’x‘、’3‘、’0‘ 各占一个字节。
 
 
 
@@ -526,7 +528,7 @@ https://dev.mysql.com/doc/refman/5.7/en/spatial-types.html
 |     MULTIPOLYGON       | TEXT | TEXT |
 |     GEOMETRYCOLLECTION       | TEXT | TEXT |
 
--   由于不同数据库对，几何数据的支持不同，因此这儿统一转换为字符串。
+-   由于不同数据库对几何数据的支持不同，因此这儿统一转换为长字符串。
 
 
 

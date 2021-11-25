@@ -1,0 +1,58 @@
+====  sourceConfig  ====
+host:192.168.30.155
+port:5432
+username:'postgres'
+password:''
+dataSourceType:POSTGRES
+databasename:test_db
+url:jdbc:postgresql://192.168.30.155:5432/test_db
+
+====  cloneConfig  ====
+host:192.168.30.148
+port:3306
+username:'root'
+password:'root'
+dataSourceType:MYSQL
+databasename:test_db
+url:jdbc:mysql://192.168.30.148:3306/test_db?useSSL=false
+
+
+(1).Read to initialization table in MYSQL ,from POSTGRES.boolean_types_pgsql
+
+	(1.1).get 'boolean_types_pgsql' info from POSTGRES
+	----get sourceTable info total time spent:232
+
+DataSourceType:POSTGRES
+CatalogName:test_db
+SchemaName:public
+TableName:boolean_types_pgsql
+========== columns info =============
+ColumnName=pgboolean            DataType=boolean              Position=1    CharMaxLength=1          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=BOOLEAN
+
+	(1.2).create 'boolean_types_pgsql_p2m' in MYSQL
+Create Table If Not Exists boolean_types_pgsql_p2m(
+pgboolean TINYINT(1)
+);
+	----create table total time spent:349
+
+DataSourceType:MYSQL
+CatalogName:null
+SchemaName:null
+TableName:boolean_types_pgsql_p2m
+========== columns info =============
+ColumnName=pgboolean            DataType=TINYINT(1)           Position=1    CharMaxLength=1          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=BOOLEAN
+----initialization table success !!!
+
+
+(2).Read to Sync table data, export POSTGRES.boolean_types_pgsql ,load to MYSQL.boolean_types_pgsql_p2m
+
+	  Excuet Shell : ./TCM-Temp/Export_from_POSTGRES_boolean_types_pgsql.sh
+	 Shell Out:COPY 8
+	----export table data total time spent:19
+
+	  Excuet Shell : ./TCM-Temp/Load_to_MYSQL_boolean_types_pgsql_p2m.sh
+	 Shell Out:mysql: [Warning] Using a password on the command line interface can be insecure.
+	----load table data total time spent:245
+
+----Sync the table success !!!!
+Mapping Table and Syncing TableData table time:845

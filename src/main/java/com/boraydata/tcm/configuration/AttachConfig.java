@@ -111,6 +111,8 @@ public class AttachConfig {
         this.tempDirectory = props.getProperty("tempDirectory","./TCM-Temp/");
         // put csv file in HDFS Path
         this.hdfsCsvDir = props.getProperty("hdfs.csv.dir");
+        if(!this.hdfsCsvDir.substring(hdfsCsvDir.length()-1).equals("/"))
+            this.hdfsCsvDir += "/";
         // Hive Path In HDFS
         this.hiveHdfsPath = props.getProperty("hive.hdfs.path");
         this.hivePrimaryKey = props.getProperty("hive.primary.key");

@@ -1,0 +1,58 @@
+====  sourceConfig  ====
+host:192.168.30.155
+port:5432
+username:'postgres'
+password:''
+dataSourceType:POSTGRES
+databasename:test_db
+url:jdbc:postgresql://192.168.30.155:5432/test_db
+
+====  cloneConfig  ====
+host:192.168.30.155
+port:5432
+username:'postgres'
+password:''
+dataSourceType:POSTGRES
+databasename:test_db
+url:jdbc:postgresql://192.168.30.155:5432/test_db
+
+
+(1).Read to initialization table in POSTGRES ,from POSTGRES.boolean_types_pgsql
+
+	(1.1).get 'boolean_types_pgsql' info from POSTGRES
+	----get sourceTable info total time spent:218
+
+DataSourceType:POSTGRES
+CatalogName:test_db
+SchemaName:public
+TableName:boolean_types_pgsql
+========== columns info =============
+ColumnName=pgboolean            DataType=boolean              Position=1    CharMaxLength=1          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=BOOLEAN
+
+	(1.2).create 'boolean_types_pgsql_p2p' in POSTGRES
+Create Table If Not Exists boolean_types_pgsql_p2p(
+pgboolean boolean
+);
+	----create table total time spent:29
+
+DataSourceType:POSTGRES
+CatalogName:null
+SchemaName:null
+TableName:boolean_types_pgsql_p2p
+========== columns info =============
+ColumnName=pgboolean            DataType=boolean              Position=1    CharMaxLength=1          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=BOOLEAN
+----initialization table success !!!
+
+
+(2).Read to Sync table data, export POSTGRES.boolean_types_pgsql ,load to POSTGRES.boolean_types_pgsql_p2p
+
+	  Excuet Shell : ./TCM-Temp/Export_from_POSTGRES_boolean_types_pgsql.sh
+	 Shell Out:COPY 8
+	----export table data total time spent:21
+
+	  Excuet Shell : ./TCM-Temp/Load_to_POSTGRES_boolean_types_pgsql_p2p.sh
+	 Shell Out:COPY 8
+	----load table data total time spent:76
+
+----Sync the table success !!!!
+Mapping Table and Syncing TableData table time:344

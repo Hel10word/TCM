@@ -22,6 +22,7 @@ public enum DataSourceType {
         MySQLContent.TABLE_NAME,
         MySQLContent.COLUMN_NAME,
         MySQLContent.DATA_TYPE,
+        MySQLContent.UDT_TYPE,
         MySQLContent.ORDINAL_POSITION,
         MySQLContent.IS_NULLABLE,
         MySQLContent.CHAR_MAX_LENGTH,
@@ -38,6 +39,7 @@ public enum DataSourceType {
         PGSQLContent.TABLE_NAME,
         PGSQLContent.COLUMN_NAME,
         PGSQLContent.DATA_TYPE,
+        PGSQLContent.UDT_TYPE,
         PGSQLContent.ORDINAL_POSITION,
         PGSQLContent.IS_NULLABLE,
         PGSQLContent.CHAR_MAX_LENGTH,
@@ -49,6 +51,7 @@ public enum DataSourceType {
         PGSQLContent.SQL_ALL_TABLE_INFO
             ),
     HUDI(
+        null,
         null,
         null,
         null,
@@ -82,6 +85,7 @@ public enum DataSourceType {
     public final String TableName;
     public final String ColumnName;
     public final String DataType;
+    public final String UdtType;
     public final String OrdinalPosition;
     public final String IsNullAble;
     public final String CharMaxLength;
@@ -97,6 +101,7 @@ public enum DataSourceType {
                    String TableName,
                    String ColumnName,
                    String DataType,
+                   String UdtType,
                    String OrdinalPosition,
                    String IsNullAble,
                    String CharMaxLength,
@@ -111,6 +116,7 @@ public enum DataSourceType {
         this.TableName = TableName;
         this.ColumnName = ColumnName;
         this.DataType = DataType;
+        this.UdtType = UdtType;
         this.OrdinalPosition = OrdinalPosition;
         this.IsNullAble = IsNullAble;
         this.CharMaxLength = CharMaxLength;
@@ -136,6 +142,7 @@ public enum DataSourceType {
         private static final String TABLE_NAME = "TABLE_NAME";
         private static final String COLUMN_NAME = "COLUMN_NAME";
         private static final String DATA_TYPE = "COLUMN_TYPE";
+        private static final String UDT_TYPE = "DATA_TYPE";
         private static final String ORDINAL_POSITION = "ORDINAL_POSITION";
         private static final String IS_NULLABLE = "IS_NULLABLE";
         private static final String CHAR_MAX_LENGTH = "CHARACTER_MAXIMUM_LENGTH";
@@ -143,7 +150,7 @@ public enum DataSourceType {
         private static final String NUMERIC_PRECISION_D = "NUMERIC_SCALE";
         private static final String DATETIME_PRECISION = "DATETIME_PRECISION";
         private static final String SELECT_TABLE_COLUMN =
-                "select "+TABLE_CATALOG+","+TABLE_SCHEMA+","+TABLE_NAME+","+COLUMN_NAME+","+DATA_TYPE+","+ORDINAL_POSITION+","+IS_NULLABLE+","+CHAR_MAX_LENGTH+","+NUMERIC_PRECISION_M+","+NUMERIC_PRECISION_D+","+DATETIME_PRECISION;
+                "select "+TABLE_CATALOG+","+TABLE_SCHEMA+","+TABLE_NAME+","+COLUMN_NAME+","+DATA_TYPE+","+UDT_TYPE+","+ORDINAL_POSITION+","+IS_NULLABLE+","+CHAR_MAX_LENGTH+","+NUMERIC_PRECISION_M+","+NUMERIC_PRECISION_D+","+DATETIME_PRECISION;
 //                " select TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,ORDINAL_POSITION,IS_NULLABLE, NUMERIC_PRECISION, NUMERIC_SCALE,CHARACTER_SET_NAME, COLLATION_NAME ";
         private static final String SELECT_TABLE_FROM = " from information_schema.COLUMNS ";
         private static final String WHERE = " where ";
@@ -179,6 +186,7 @@ public enum DataSourceType {
         private static final String TABLE_NAME = "table_name";
         private static final String COLUMN_NAME = "column_name";
         private static final String DATA_TYPE = "data_type";
+        private static final String UDT_TYPE = "udt_name";
         private static final String ORDINAL_POSITION = "ordinal_position";
         private static final String IS_NULLABLE = "is_nullable";
         private static final String CHAR_MAX_LENGTH = "character_maximum_length";
@@ -186,7 +194,7 @@ public enum DataSourceType {
         private static final String NUMERIC_PRECISION_D = "numeric_scale";
         private static final String DATETIME_PRECISION = "datetime_precision";
         private static final String SELECT_TABLE_COLUMN =
-                "select "+TABLE_CATALOG+","+TABLE_SCHEMA+","+TABLE_NAME+","+COLUMN_NAME+","+DATA_TYPE+","+ORDINAL_POSITION+","+IS_NULLABLE+","+CHAR_MAX_LENGTH+","+NUMERIC_PRECISION_M+","+NUMERIC_PRECISION_D+","+DATETIME_PRECISION;
+                "select "+TABLE_CATALOG+","+TABLE_SCHEMA+","+TABLE_NAME+","+COLUMN_NAME+","+DATA_TYPE+","+UDT_TYPE+","+ORDINAL_POSITION+","+IS_NULLABLE+","+CHAR_MAX_LENGTH+","+NUMERIC_PRECISION_M+","+NUMERIC_PRECISION_D+","+DATETIME_PRECISION;
 //                " select table_catalog,table_schema,table_name,column_name,data_type,ordinal_position,is_nullable,numeric_precision,numeric_precision_radix,numeric_scale,character_set_name,collation_name ";
         private static final String SELECT_TABLE_FROM = " from information_schema.columns ";
         private static final String WHERE = " where ";

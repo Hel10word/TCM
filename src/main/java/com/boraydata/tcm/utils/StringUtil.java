@@ -15,9 +15,8 @@ public class StringUtil {
     // Format DataType
     public static String dataTypeFormat(String string){
         // e.g. : var char  -->  varchar
-        string = string.replaceAll(" ","");
-//        if(string.equalsIgnoreCase("bit(1)"))
-//            return string;
+//        string = string.replaceAll(" ","");
+
         if(string.equalsIgnoreCase("tinyint(1)"))
             return string;
         // e.g. :  bit(100) -->  bit(>1)

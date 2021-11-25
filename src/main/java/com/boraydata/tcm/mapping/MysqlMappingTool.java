@@ -28,8 +28,11 @@ public class MysqlMappingTool implements MappingTool {
         mappingMap.put("NUMERIC", TableCloneManageType.DECIMAL);
         mappingMap.put("FLOAT", TableCloneManageType.FLOAT64);
         mappingMap.put("REAL", TableCloneManageType.FLOAT64);
-        mappingMap.put("DOUBLE", TableCloneManageType.FLOAT64);
+        mappingMap.put("DOUBLE PRECISION", TableCloneManageType.FLOAT64);
         mappingMap.put("INT", TableCloneManageType.INT32);
+        mappingMap.put("DEC", TableCloneManageType.DECIMAL);
+        mappingMap.put("FIXED", TableCloneManageType.DECIMAL);
+        mappingMap.put("DOUBLE", TableCloneManageType.FLOAT64);
         mappingMap.put("BIT", TableCloneManageType.BYTES);
         mappingMap.put("TINYINT(1)", TableCloneManageType.BOOLEAN);
         mappingMap.put("TINYINT", TableCloneManageType.INT8);
@@ -89,8 +92,11 @@ public class MysqlMappingTool implements MappingTool {
             if (StringUtil.isNullOrEmpty(column.getDataType()))
                 throw new TCMException("not found DataType value in "+column.getColumnInfo());
             TableCloneManageType relation = StringUtil.findRelation(mappingMap,column.getDataType(),null);
-//            if (relation == null)
-//                throw new TCMException("not found DataType relation in "+column.getColumnInfo());
+            if (relation == null)
+                throw new TCMException("not found DataType relation in "+column.getColumnInfo());
+            String colName = StringUtil.dataTypeFormat(column.getDataType());
+            if(relation != null && "TINYINT".equalsIgnoreCase(colName) && column.getCharMaxLength() == 1)
+                relation = TableCloneManageType.BOOLEAN;
             column.setTableCloneManageType(relation);
         }
         return table;
@@ -137,40 +143,87 @@ public class MysqlMappingTool implements MappingTool {
         for(Column column : columns){
             if(column.getDataType() == null)
                 throw new TCMException("Create Table SQL is fail,Because unable use null type:"+column.getColumnInfo());
-            String colName = StringUtil.dataTypeFormat(column.getDataType());
+            String colDataType = StringUtil.dataTypeFormat(column.getDataType());
             stringBuilder.append(column.getColumnName()).append(" ");
-            if("DECIMAL".equalsIgnoreCase(colName)){
-                stringBuilder.append(colName);
-                if(column.getNumericPrecisionM()>0){
-                    stringBuilder.append("("+column.getNumericPrecisionM());
-                    if(column.getNumericPrecisionD()>0)
-                        stringBuilder.append(","+column.getNumericPrecisionD());
+            if(
+                    "DECIMAL".equalsIgnoreCase(colDataType) ||
+                    "NUMERIC".equalsIgnoreCase(colDataType) ||
+                    "DEC".equalsIgnoreCase(colDataType) ||
+                    "FIXED".equalsIgnoreCase(colDataType)
+            ){
+                stringBuilder.append(colDataType);
+                if(column.getNumericPrecisionM() != null){
+                    if(column.getNumericPrecisionM() > 0 && column.getNumericPrecisionM() <= 65)
+                        stringBuilder.append("("+column.getNumericPrecisionM());
+                    else
+                        stringBuilder.append("(65");
+                    if(column.getNumericPrecisionD() != null){
+                        if(column.getNumericPrecisionD() > 0 && column.getNumericPrecisionD() <= 30)
+                            stringBuilder.append(","+column.getNumericPrecisionD());
+                        else
+                            stringBuilder.append(",30");
+                    }
                     stringBuilder.append(")");
-                }else
-                    stringBuilder.append("(65,30)");
-            }else if ("VARBINARY".equalsIgnoreCase(colName)){
-                stringBuilder.append(colName);
-                if(column.getCharMaxLength() > 0)
-                    stringBuilder.append("("+column.getCharMaxLength()+")");
-                else
-                    stringBuilder.append("(1024)");
-            }else if ("VARCHAR".equalsIgnoreCase(colName) || "CHAR".equalsIgnoreCase(colName)){
-                stringBuilder.append(colName);
-                if(column.getCharMaxLength() > 0)
-                    stringBuilder.append("("+column.getCharMaxLength()+")");
-                else
-                    stringBuilder.append("(255)");
-            }else if("TIMESTAMP".equalsIgnoreCase(colName)){
-                stringBuilder.append(colName);
-                String tempStr = "/ DEFAULT CURRENT_TIMESTAMP/ ON UPDATE CURRENT_TIMESTAMP/";
-                if(column.getDatetimePrecision()>0)
-                    stringBuilder.append(tempStr.replaceAll("/","("+column.getDatetimePrecision()+")"));
-                else
-                    stringBuilder.append(tempStr.replaceAll("/",""));
-            }else if("DATETIME".equalsIgnoreCase(colName)||"TIME".equalsIgnoreCase(colName)){
-                stringBuilder.append(colName);
-                if(column.getDatetimePrecision()>0)
-                    stringBuilder.append("("+column.getDatetimePrecision()+")");
+                }else {
+                    // nothing to do
+                }
+            }else if (
+                    "CHAR".equalsIgnoreCase(colDataType) ||
+                    "BINARY".equalsIgnoreCase(colDataType)
+            ){
+                stringBuilder.append(colDataType);
+                if(column.getCharMaxLength() != null){
+                    //  mysql permits to create a column of type CHAR(0)
+                    if(column.getCharMaxLength() >= 0 && column.getCharMaxLength() <= 255)
+                        stringBuilder.append("(").append(column.getCharMaxLength()).append(")");
+                    else
+                        stringBuilder.append("(255)");
+                }else {
+                    // nothing to do
+                }
+            }else if ("TINYINT".equalsIgnoreCase(colDataType) && table.getSourceType() != null && !table.getSourceType().equals(DataSourceType.MYSQL)){
+                stringBuilder.append(colDataType);
+                if(column.getCharMaxLength() != null){
+                    if(column.getCharMaxLength() > 0 && column.getCharMaxLength() <= 255)
+                        stringBuilder.append("(").append(column.getCharMaxLength()).append(")");
+                    else
+                        stringBuilder.append("(255)");
+                }else {
+                    // nothing to do
+                }
+            }else if (
+                    "VARCHAR".equalsIgnoreCase(colDataType) ||
+                    "VARBINARY".equalsIgnoreCase(colDataType)
+            ){
+                stringBuilder.append(colDataType);
+//                 https://dev.mysql.com/doc/refman/8.0/en/column-count-limit.html
+//                https://dev.mysql.com/doc/refman/5.7/en/innodb-row-format.html#innodb-row-format-compact
+                if(column.getCharMaxLength() != null){
+                    if(column.getCharMaxLength() >= 0 && table.getSourceType() != null && table.getSourceType().equals(DataSourceType.MYSQL))
+                        stringBuilder.append("("+column.getCharMaxLength()+")");
+                    else if(column.getCharMaxLength() > 0)
+                        stringBuilder.append("("+column.getCharMaxLength()+")");
+                    else
+                        stringBuilder.append("(8192)");
+                }else {
+                    // nothing to do
+                }
+            }else if("TIMESTAMP".equalsIgnoreCase(colDataType)){
+                stringBuilder.append(colDataType);
+                if(column.getDatetimePrecision() != null && column.getDatetimePrecision() > 0 && column.getDatetimePrecision() <= 6){
+                    String fsp = "("+column.getDatetimePrecision()+")";
+                    stringBuilder.append(fsp)
+                            .append(" DEFAULT CURRENT_TIMESTAMP").append(fsp)
+                            .append(" ON UPDATE CURRENT_TIMESTAMP").append(fsp);
+                }else if(column.getDatetimePrecision() != null && column.getDatetimePrecision() == 0)
+                    stringBuilder.append(" DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+                else {
+                    // nothing to do
+                }
+            }else if("DATETIME".equalsIgnoreCase(colDataType)||"TIME".equalsIgnoreCase(colDataType)){
+                stringBuilder.append(colDataType);
+                if(column.getDatetimePrecision() != null && column.getDatetimePrecision() > 0 && column.getDatetimePrecision() <= 6)
+                    stringBuilder.append("(").append(column.getDatetimePrecision()).append(")");
             }else
                 stringBuilder.append(column.getDataType());
 
@@ -179,7 +232,8 @@ public class MysqlMappingTool implements MappingTool {
             stringBuilder.append("\n,");
         }
         stringBuilder.deleteCharAt(stringBuilder.length()-1);
-        stringBuilder.append(")Engine InnoDB;");
+//        stringBuilder.append(")Engine InnoDB;");
+        stringBuilder.append(");");
         return stringBuilder.toString();
     }
 }

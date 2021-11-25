@@ -18,6 +18,8 @@ public class Table implements Cloneable {
     private String schemaname;
     // 表名
     private String tablename;
+    // 记录上一个
+    private DataSourceType sourceType;
     // 表下面列的信息
     private List<Column> columns = new LinkedList<>();
 
@@ -68,6 +70,16 @@ public class Table implements Cloneable {
         this.columns = columns;
         return this;
     }
+
+    public DataSourceType getSourceType() {
+        return sourceType==null?dataSourceType:sourceType;
+    }
+
+    public Table setSourceType(DataSourceType sourceType) {
+        this.sourceType = sourceType;
+        return this;
+    }
+
     public void outTableInfo(){
         System.out.println("DataSourceType:"+this.dataSourceType+"\n"
         +"CatalogName:"+this.catalogname+"\n"
@@ -94,9 +106,10 @@ public class Table implements Cloneable {
         try {
             table = (Table) super.clone();
             List<Column> cloneList = new LinkedList<>();
-            for(Column column : columns)
+            for(Column column : this.columns)
                 cloneList.add(column.clone());
             table.setColumns(cloneList);
+            table.setSourceType(dataSourceType);
             table.setCatalogname(null);
             table.setSchemaname(null);
         }catch (CloneNotSupportedException e){

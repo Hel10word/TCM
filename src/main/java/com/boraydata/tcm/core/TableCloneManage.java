@@ -120,6 +120,7 @@ public class TableCloneManage {
                 column.setTableName(rs.getString(dsType.TableName));
                 column.setColumnName(rs.getString(dsType.ColumnName));
                 column.setDataType(rs.getString(dsType.DataType));
+                column.setUdtType(rs.getString(dsType.UdtType));
                 column.setOrdinalPosition(rs.getInt(dsType.OrdinalPosition));
                 column.setNullAble(rs.getBoolean(dsType.IsNullAble));
                 column.setCharMaxLength(rs.getLong(dsType.CharMaxLength));

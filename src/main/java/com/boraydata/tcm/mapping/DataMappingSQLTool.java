@@ -28,7 +28,7 @@ public class DataMappingSQLTool {
 
     public static String getSQL(Table table,DataSourceType target){
         StringBuilder sbSQL = new StringBuilder();
-        DataSourceType tableType = table.getDataSourceType();
+        DataSourceType tableType = table.getSourceType();
         sbSQL.append("select ");
         for (Column column : table.getColumns()){
             TableCloneManageType colType = column.getTableCloneManageType();
@@ -37,23 +37,25 @@ public class DataMappingSQLTool {
                 sbSQL.append(colName);
             }else if(TableCloneManageType.MONEY.equals(colType) && DataSourceType.POSTGRES.equals(tableType)){
 //                pgmoney::money::numeric as pgmoney3
-                sbSQL.append(colName)
-                        .append("::money::numeric as ")
+                sbSQL.append("(")
+                        .append(colName)
+                        .append("::money::numeric) as ")
                         .append(colName);
             }else if(TableCloneManageType.BYTES.equals(colType) && DataSourceType.MYSQL.equals(tableType)){
                 String dataType = column.getDataType().replaceAll("\\(.*\\)","");
-                if(dataType.equalsIgnoreCase("binary") ||
-                        dataType.equalsIgnoreCase("varbinary") ||
-                        dataType.equalsIgnoreCase("blob") ||
-                        dataType.equalsIgnoreCase("mediumblob") ||
-                        dataType.equalsIgnoreCase("longblob")
+                if(
+                        dataType.equalsIgnoreCase("BINARY") ||
+                        dataType.equalsIgnoreCase("VARBINARY") ||
+                        dataType.equalsIgnoreCase("BLOB") ||
+                        dataType.equalsIgnoreCase("MEDIUMBLOB") ||
+                        dataType.equalsIgnoreCase("LONGBLOB")
                 ){
 //                    select mybit1,mybit5,HEX(mybinary),HEX(myvarbinary),HEX(myblob),HEX(mymediumblob),HEX(mylongblob) from byte_types_mysql;
                     sbSQL.append("CONCAT('0x',HEX(")
                             .append(colName)
                             .append(")) as ")
                             .append(colName);
-                }else if(dataType.equalsIgnoreCase("bit")){
+                }else if(dataType.equalsIgnoreCase("BIT")){
                     sbSQL.append("BIN(")
                             .append(colName)
                             .append(") as ")

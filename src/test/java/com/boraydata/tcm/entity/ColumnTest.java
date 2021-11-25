@@ -31,7 +31,13 @@ class ColumnTest {
         System.out.println("DataSourceType    column:"+column.getDataSourceType()+"    clone:"+clone.getDataSourceType()+"  "+(column.getDataSourceType()==clone.getDataSourceType()));
         System.out.println("TableCloneManageType    column:"+column.getTableCloneManageType()+"    clone:"+clone.getTableCloneManageType()+"  "+(column.getTableCloneManageType()==clone.getTableCloneManageType()));
         System.out.println("TableName    column:"+column.getTableName()+"    clone:"+clone.getTableName()+"  "+(column.getTableName()==clone.getTableName()));
-
     }
+
+    @Test
+    public void outInfoTest(){
+        Column column = new Column();
+        column.outInfo();
+    }
+
 
 }
