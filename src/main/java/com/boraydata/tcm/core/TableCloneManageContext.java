@@ -70,12 +70,12 @@ public class TableCloneManageContext {
             if (DataSourceType.HUDI.toString().equals(cloneConfig.getDataSourceType().toString())){
                 if(StringUtil.isNullOrEmpty(attachConfig.getHdfsCsvDir()))
                     throw new TCMException("if you want use DB-Hive,the 'HdfsCsvDir' You need to fill in");
-                if(StringUtil.isNullOrEmpty(attachConfig.getHiveHdfsPath()))
-                    throw new TCMException("if you want use DB-Hive,the 'HiveHdfsPath' You need to fill in");
-                if(StringUtil.isNullOrEmpty(attachConfig.getHivePrimaryKey()))
-                    throw new TCMException("if you want use DB-Hive,the 'HivePrimaryKey' You need to fill in");
-                if(StringUtil.isNullOrEmpty(attachConfig.getHivePartitionKey()))
-                    throw new TCMException("if you want use DB-Hive,the 'HivePartitionKey' You need to fill in");
+                if(StringUtil.isNullOrEmpty(attachConfig.getHudiHdfsPath()))
+                    throw new TCMException("if you want use DB-Hive,the 'HudiHdfsPath' You need to fill in");
+                if(StringUtil.isNullOrEmpty(attachConfig.getHudiPrimaryKey()))
+                    throw new TCMException("if you want use DB-Hive,the 'HudiPrimaryKey' You need to fill in");
+                if(StringUtil.isNullOrEmpty(attachConfig.getHudiPartitionKey()))
+                    throw new TCMException("if you want use DB-Hive,the 'HudiPartitionKey' You need to fill in");
             }
             return new TableCloneManageContext(this);
         }

@@ -27,15 +27,15 @@ public class AttachConfig {
     private String cloneUser;
     private String clonePassword;
 
-
     private String sourceTableName;
     private String cloneTableName;
 
+    private String[] colNames;
     private String tempDirectory;
     private String hdfsCsvDir;
-    private String hiveHdfsPath;
-    private String hivePrimaryKey;
-    private String hivePartitionKey;
+    private String hudiHdfsPath;
+    private String hudiPrimaryKey;
+    private String hudiPartitionKey;
     private String hoodieTableType;
     private Boolean hiveNonPartitioned;
     private Boolean hiveMultiPartitionKeys;
@@ -48,7 +48,7 @@ public class AttachConfig {
     private String localCsvPath;
     private String exportShellPath;
     private String loadShellPath;
-
+    private String loadExpendScriptPath;
 
     private String delimiter;
     private Boolean debug;
@@ -88,7 +88,7 @@ public class AttachConfig {
             this.sourceDataType = DataSourceType.MYSQL.toString();
         }else if (this.sourceDataType.equalsIgnoreCase("postgresql")){
             this.sourceDataType = DataSourceType.POSTGRES.toString();
-        }else if (this.sourceDataType.equalsIgnoreCase("hive")) {
+        }else if (this.sourceDataType.equalsIgnoreCase("hudi")) {
             throw new TCMException("sourceDataType unable to be");
         }else
             throw new TCMException("pls check configFile,sourceDataType cannot be the '"+this.sourceDataType+'\'');
@@ -97,7 +97,7 @@ public class AttachConfig {
             this.cloneDataType = DataSourceType.MYSQL.toString();
         }else if (this.cloneDataType.equalsIgnoreCase("postgresql")) {
             this.cloneDataType = DataSourceType.POSTGRES.toString();
-        }else if (this.cloneDataType.equalsIgnoreCase("hive")) {
+        }else if (this.cloneDataType.equalsIgnoreCase("hudi")) {
             this.cloneDataType = DataSourceType.HUDI.toString();
         }else
             throw new TCMException("pls check configFile,cloneDataType cannot be the '"+this.cloneDataType+'\'');
@@ -114,9 +114,9 @@ public class AttachConfig {
         if(!this.hdfsCsvDir.substring(hdfsCsvDir.length()-1).equals("/"))
             this.hdfsCsvDir += "/";
         // Hive Path In HDFS
-        this.hiveHdfsPath = props.getProperty("hive.hdfs.path");
-        this.hivePrimaryKey = props.getProperty("hive.primary.key");
-        this.hivePartitionKey = props.getProperty("hive.partition.key","_hoodie_date");
+        this.hudiHdfsPath = props.getProperty("hudi.hdfs.path");
+        this.hudiPrimaryKey = props.getProperty("hudi.primary.key");
+        this.hudiPartitionKey = props.getProperty("hudi.partition.key","_hoodie_date");
         this.hoodieTableType = props.getProperty("hive.table.type","MERGE_ON_READ");
         this.hiveNonPartitioned = Boolean.parseBoolean(props.getProperty("hive.non.partitioned", "false").toLowerCase());
         this.hiveMultiPartitionKeys = Boolean.parseBoolean(props.getProperty("hive.multi.partition.keys", "false").toLowerCase());
@@ -150,9 +150,9 @@ public class AttachConfig {
                 "\n cloneTableName='" + cloneTableName + '\'' +
                 "\n tempDirectory='" + tempDirectory + '\'' +
                 "\n hdfsCsvDir='" + hdfsCsvDir + '\'' +
-                "\n hiveHdfsPath='" + hiveHdfsPath + '\'' +
-                "\n hivePrimaryKey='" + hivePrimaryKey + '\'' +
-                "\n hivePartitionKey='" + hivePartitionKey + '\'' +
+                "\n hiveHdfsPath='" + hudiHdfsPath + '\'' +
+                "\n hivePrimaryKey='" + hudiPrimaryKey + '\'' +
+                "\n hivePartitionKey='" + hudiPartitionKey + '\'' +
                 "\n hoodieTableType='" + hoodieTableType + '\'' +
                 "\n hiveNonPartitioned=" + hiveNonPartitioned +
                 "\n hiveMultiPartitionKeys=" + hiveMultiPartitionKeys +
@@ -163,6 +163,7 @@ public class AttachConfig {
                 "\n localCsvPath='" + localCsvPath + '\'' +
                 "\n exportShellPath='" + exportShellPath + '\'' +
                 "\n loadShellPath='" + loadShellPath + '\'' +
+                "\n loadExpendScriptPath='" + loadExpendScriptPath + '\'' +
                 "\n delimiter='" + delimiter + '\'' +
                 "\n debug=" + debug +
                 '}';
@@ -192,6 +193,15 @@ public class AttachConfig {
         return this;
     }
 
+    public String[] getColNames() {
+        return colNames;
+    }
+
+    public AttachConfig setColNames(String[] colNames) {
+        this.colNames = colNames;
+        return this;
+    }
+
     public String getTempDirectory() {
         return tempDirectory;
     }
@@ -210,30 +220,30 @@ public class AttachConfig {
         return this;
     }
 
-    public String getHiveHdfsPath() {
-        return hiveHdfsPath;
+    public String getHudiHdfsPath() {
+        return hudiHdfsPath;
     }
 
-    public AttachConfig setHiveHdfsPath(String hiveHdfsPath) {
-        this.hiveHdfsPath = hiveHdfsPath;
+    public AttachConfig setHudiHdfsPath(String hudiHdfsPath) {
+        this.hudiHdfsPath = hudiHdfsPath;
         return this;
     }
 
-    public String getHivePrimaryKey() {
-        return hivePrimaryKey;
+    public String getHudiPrimaryKey() {
+        return hudiPrimaryKey;
     }
 
-    public AttachConfig setHivePrimaryKey(String hivePrimaryKey) {
-        this.hivePrimaryKey = hivePrimaryKey;
+    public AttachConfig setHudiPrimaryKey(String hudiPrimaryKey) {
+        this.hudiPrimaryKey = hudiPrimaryKey;
         return this;
     }
 
-    public String getHivePartitionKey() {
-        return hivePartitionKey;
+    public String getHudiPartitionKey() {
+        return hudiPartitionKey;
     }
 
-    public AttachConfig setHivePartitionKey(String hivePartitionKey) {
-        this.hivePartitionKey = hivePartitionKey;
+    public AttachConfig setHudiPartitionKey(String hudiPartitionKey) {
+        this.hudiPartitionKey = hudiPartitionKey;
         return this;
     }
 
@@ -336,7 +346,16 @@ public class AttachConfig {
         return this;
     }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public String getLoadExpendScriptPath() {
+        return loadExpendScriptPath;
+    }
+
+    public AttachConfig setLoadExpendScriptPath(String loadExpendScriptPath) {
+        this.loadExpendScriptPath = loadExpendScriptPath;
+        return this;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public String getSourceDatabaseName() {
         return sourceDatabaseName;

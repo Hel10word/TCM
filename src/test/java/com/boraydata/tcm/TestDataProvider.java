@@ -40,7 +40,7 @@ public class TestDataProvider {
                 .setSourceTableName("lineitem")
                 .setCloneTableName("lineitem")
                 .setTempDirectory("./TCM-Temp/")
-                .setHivePartitionKey("_hoodie_date")
+                .setHudiPartitionKey("_hoodie_date")
                 .setHoodieTableType("MERGE_ON_READ")
                 .setHiveMultiPartitionKeys(false)
                 .setHiveNonPartitioned(false)

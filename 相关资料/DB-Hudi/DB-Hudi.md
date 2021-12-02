@@ -55,6 +55,12 @@ DB-Hudi
 
 
 
+
+
+[Spark-Shell](https://spark.apache.org/docs/latest/quick-start.html)   [Spark-Shell Command](https://spark.apache.org/docs/3.2.0/submitting-applications.html)
+
+[Hudi](https://hudi.apache.org/docs/quick-start-guide/)
+
 使用 Spark 连接 hudi
 
 ```sh

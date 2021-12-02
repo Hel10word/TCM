@@ -26,7 +26,7 @@ public class DataMappingSQLTool {
         mappingPts.put(DataSourceType.HUDI+FALSE,"'false'");
     }
 
-    public static String getSQL(Table table,DataSourceType target){
+    public static String getMappingDataSQL(Table table, DataSourceType target){
         StringBuilder sbSQL = new StringBuilder();
         DataSourceType tableType = table.getSourceType();
         sbSQL.append("select ");

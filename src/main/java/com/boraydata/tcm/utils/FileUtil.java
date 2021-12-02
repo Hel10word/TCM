@@ -1,6 +1,7 @@
 package com.boraydata.tcm.utils;
 
 import com.boraydata.tcm.exception.TCMException;
+import org.omg.PortableServer.ImplicitActivationPolicy;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,23 +33,26 @@ public class FileUtil {
 
     // write file , if shell exists , will delete .
     public static boolean WriteMsgToFile(String msg,String path){
-        File file = new File(path);
-        try {
-            if(Exists(path))
-                file.delete();
-            if (!file.getParentFile().exists())
-                file.getParentFile().mkdirs();
-            file.createNewFile();
-        }catch (IOException e){
-            throw new TCMException("Create '"+path+"' failed");
-        }
-        try(BufferedWriter br = new BufferedWriter(new FileWriter(file))){
-            br.write(msg);
-
-        }catch (IOException e){
-            throw new TCMException("write '"+msg+"' to '"+path+"' failed");
-        }
+        System.out.println("msg:\n"+msg);
+        System.out.println("path:\n"+path);
         return true;
+//        File file = new File(path);
+//        try {
+//            if(Exists(path))
+//                file.delete();
+//            if (!file.getParentFile().exists())
+//                file.getParentFile().mkdirs();
+//            file.createNewFile();
+//        }catch (IOException e){
+//            throw new TCMException("Create '"+path+"' failed");
+//        }
+//        try(BufferedWriter br = new BufferedWriter(new FileWriter(file))){
+//            br.write(msg);
+//
+//        }catch (IOException e){
+//            throw new TCMException("write '"+msg+"' to '"+path+"' failed");
+//        }
+//        return true;
     }
 
     // delete file

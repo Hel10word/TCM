@@ -15,6 +15,7 @@ import com.boraydata.tcm.utils.StringUtil;
 import java.io.File;
 import java.sql.*;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * provide use DatabaseConfig to get Table Information by table name  e.g.: getSourceTable()
@@ -73,7 +74,7 @@ public class TableCloneManage {
     // find the mapping relationship of each field
     // =======================================  SourceMappingTable  and  check TempTable ==============================
     public Table createSourceMappingTable(String tablename){
-        this.sourceMappingTable = sourceMappingTool.createSourceMappingTable(getSourceTableByTablename(sourceConfig, tablename));
+        this.sourceMappingTable = sourceMappingTool.createSourceMappingTable(getSourceTableByTableName(sourceConfig, tablename));
 
         // if source is MySQL,should create TempTable.
         if(this.sourceConfig.getDataSourceType().equals(DataSourceType.MYSQL)){
@@ -88,16 +89,21 @@ public class TableCloneManage {
             for (Column col:sourceMappingTable.getColumns()){
                 if(col.getTableCloneManageType().equals(TableCloneManageType.BOOLEAN)||
                         col.getTableCloneManageType().equals(TableCloneManageType.MONEY)){
-                    this.attachConfig.setTempTableSQL(DataMappingSQLTool.getSQL(sourceMappingTable,cloneConfig.getDataSourceType()));
+                    this.attachConfig.setTempTableSQL(DataMappingSQLTool.getMappingDataSQL(sourceMappingTable,cloneConfig.getDataSourceType()));
                     break;
                 }
             }
         }
+        List<Column> colList = sourceMappingTable.getColumns();
+        String[] colNames = new String[colList.size()];
+        for (Column column : colList)
+            colNames[column.getOrdinalPosition()-1] = column.getColumnName();
+        attachConfig.setColNames(colNames);
 
         return sourceMappingTable;
     }
     //  try to get table struct from Metadata by table name
-    public Table getSourceTableByTablename(DatabaseConfig databaseConfig, String tablename){
+    public Table getSourceTableByTableName(DatabaseConfig databaseConfig, String tablename){
         DataSourceType dsType = databaseConfig.getDataSourceType();
         try (
                 Connection con =DatasourceConnectionFactory.createDataSourceConnection(databaseConfig);
@@ -164,7 +170,7 @@ public class TableCloneManage {
         return createCloneTable(table,table.getTablename());
     }
     public Table createCloneTable(Table table,String tableName){
-        if(table.getDataSourceType().equals(cloneConfig.getDataSourceType()) || DataSourceType.HUDI.equals(cloneConfig.getDataSourceType())) {
+        if(table.getDataSourceType().equals(cloneConfig.getDataSourceType()) || cloneMappingTool == null) {
             this.cloneTable = table.clone();
             this.cloneTable.setTablename(tableName);
             return cloneTable;
@@ -177,18 +183,14 @@ public class TableCloneManage {
 
     // ========================================  create TempTable && CloneTable in Database ===========================
     public boolean createTableInDatasource(){
-        if(DataSourceType.HUDI.equals(cloneConfig.getDataSourceType()))
+        if(cloneMappingTool == null)
             return true;
 
-//        if(sourceConfig.getDataSourceType().equals(cloneConfig.getDataSourceType())){
-//            return createTableInDatasource(cloneTable,cloneConfig,cloneMappingTool,attachConfig.getDebug(),attachConfig.getTempDirectory());
-//        }
-
-        // check the TempTable is create
+        // check the TempTable,at present, only MySQL needs to create temp table
         if(this.tempTable != null && sourceConfig.getDataSourceType().equals(DataSourceType.MYSQL)){
             if(createTableInDatasource(tempTable,sourceConfig,sourceMappingTool,attachConfig.getDebug(),attachConfig.getTempDirectory())){
                 this.attachConfig.setTempTableName(tempTable.getTablename());
-                this.attachConfig.setTempTableSQL(DataMappingSQLTool.getSQL(sourceMappingTable,cloneConfig.getDataSourceType()));
+                this.attachConfig.setTempTableSQL(DataMappingSQLTool.getMappingDataSQL(sourceMappingTable,cloneConfig.getDataSourceType()));
             }else
                 throw new TCMException("Create TempTable is Failed!!! in "+sourceConfig.getDataSourceType()+"."+tempTable.getTablename());
         }
@@ -207,8 +209,7 @@ public class TableCloneManage {
             String sql = mappingTool.getCreateTableSQL(table);
             String outPath = new File(outSQLDir,"createTableIn_" + table.getDataSourceType().toString() + "_" + table.getTablename() + ".sql").getPath();
             if(Boolean.TRUE.equals(outSQLFlag))
-                System.out.println(sql);
-//                FileUtil.WriteMsgToFile(sql,outPath);
+                FileUtil.WriteMsgToFile(sql,outPath);
             try {
                 int i = statement.executeUpdate(sql);
                 if (i == 0)

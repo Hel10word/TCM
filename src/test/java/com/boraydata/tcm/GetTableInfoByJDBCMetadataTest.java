@@ -39,9 +39,9 @@ public class GetTableInfoByJDBCMetadataTest {
             .setPassword("postgres")
             .create();
 
-    String tableName = "pg_lsn_types_pgsql";
-//    DatabaseConfig config = mysqlConfig;
-    DatabaseConfig config = pgsqlConfig;
+    String tableName = "lineitem";
+    DatabaseConfig config = mysqlConfig;
+//    DatabaseConfig config = pgsqlConfig;
     @Test
     public void test(){
         showTableInfo(config,tableName);
@@ -49,7 +49,7 @@ public class GetTableInfoByJDBCMetadataTest {
         System.out.println();
         MappingTool tool = MappingToolFactory.create(config.getDataSourceType());
         assert tool != null;
-        tool.createSourceMappingTable(tcm.getSourceTableByTablename(config,tableName)).outTableInfo();
+        tool.createSourceMappingTable(tcm.getSourceTableByTableName(config,tableName)).outTableInfo();
     }
 
 

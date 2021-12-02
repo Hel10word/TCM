@@ -41,15 +41,15 @@ class TableCloneManageTest {
     // create the table clone manager
     TableCloneManageContext.Builder tcmcBuilder = new TableCloneManageContext.Builder();
     TableCloneManageContext tcmc = tcmcBuilder
-            .setSourceConfig(configPGSQL)
-//            .setSourceConfig(configMySQL)
+//            .setSourceConfig(configPGSQL)
+            .setSourceConfig(configMySQL)
 //            .setCloneConfig(configSpark)
-//            .setCloneConfig(configMySQL)
-            .setCloneConfig(configPGSQL)
+            .setCloneConfig(configMySQL)
+//            .setCloneConfig(configPGSQL)
             .setAttachConfig(TestDataProvider.getDefAttCfg())
             .create();
     TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmc);
-    String sourceName = "pg_lsn_types_pgsql";
+    String sourceName = "lineitem";
     String cloneName = sourceName+"_clone";
 //    String cloneName = "numeric_types_pgsql_clone";
 
@@ -74,7 +74,7 @@ class TableCloneManageTest {
 
 //        System.out.println("sourceTableSQL:\n"+sourceTableSQL);
 //        System.out.println("\n\ntempTableSQL:\n"+tempTableSQL);
-        System.out.println("\n\ncloneTableSQL:\n"+cloneTableSQL);
+//        System.out.println("\n\ncloneTableSQL:\n"+cloneTableSQL);
     }
 
     @Test
