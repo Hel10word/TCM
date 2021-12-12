@@ -51,8 +51,8 @@ class DatasourceConnectionFactoryTest {
 //        String sql = configMySQL.getDataSourceType().SQL_TableInfoByTableName.replace("?","'boolean_mysql'");
 //        String sql = "select * from lineitem_mysql";
         System.out.println(sql);
-        List list = DatasourceConnectionFactory.executeQuerySQL(configMySQL, sql);
-//        List list = DatasourceConnectionFactory.executeQuerySQL(configPgSQL, sql);
+//        List list = DatasourceConnectionFactory.executeQuerySQL(configMySQL, sql);
+        List list = DatasourceConnectionFactory.executeQuerySQL(configPgSQL, sql);
         list.forEach(System.out::println);
 //        System.out.println(list.get(0).toString());
     }

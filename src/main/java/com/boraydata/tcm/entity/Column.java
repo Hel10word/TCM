@@ -4,7 +4,7 @@ import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.core.TableCloneManageType;
 
 
-/** 用来记录一些列的信息
+/**
  * @author bufan
  * @data 2021/8/25
  */
@@ -15,27 +15,22 @@ public class Column implements Cloneable {
     private String TableCatalog;
     // Schema
     private String TableSchema;
-    // 表名
     private String TableName;
-    // 字段名
     private String ColumnName;
-    // 字段类型
     private String DataType;
-    // 标准的字段类型
+    // standard data type
     private String UdtType;
-    // 字段所在位置
     private Integer OrdinalPosition;
-    // Char 类型的 长度
+    // Char data type length
     private Long CharMaxLength;
-    // numeric 类型的长度
+    // numeric data type length
     private Integer NumericPrecisionM;
-    // numeric 类型的精度
+    // numeric data type precision
     private Integer NumericPrecisionD;
-    // time 类型的精度
+    // time data type precision
     private Integer DatetimePrecision;
-    // 字段是否允许为空
     private Boolean IsNullAble;
-    // 映射到内部的字段
+    // mapping tcm data type
     private TableCloneManageType tableCloneManageType;
 
     public Column() {}
@@ -191,8 +186,8 @@ public class Column implements Cloneable {
                 '}';
     }
 
-    public void outInfo(){
-        System.out.printf("ColumnName=%-20s DataType=%-20s UdtType=%-20s Position=%-4d CharMaxLength=%-10d NumericPrecisionM=%-4d NumericPrecisionD=%-4d DatetimePrecision=%-4d tableCLoneManageType=%s\n",ColumnName,DataType,UdtType,OrdinalPosition,CharMaxLength,NumericPrecisionM,NumericPrecisionD,DatetimePrecision,tableCloneManageType);
+    public String getInfo(){
+        return String.format("ColumnName=%-20s DataType=%-20s UdtType=%-20s Position=%-4d CharMaxLength=%-10d NumericPrecisionM=%-4d NumericPrecisionD=%-4d DatetimePrecision=%-4d tableCLoneManageType=%s\n",ColumnName,DataType,UdtType,OrdinalPosition,CharMaxLength,NumericPrecisionM,NumericPrecisionD,DatetimePrecision,tableCloneManageType);
     }
 
     public Column clone(){

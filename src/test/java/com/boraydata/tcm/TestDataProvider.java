@@ -1,11 +1,13 @@
 package com.boraydata.tcm;
 
-import com.boraydata.tcm.configuration.AttachConfig;
+import com.boraydata.tcm.configuration.TableCloneManageConfig;
 import com.boraydata.tcm.configuration.DatabaseConfig;
 import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.core.TableCloneManage;
 import com.boraydata.tcm.core.TableCloneManageContext;
 import com.boraydata.tcm.core.TableCloneManageFactory;
+
+import java.util.Properties;
 
 /**
  * @author bufan
@@ -35,26 +37,56 @@ public class TestDataProvider {
             .setPassword("")
             .create();
 
-    public static AttachConfig getDefAttCfg(){
-        return AttachConfig.getInstance()
-                .setSourceTableName("lineitem")
-                .setCloneTableName("lineitem")
-                .setTempDirectory("./TCM-Temp/")
-                .setHudiPartitionKey("_hoodie_date")
-                .setHoodieTableType("MERGE_ON_READ")
-                .setHiveMultiPartitionKeys(false)
-                .setHiveNonPartitioned(false)
-                .setParallel("8")
-                .setDelimiter("|")
-                .setDebug(false);
+    //========================== Hudi ===============================
+    public static DatabaseConfig.Builder builderHudi = new DatabaseConfig.Builder();
+    public static DatabaseConfig configHudi = builderHudi
+            .setDatabasename("test_db")
+            .setDataSourceType(DataSourceType.HUDI)
+            .setHost("192.168.120.67")
+            .setPort("10000")
+            .setUsername("rapids")
+            .setPassword("rapids")
+            .create();
+
+    public static TableCloneManageConfig getDefTcmConfig(DatabaseConfig sourceConfig,DatabaseConfig cloneConfig){
+        Properties properties = new Properties();
+
+        properties.setProperty("sourceDatabaseName",sourceConfig.getDatabasename());
+        properties.setProperty("sourceDataType",sourceConfig.getDataSourceType().toString());
+        properties.setProperty("sourceHost",sourceConfig.getHost());
+        properties.setProperty("sourcePort",sourceConfig.getPort());
+        properties.setProperty("sourceUser",sourceConfig.getUsername());
+        properties.setProperty("sourcePassword",sourceConfig.getPassword());
+        properties.setProperty("sourceTable","");
+
+        properties.setProperty("cloneDatabaseName",cloneConfig.getDatabasename());
+        properties.setProperty("cloneDataType",cloneConfig.getDataSourceType().toString());
+        properties.setProperty("cloneHost",cloneConfig.getHost());
+        properties.setProperty("clonePort",cloneConfig.getPort());
+        properties.setProperty("cloneUser",cloneConfig.getUsername());
+        properties.setProperty("clonePassword",cloneConfig.getPassword());
+        properties.setProperty("cloneTable","");
+
+        properties.setProperty("hdfs.source.data.path","hdfs://192.168.30.39:9000/HudiTest/");
+//        properties.setProperty("hdfs.source.data.path","file:///HudiTest/");
+//        properties.setProperty("hdfs.source.data.path","/HudiTest/");
+        properties.setProperty("hdfs.clone.data.path","/HudiTest/");
+        properties.setProperty("primary.key","id");
+        properties.setProperty("partition.key","_hoodie_date");
+        properties.setProperty("hudi.table.type","MERGE_ON_READ");
+//        properties.setProperty("hudi.table.type","COPY_ON_WRITE");
+
+        properties.setProperty("tempDirectory","./TCM-TempData/");
+        properties.setProperty("delimiter","|");
+        properties.setProperty("debug","true");
+
+        return TableCloneManageConfig.getInstance().loadLocalConfig(properties);
     }
 
     public static TableCloneManageContext getTCMC(DatabaseConfig sourceConfig,DatabaseConfig cloneConfig){
         TableCloneManageContext.Builder tcmcBuilder = new TableCloneManageContext.Builder();
         return tcmcBuilder
-                .setSourceConfig(sourceConfig)
-                .setCloneConfig(cloneConfig)
-                .setAttachConfig(getDefAttCfg())
+                .setTcmConfig(getDefTcmConfig(sourceConfig,cloneConfig))
                 .create();
     }
 
@@ -68,5 +100,9 @@ public class TestDataProvider {
 
     public static DatabaseConfig getConfigPGSQL() {
         return configPGSQL;
+    }
+
+    public static DatabaseConfig getConfigHudi() {
+        return configHudi;
     }
 }

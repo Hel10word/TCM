@@ -2,28 +2,22 @@ package com.boraydata.tcm.configuration;
 
 import com.boraydata.tcm.core.DataSourceType;
 
-/** Used to define metadata related information,this info be used to create Connection.
+/** define metadata connection info.
  * @author bufan
  * @data 2021/8/25
  */
 public class DatabaseConfig {
 
-    // 主机名
     private String host;
-    // 端口号
     private String port;
-    // 登陆 用户名
     private String username;
-    // 登陆 密码
     private String password;
-    // 数据库的类型 以及相关信息
     private DataSourceType dataSourceType;
-    // 数据库名称
     private String databasename;
-    // 连接驱动的名称
     private String driver;
-    // 连接的地址 （该地址可以手动设置，若没有设置，在获取 Connection 时 会根据前面的相关信息生成 URL 并赋值）
     private String url;
+    // default tableName
+    private String tableName;
 
     DatabaseConfig(Builder builder){
         username = builder.username;
@@ -38,6 +32,15 @@ public class DatabaseConfig {
 
     public DatabaseConfig setUrl(String url) {
         this.url = url;
+        return this;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public DatabaseConfig setTableName(String tableName) {
+        this.tableName = tableName;
         return this;
     }
 
@@ -135,13 +138,14 @@ public class DatabaseConfig {
 
 
     public String getCofInfo(){
-        return "host:"+host+"\n"+
-                "port:"+port+"\n"+
-                "username:'"+username+"'\n"+
-                "password:'"+password+"'\n"+
-                "dataSourceType:"+dataSourceType.toString()+"\n"+
-                "databasename:"+databasename+"\n"+
-                "url:"+url+"\n";
+        return  "\thost:"+host+"\n"+
+                "\tport:"+port+"\n"+
+                "\tusername:'"+username+"'\n"+
+                "\tpassword:'"+password+"'\n"+
+                "\tdataSourceType:"+dataSourceType.toString()+"\n"+
+                "\tdatabasename:"+databasename+"\n"+
+                "\ttableName:"+tableName+"\n"+
+                "\turl:"+url+"\n";
     }
 
 }

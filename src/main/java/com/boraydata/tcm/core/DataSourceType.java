@@ -69,11 +69,11 @@ public enum DataSourceType {
     );
 
     public static DataSourceType getTypeByStr(String str){
-        if(str.equals(DataSourceType.MYSQL.toString()))
+        if(str.equals(DataSourceType.MYSQL.toString()) || str.equalsIgnoreCase("mysql"))
             return DataSourceType.MYSQL;
-        else if(str.equals(DataSourceType.POSTGRES.toString()))
+        else if(str.equals(DataSourceType.POSTGRES.toString()) || str.equalsIgnoreCase("postgresql"))
             return DataSourceType.POSTGRES;
-        else if(str.equals(DataSourceType.HUDI.toString()))
+        else if(str.equals(DataSourceType.HUDI.toString()) || str.equalsIgnoreCase("hudi"))
             return DataSourceType.HUDI;
         throw new TCMException("Failed to get DataSourceType, you must fill in the correct , are not '"+str+'\'');
     }

@@ -6,7 +6,7 @@ import com.boraydata.tcm.exception.TCMException;
 import java.sql.*;
 import java.util.*;
 
-/** Used to create some database connection objects
+/** create database connection objects
  * @author bufan
  * @data 2021/8/25
  */
@@ -51,10 +51,11 @@ public class DatasourceConnectionFactory {
         if (databaseConfig.getUrl() != null)
             return databaseConfig.getUrl();
         StringBuilder url = new StringBuilder();
-//        DataSourceType dataSourceType = databaseConfig.getDataSourceType();
         String dbType = databaseConfig.getDataSourceType().toString();
+        // Hudi、Spark、Hive default use Hive_Driver
         if(DataSourceType.HUDI.toString().equals(dbType))
             dbType = "SPARK";
+
         url.append(dscPropers.getProperty(dbType));
         // get hostname、port      e.g:  192.168.1.1、3306
         if(databaseConfig.getHost() != null && databaseConfig.getPort() != null){

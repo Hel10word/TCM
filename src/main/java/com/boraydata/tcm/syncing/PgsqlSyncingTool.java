@@ -1,7 +1,11 @@
 package com.boraydata.tcm.syncing;
 
-import com.boraydata.tcm.configuration.AttachConfig;
+import com.boraydata.tcm.configuration.TableCloneManageConfig;
 import com.boraydata.tcm.configuration.DatabaseConfig;
+import com.boraydata.tcm.core.DataSourceType;
+import com.boraydata.tcm.core.TableCloneManageContext;
+import com.boraydata.tcm.entity.Table;
+import com.boraydata.tcm.mapping.DataMappingSQLTool;
 import com.boraydata.tcm.utils.FileUtil;
 import com.boraydata.tcm.utils.StringUtil;
 
@@ -12,34 +16,33 @@ import com.boraydata.tcm.utils.StringUtil;
 public class PgsqlSyncingTool implements SyncingTool {
 
     @Override
-    public boolean exportFile(DatabaseConfig config, AttachConfig attachConfig) {
-        String exportCommand =  exportCommand(config,attachConfig);
-        String exportShellPath = attachConfig.getExportShellPath();
-
-//        System.out.println(exportCommand);
-//        return true;
-
-        if(FileUtil.WriteMsgToFile(exportCommand,exportShellPath)){
-            if(FileUtil.Exists(exportShellPath))
-                return CommandExecutor.execuetShell(exportShellPath,attachConfig.getDebug());
-        }
-        return false;
+    public String exportFile(TableCloneManageContext tcmContext) {
+        Table table = tcmContext.getFinallySourceTable();
+        boolean hudiFlag = DataSourceType.HUDI.equals(tcmContext.getCloneConfig().getDataSourceType());
+        String exportSQL = "";
+        if(tcmContext.getTempTable() == null)
+            exportSQL = table.getTablename();
+        else
+            exportSQL = DataMappingSQLTool.getMappingDataSQL(table,tcmContext.getCloneConfig().getDataSourceType());
+        String csvPath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
+        String delimiter = tcmContext.getTcmConfig().getDelimiter();
+        return exportCommand(tcmContext.getSourceConfig(),exportSQL,csvPath,delimiter,hudiFlag);
+    }
+    public String exportCommand(DatabaseConfig config,String exportSQL, String csvPath,String delimiter,boolean hudiFlag) {
+        return completeExportCommand(getConnectCommand(config),exportSQL,csvPath,delimiter,hudiFlag);
     }
 
     @Override
-    public boolean loadFile(DatabaseConfig config, AttachConfig attachConfig) {
-        String loadCommand = loadCommand(config, attachConfig);
-        String loadShellPath = attachConfig.getLoadShellPath();
-
-//        System.out.println(loadCommand);
-//        return true;
-
-        if(FileUtil.WriteMsgToFile(loadCommand,loadShellPath)){
-            if(FileUtil.Exists(loadShellPath))
-                return CommandExecutor.execuetShell(loadShellPath,attachConfig.getDebug());
-        }
-        return false;
+    public String loadFile(TableCloneManageContext tcmContext) {
+        String csvPath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
+        String tablename = tcmContext.getCloneTable().getTablename();
+        String delimiter = tcmContext.getTcmConfig().getDelimiter();
+        return loadCommand(tcmContext.getCloneConfig(), csvPath,tablename,delimiter);
     }
+    public String loadCommand(DatabaseConfig config, String csvPath,String tablename,String delimiter) {
+        return completeLoadCommand(getConnectCommand(config),csvPath,tablename,delimiter);
+    }
+
 
 
 
@@ -55,10 +58,12 @@ public class PgsqlSyncingTool implements SyncingTool {
                 config.getHost(),
                 config.getDatabasename());
     }
-    private String completeExportCommand(String com,String tableName,String filePath, String delimiter){
-        return com.replace("?",
-                "\\copy "+tableName+" to " +
-                        "'"+filePath+"' with DELIMITER '"+delimiter+"';");
+
+    private String completeExportCommand(String com,String tableName,String filePath, String delimiter,boolean hudiFlag){
+        if(hudiFlag)
+            return com.replace("?","\\copy "+tableName+" to " + "'"+filePath+"' with DELIMITER '"+delimiter+"' CSV QUOTE '\\\"' escape '\\\\' force quote *;");
+        else
+            return com.replace("?","\\copy "+tableName+" to " + "'"+filePath+"' with DELIMITER '"+delimiter+"';");
     }
     private String completeLoadCommand(String com,String filePath, String tableName, String delimiter){
         return com.replace("?",
@@ -66,15 +71,8 @@ public class PgsqlSyncingTool implements SyncingTool {
                         "'"+filePath+"' with DELIMITER '"+delimiter+"';");
     }
 
-    public String exportCommand(DatabaseConfig config,AttachConfig attachConfig) {
-        if(!StringUtil.isNullOrEmpty(attachConfig.getTempTableSQL())){
-            return completeExportCommand(getConnectCommand(config),"("+attachConfig.getTempTableSQL().replaceAll(";","")+")",attachConfig.getLocalCsvPath(),attachConfig.getDelimiter());
-        }else
-            return completeExportCommand(getConnectCommand(config),attachConfig.getSourceTableName(),attachConfig.getLocalCsvPath(),attachConfig.getDelimiter());
-    }
 
-    public String loadCommand(DatabaseConfig config,AttachConfig attachConfig) {
-        return completeLoadCommand(getConnectCommand(config),attachConfig.getLocalCsvPath(),attachConfig.getCloneTableName(),attachConfig.getDelimiter());
-    }
+
+
 
 }

@@ -1,7 +1,8 @@
 package com.boraydata.tcm.core;
 
-import com.boraydata.tcm.configuration.AttachConfig;
+import com.boraydata.tcm.configuration.TableCloneManageConfig;
 import com.boraydata.tcm.configuration.DatabaseConfig;
+import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.exception.TCMException;
 import com.boraydata.tcm.utils.StringUtil;
 
@@ -13,12 +14,33 @@ public class TableCloneManageContext {
 
     private DatabaseConfig sourceConfig;
     private DatabaseConfig cloneConfig;
-    private AttachConfig attachConfig;
+    private TableCloneManageConfig tcmConfig;
 
-    TableCloneManageContext(Builder builder){
+    private Table sourceTable;
+    private Table tempTable;
+    private Table cloneTable;
+
+    private String csvFileName;
+    private String exportShellName;
+    private String loadShellName;
+    private String loadDataScriptName;
+    private String tempDirectory;
+
+    private String exportShellContent;
+    private String loadShellContent;
+    private String loadDataScriptContent;
+
+    private TableCloneManageContext(Builder builder){
         this.sourceConfig = builder.sourceConfig;
         this.cloneConfig = builder.cloneConfig;
-        this.attachConfig = builder.attachConfig;
+        this.tcmConfig = builder.tcmConfig;
+        this.tempDirectory = builder.tcmConfig.getTempDirectory();
+    }
+
+    public Table getFinallySourceTable(){
+        if(this.tempTable != null)
+            return this.tempTable;
+        return this.sourceTable;
     }
 
     public DatabaseConfig getSourceConfig() {
@@ -29,14 +51,108 @@ public class TableCloneManageContext {
         return cloneConfig;
     }
 
-    public AttachConfig getAttachConfig() {
-        return attachConfig;
+    public TableCloneManageConfig getTcmConfig() {
+        return tcmConfig;
+    }
+
+    public Table getSourceTable() {
+        return sourceTable;
+    }
+
+    public TableCloneManageContext setSourceTable(Table sourceTable) {
+        this.sourceTable = sourceTable;
+        return this;
+    }
+
+    public Table getTempTable() {
+        return tempTable;
+    }
+
+    public TableCloneManageContext setTempTable(Table tempTable) {
+        this.tempTable = tempTable;
+        return this;
+    }
+
+    public Table getCloneTable() {
+        return cloneTable;
+    }
+
+    public TableCloneManageContext setCloneTable(Table cloneTable) {
+        this.cloneTable = cloneTable;
+        return this;
+    }
+
+    public String getCsvFileName() {
+        return csvFileName;
+    }
+
+    public TableCloneManageContext setCsvFileName(String csvFileName) {
+        this.csvFileName = csvFileName;
+        return this;
+    }
+
+    public String getExportShellName() {
+        return exportShellName;
+    }
+
+    public TableCloneManageContext setExportShellName(String exportShellName) {
+        this.exportShellName = exportShellName;
+        return this;
+    }
+
+    public String getLoadShellName() {
+        return loadShellName;
+    }
+
+    public TableCloneManageContext setLoadShellName(String loadShellName) {
+        this.loadShellName = loadShellName;
+        return this;
+    }
+
+    public String getLoadDataScriptName() {
+        return loadDataScriptName;
+    }
+
+    public TableCloneManageContext setLoadDataScriptName(String loadDataScriptName) {
+        this.loadDataScriptName = loadDataScriptName;
+        return this;
+    }
+
+    public String getTempDirectory() {
+        return tempDirectory;
+    }
+
+    public String getExportShellContent() {
+        return exportShellContent;
+    }
+
+    public TableCloneManageContext setExportShellContent(String exportShellContent) {
+        this.exportShellContent = exportShellContent;
+        return this;
+    }
+
+    public String getLoadShellContent() {
+        return loadShellContent;
+    }
+
+    public TableCloneManageContext setLoadShellContent(String loadShellContent) {
+        this.loadShellContent = loadShellContent;
+        return this;
+    }
+
+    public String getLoadDataScriptContent() {
+        return loadDataScriptContent;
+    }
+
+    public TableCloneManageContext setLoadDataScriptContent(String loadDataScriptContent) {
+        this.loadDataScriptContent = loadDataScriptContent;
+        return this;
     }
 
     public static class Builder{
         private DatabaseConfig sourceConfig;
         private DatabaseConfig cloneConfig;
-        private AttachConfig attachConfig;
+        private TableCloneManageConfig tcmConfig;
 
         public Builder() {
         }
@@ -51,32 +167,14 @@ public class TableCloneManageContext {
             return this;
         }
 
-        public Builder setAttachConfig(AttachConfig attachConfig) {
-            this.attachConfig = attachConfig;
+        public Builder setTcmConfig(TableCloneManageConfig tcmConfig) {
+            this.tcmConfig = tcmConfig;
+            this.setSourceConfig(tcmConfig.getSourceConfig());
+            this.setCloneConfig(tcmConfig.getCloneConfig());
             return this;
         }
 
         public TableCloneManageContext create() {
-            if(sourceConfig == null || cloneConfig == null || attachConfig == null)
-                throw new TCMException(" sourceConfig、cloneConfig、attachConfig unable null！！！ ");
-            if (DataSourceType.HUDI.toString().equals(sourceConfig.getDataSourceType().toString()))
-                throw new TCMException(" now does not support Hive to DB ");
-            if(StringUtil.isNullOrEmpty(attachConfig.getSourceTableName()))
-                throw new TCMException(" 'AttachConfig.sourceTable' is null");
-            if(StringUtil.isNullOrEmpty(attachConfig.getCloneTableName()))
-                throw new TCMException(" 'AttachConfig.cloneTable' is null");
-            if(StringUtil.isNullOrEmpty(attachConfig.getTempDirectory()))
-                throw new TCMException(" 'AttachConfig.tempDirectory' is null");
-            if (DataSourceType.HUDI.toString().equals(cloneConfig.getDataSourceType().toString())){
-                if(StringUtil.isNullOrEmpty(attachConfig.getHdfsCsvDir()))
-                    throw new TCMException("if you want use DB-Hive,the 'HdfsCsvDir' You need to fill in");
-                if(StringUtil.isNullOrEmpty(attachConfig.getHudiHdfsPath()))
-                    throw new TCMException("if you want use DB-Hive,the 'HudiHdfsPath' You need to fill in");
-                if(StringUtil.isNullOrEmpty(attachConfig.getHudiPrimaryKey()))
-                    throw new TCMException("if you want use DB-Hive,the 'HudiPrimaryKey' You need to fill in");
-                if(StringUtil.isNullOrEmpty(attachConfig.getHudiPartitionKey()))
-                    throw new TCMException("if you want use DB-Hive,the 'HudiPartitionKey' You need to fill in");
-            }
             return new TableCloneManageContext(this);
         }
     }

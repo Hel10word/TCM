@@ -5,7 +5,7 @@
 // * @data 2021/9/24
 // */
 //
-//import com.boraydata.tcm.configuration.AttachConfig;
+//import com.boraydata.tcm.configuration.TableCloneManageConfig;
 //import com.boraydata.tcm.configuration.DatabaseConfig;
 //
 ///**
@@ -27,7 +27,7 @@
 ////    String exportCommand(DatabaseConfig config,String filePath,Table table,String delimiter,String limit);
 ////    String loadCommand(DatabaseConfig config,String filePath,String tableName,String delimiter);
 //
-//    String loadCommand(DatabaseConfig config,AttachConfig attachConfig);
+//    String loadCommand(DatabaseConfig config,TableCloneManageConfig attachConfig);
 //
-//    String exportCommand(DatabaseConfig config, AttachConfig attachConfig);
+//    String exportCommand(DatabaseConfig config, TableCloneManageConfig attachConfig);
 //}

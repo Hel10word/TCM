@@ -36,7 +36,7 @@ class ColumnTest {
     @Test
     public void outInfoTest(){
         Column column = new Column();
-        column.outInfo();
+        System.out.println(column.getColumnInfo());
     }
 
 

@@ -20,7 +20,7 @@ class DataMappingSQLToolTest {
         Table boolean_pgsql = tcm.createSourceMappingTable("byte_types_mysql");
         String sql = dmSQLt.getMappingDataSQL(boolean_pgsql, DataSourceType.POSTGRES);
         System.out.println(sql+"\n");
-        boolean_pgsql.outTableInfo();
+        System.out.println(boolean_pgsql.getTableInfo());
 //        List list = DatasourceConnectionFactory.executeQuerySQL(TestDataProvider.configPGSQL, sql);
 //        list.forEach(System.out::println);
     }

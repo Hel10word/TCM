@@ -5,8 +5,7 @@ package com.boraydata.tcm.syncing;
  * @data 2021/9/24
  */
 
-import com.boraydata.tcm.configuration.AttachConfig;
-import com.boraydata.tcm.configuration.DatabaseConfig;
+import com.boraydata.tcm.core.TableCloneManageContext;
 
 /**
  * e.g.
@@ -22,10 +21,8 @@ import com.boraydata.tcm.configuration.DatabaseConfig;
  *
  */
 public interface SyncingTool{
-
-    // use shell commands to call native SQL statements
-    // export table data in local csv file.
-    boolean exportFile(DatabaseConfig config, AttachConfig attachConfig);
-    // load local csv file in to clone table.
-    boolean loadFile(DatabaseConfig config, AttachConfig attachConfig);
+    // generate export table data command
+    String exportFile(TableCloneManageContext tcmContext);
+    // generate load table data command
+    String loadFile(TableCloneManageContext tcmContext);
 }

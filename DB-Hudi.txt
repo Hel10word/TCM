@@ -1,6 +1,0 @@
-1. db source导出的过程中，使用函数的方式case不支持的字段类型，譬如boolean的0/1 mapping spark的True/False，导出到csv中，使用hudi脚本导入hudi，这个你只需要mapping前面的source数据，不需要熟悉hudi，使用我的工具就可以了，还有查看Spark支持的csv的字符串格式(boolean, timestamp)
-2. 保留之前说过的staging方式，使用db-spark的方式mapping，但需要解决spark-hudi的问题，这个今天在会议上Robert说让你去调研这个问题，作为你q4工作的一部分，具体我们遇到的问题是，spark中建表并不能同步到hudi api建的表中，你需要调研如何在导入一张hudi外部的table进hudi table
-
-按Robert的意思，两个方式都需要完成，第二种是传统的etl方式
-
-我觉得1应该比较简单，你可以在近期完成了1，并与manager联调，进行一些性能测试，再去调研2

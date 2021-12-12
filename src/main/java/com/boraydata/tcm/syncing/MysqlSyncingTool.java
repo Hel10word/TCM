@@ -1,8 +1,11 @@
 package com.boraydata.tcm.syncing;
 
-import com.boraydata.tcm.configuration.AttachConfig;
+import com.boraydata.tcm.configuration.TableCloneManageConfig;
 import com.boraydata.tcm.configuration.DatabaseConfig;
-import com.boraydata.tcm.utils.FileUtil;
+import com.boraydata.tcm.core.DataSourceType;
+import com.boraydata.tcm.core.TableCloneManageContext;
+import com.boraydata.tcm.entity.Table;
+import com.boraydata.tcm.mapping.DataMappingSQLTool;
 import com.boraydata.tcm.utils.StringUtil;
 
 
@@ -20,6 +23,7 @@ public class MysqlSyncingTool implements SyncingTool {
     // https://dev.mysql.com/doc/refman/5.7/en/mysql-command-options.html#option_mysql_skip-column-names
 
     // 2.0 use MySQL-Shell to export and load
+    // time mysqlsh -h192.168.120.68 -P3306 -uroot -pMyNewPass4! --database test_db -e "shell.getSession().runSql(\"set foreign_key_checks=0;\");"
     //-- export
     //mysqlsh -h192.168.30.244 -P3306 -uroot -proot --database test_db -e "util.exportTable('lineitem_mysql','/usr/local/test.csv',{linesTerminatedBy:'\n',fieldsTerminatedBy:','})"
     //-- load
@@ -27,36 +31,44 @@ public class MysqlSyncingTool implements SyncingTool {
 
 
     @Override
-    public boolean exportFile(DatabaseConfig config, AttachConfig attachConfig) {
-        String exportCommand =  exportCommand(config,attachConfig);
-        String exportShellPath = attachConfig.getExportShellPath();
+    public String exportFile(TableCloneManageContext tcmContext) {
+        Table table = tcmContext.getFinallySourceTable();
+        boolean tempFlag = (tcmContext.getTempTable() != null);
+        boolean hudiFlag = DataSourceType.HUDI.equals(tcmContext.getCloneConfig().getDataSourceType());
+        String tempMappingSQL = "";
+        if(Boolean.TRUE.equals(tempFlag))
+            tempMappingSQL = DataMappingSQLTool.getMappingDataSQL(tcmContext.getSourceTable(),tcmContext.getCloneConfig().getDataSourceType());
+        String csvPath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
+        String delimiter = tcmContext.getTcmConfig().getDelimiter();
+        return exportCommand(tcmContext.getSourceConfig(),table,csvPath,delimiter,tempFlag,tempMappingSQL,hudiFlag);
+    }
 
-//        System.out.println(exportCommand);
-//        return true;
+    private String exportCommand(DatabaseConfig config,Table table, String csvPath,String delimiter,boolean tempFlag,String tempMappingSQL,boolean hudiFlag) {
+        String exportStr = "";
+        String tableName = table.getTablename();
+        // Write data to temp table
+        if(Boolean.TRUE.equals(tempFlag))
+            exportStr += getConnectCommand(config, "mysql").replace("?","insert into "+table.getTablename()+" "+tempMappingSQL)+"\n";
 
-
-        if(FileUtil.WriteMsgToFile(exportCommand,exportShellPath)){
-            if(FileUtil.Exists(exportShellPath))
-                return CommandExecutor.execuetShell(exportShellPath,attachConfig.getDebug());
-        }
-        return false;
+        exportStr += completeExportCommand(getConnectCommand(config,"mysqlsh"),csvPath,tableName,delimiter,hudiFlag)+"\n";
+        // drop temp table
+        if(Boolean.TRUE.equals(tempFlag))
+            exportStr += getConnectCommand(config, "mysql").replace("?","drop table "+tableName)+"\n";
+        return exportStr;
     }
 
     @Override
-    public boolean loadFile(DatabaseConfig config, AttachConfig attachConfig) {
-        String loadCommand = loadCommand(config, attachConfig);
-        String loadShellPath = attachConfig.getLoadShellPath();
-
-//        System.out.println(loadCommand);
-//        return true;
-
-        if(FileUtil.WriteMsgToFile(loadCommand,loadShellPath)){
-            if(FileUtil.Exists(loadShellPath))
-                return CommandExecutor.execuetShell(loadShellPath,attachConfig.getDebug());
-        }
-        return false;
+    public String loadFile(TableCloneManageContext tcmContext) {
+        String csvPath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
+        String tablename = tcmContext.getCloneTable().getTablename();
+        String delimiter = tcmContext.getTcmConfig().getDelimiter();
+        return loadCommand(tcmContext.getCloneConfig(), csvPath,tablename,delimiter);
     }
 
+    public String loadCommand(DatabaseConfig config, String csvPath,String tablename,String delimiter) {
+        return completeLoadCommandCli(getConnectCommand(config,"mysql"),csvPath,tablename,delimiter);
+//        return completeLoadCommand(getConnectCommand(config,"mysqlsh"),attachConfig.getLocalCsvPath(),attachConfig.getCloneTableName(),attachConfig.getDelimiter());
+    }
     /**
      *
      * @Param config :
@@ -72,9 +84,14 @@ public class MysqlSyncingTool implements SyncingTool {
                 config.getPassword(),
                 config.getDatabasename());
     }
-    private String completeExportCommand(String conCommand,String filePath, String tableName,String delimiter){
-        return conCommand.replace("?",
-                "util.exportTable('"+tableName+"','"+filePath+"',{linesTerminatedBy:'\\n',fieldsTerminatedBy:'"+delimiter+"'})");
+
+    private String completeExportCommand(String conCommand,String filePath, String tableName,String delimiter,boolean hudiFlag){
+        if(hudiFlag)
+            return conCommand.replace("?",
+                "util.exportTable('"+tableName+"','"+filePath+"',{linesTerminatedBy:'\\n',fieldsTerminatedBy:'"+delimiter+"',fieldsOptionallyEnclosed:true,fieldsEnclosedBy:'\\\"',fieldsEscapedBy:'\\\\\\'})");
+        else
+            return conCommand.replace("?",
+                    "util.exportTable('"+tableName+"','"+filePath+"',{linesTerminatedBy:'\\n',fieldsTerminatedBy:'"+delimiter+"'})");
     }
     private String completeLoadCommand(String com,String filePath, String tableName, String delimiter){
         return com.replace("?",
@@ -85,25 +102,6 @@ public class MysqlSyncingTool implements SyncingTool {
 //mysql -h 192.168.30.200 -P 3306 -uroot -proot --database test_db -e "load data local infile '/usr/local/lineitem_1_limit_10.csv' into table lineitem fields terminated by ',' lines terminated by '\n';"
         return com.replace("?",
                 "load data local infile '"+filePath+"' into table "+tableName+" fields terminated by '"+delimiter+"';");
-    }
-
-    public String exportCommand(DatabaseConfig config,AttachConfig attachConfig) {
-        if(!StringUtil.isNullOrEmpty(attachConfig.getTempTableName()) && !StringUtil.isNullOrEmpty(attachConfig.getTempTableSQL())){
-            String mysqlsh = getConnectCommand(config, "mysql");
-            String exportStr = "";
-            exportStr += mysqlsh.replace("?","insert into "+attachConfig.getTempTableName()+" "+attachConfig.getTempTableSQL());
-            exportStr += "\n"+completeExportCommand(getConnectCommand(config,"mysqlsh"),attachConfig.getLocalCsvPath(),attachConfig.getTempTableName(),attachConfig.getDelimiter());
-//            exportStr += "\n"+mysqlsh.replace("?","drop table "+attachConfig.getTempTableName());
-            return exportStr;
-        }else{
-            return completeExportCommand(getConnectCommand(config,"mysqlsh"),attachConfig.getLocalCsvPath(),attachConfig.getRealSourceTableName(),attachConfig.getDelimiter());
-        }
-
-    }
-
-    public String loadCommand(DatabaseConfig config,AttachConfig attachConfig) {
-        return completeLoadCommandCli(getConnectCommand(config,"mysql"),attachConfig.getLocalCsvPath(),attachConfig.getCloneTableName(),attachConfig.getDelimiter());
-//        return completeLoadCommand(getConnectCommand(config,"mysqlsh"),attachConfig.getLocalCsvPath(),attachConfig.getCloneTableName(),attachConfig.getDelimiter());
     }
 
 

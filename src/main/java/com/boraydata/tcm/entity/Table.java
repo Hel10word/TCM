@@ -5,22 +5,19 @@ import com.boraydata.tcm.core.DataSourceType;
 import java.util.LinkedList;
 import java.util.List;
 
-/** 存储 表的信息
+/**
  * @author bufan
  * @data 2021/8/25
  */
 public class Table implements Cloneable {
-    // 数据库类型
     private DataSourceType dataSourceType;
     // Catalog
     private String catalogname;
     // Schema
     private String schemaname;
-    // 表名
     private String tablename;
-    // 记录上一个
+    // When the table data source type be modified, this can record the most original type.
     private DataSourceType sourceType;
-    // 表下面列的信息
     private List<Column> columns = new LinkedList<>();
 
     public Table() {
@@ -80,14 +77,17 @@ public class Table implements Cloneable {
         return this;
     }
 
-    public void outTableInfo(){
-        System.out.println("DataSourceType:"+this.dataSourceType+"\n"
-        +"CatalogName:"+this.catalogname+"\n"
-        +"SchemaName:"+this.schemaname+"\n"
-        +"TableName:"+this.tablename+"\n========== columns info ============="
-        );
+    public String getTableInfo(){
+        StringBuilder info = new StringBuilder();
+        info
+                .append("\tDataSourceType:").append(this.dataSourceType).append("\n")
+                .append("\tCatalogName:").append(this.catalogname).append("\n")
+                .append("\tSchemaName:").append(this.schemaname).append("\n")
+                .append("\tTableName:").append(this.tablename).append("\n")
+                .append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ columns info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
         for(Column column : columns)
-            column.outInfo();
+            info.append("\t").append(column.getInfo());
+        return info.toString();
     }
 
     @Override
@@ -109,9 +109,9 @@ public class Table implements Cloneable {
             for(Column column : this.columns)
                 cloneList.add(column.clone());
             table.setColumns(cloneList);
-            table.setSourceType(dataSourceType);
             table.setCatalogname(null);
             table.setSchemaname(null);
+            table.setSourceType(dataSourceType);
         }catch (CloneNotSupportedException e){
             e.printStackTrace();
         }

@@ -1,6 +1,6 @@
 package com.boraydata.tcm;
 
-import com.boraydata.tcm.configuration.AttachConfig;
+import com.boraydata.tcm.configuration.TableCloneManageConfig;
 import com.boraydata.tcm.configuration.DatabaseConfig;
 import com.boraydata.tcm.configuration.DatasourceConnectionFactory;
 import com.boraydata.tcm.core.DataSourceType;
@@ -9,6 +9,10 @@ import com.boraydata.tcm.core.TableCloneManageContext;
 import com.boraydata.tcm.core.TableCloneManageFactory;
 import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.exception.TCMException;
+import com.boraydata.tcm.utils.FileUtil;
+import com.boraydata.tcm.utils.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,11 +26,17 @@ import java.util.Properties;
  */
 public class DoIt {
 
-//    private static final Logger log = LoggerFactory.getLogger(DoIt.class);
-
     public static void main(String[] args)  {
+
+        Logger logger = LoggerFactory.getLogger(DoIt.class);
+        Boolean debugFlag;
+        String sourceTableName;
+        String cloneTableName;
+        String sourceDataType;
+        String cloneDataType;
+
         Properties properties;
-        AttachConfig config;
+        TableCloneManageConfig config;
         long start = 0;
         long end = 0;
         long all = 0;
@@ -44,121 +54,99 @@ public class DoIt {
 //        try(InputStream in = DoIt.class.getClassLoader().getResourceAsStream("./config.properties")){
             properties = new Properties();
             properties.load(in);
-            // read the properties file and initialize the information.
-            config = AttachConfig.getInstance();
-            // 1、读取并加载配置文件
+            config = TableCloneManageConfig.getInstance();
+//====================== 1. read the properties file and initialize the information.
             config.loadLocalConfig(properties);
+
+            debugFlag = config.getDebug();
+            sourceTableName = config.getSourceConfig().getTableName();
+            cloneTableName = config.getCloneConfig().getTableName();
+            sourceDataType = config.getSourceConfig().getDataSourceType().toString();
+            cloneDataType = config.getCloneConfig().getDataSourceType().toString();
         } catch (IOException e) {
             throw new TCMException("the '"+configFilePath+"' is not found",e);
         }
-        String sourceTableName = config.getSourceTableName();
-        String sourceDataType = config.getSourceDataType();
-        String cloneTableName = config.getCloneTableName();
-        String cloneDataType = config.getCloneDataType();
+        if(Boolean.TRUE.equals(debugFlag))
+            logger.info("\n================================== Source Config Info ==================================\n" +
+                    "{}" +
+                        "\n================================== Clone Config Info ==================================\n" +
+                    "{}\n",config.getSourceConfig().getCofInfo(),config.getCloneConfig().getCofInfo());
 
-
-        // 2、创建 Source 数据源信息
-        DatabaseConfig.Builder sourceBuilder = new DatabaseConfig.Builder();
-        DatabaseConfig sourceConfig = sourceBuilder
-                .setDatabasename(config.getSourceDatabaseName())
-                .setDataSourceType(DataSourceType.getTypeByStr(config.getSourceDataType()))
-                .setHost(config.getSourceHost())
-                .setPort(config.getSourcePort())
-                .setUsername(config.getSourceUser())
-                .setPassword(config.getSourcePassword())
+//====================== 2. Create TableCloneManageContext, pass the read information to context
+        TableCloneManageContext tcmContext = new TableCloneManageContext.Builder()
+                .setTcmConfig(config)
                 .create();
 
-        // 3、创建 Clone 数据源信息
-        DatabaseConfig.Builder cloneBuilder = new DatabaseConfig.Builder();
-        DatabaseConfig cloneConfig = cloneBuilder
-                .setDatabasename(config.getCloneDatabaseName())
-                .setDataSourceType(DataSourceType.getTypeByStr(config.getCloneDataType()))
-                .setHost(config.getCloneHost())
-                .setPort(config.getClonePort())
-                .setUsername(config.getCloneUser())
-                .setPassword(config.getClonePassword())
-                .create();
-
-        String sourceJdbcUrl = DatasourceConnectionFactory.getJDBCUrl(sourceConfig);
-        String cloneJdbcUrl = DatasourceConnectionFactory.getJDBCUrl(cloneConfig);
-        sourceConfig.setUrl(sourceJdbcUrl);
-        cloneConfig.setUrl(cloneJdbcUrl);
-        config.setSourceJdbcConnect(sourceJdbcUrl).setCloneJdbcConnect(cloneJdbcUrl);
-
-        //4、 创建管理器上下文 设置 相关信息
-        TableCloneManageContext.Builder tcmcBuilder = new TableCloneManageContext.Builder();
-        TableCloneManageContext tcmContext = tcmcBuilder
-                .setSourceConfig(sourceConfig)
-                .setCloneConfig(cloneConfig)
-                .setAttachConfig(config)
-                .create();
-
-                                    if (Boolean.TRUE.equals(config.getDebug())){
-                                        System.out.println("====  sourceConfig  ====\n"+sourceConfig.getCofInfo());
-                                        System.out.println("====  cloneConfig  ====\n"+cloneConfig.getCofInfo());
-                                    }
-
-        //5、 创建管理器
+//====================== 3、 use Context create TCM
         TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmContext);
 
 
-        //======================================================== getSourceMappingTable ====================================================================
-                                    System.out.println("\n(1).Read to initialization table in "
-                                            +cloneDataType+" ,from "
-                                            +sourceDataType+"."+sourceTableName);
-                                    System.out.println("\n\t(1.1).get '"+sourceTableName+"' info from "+sourceDataType);
+
                                     start = System.currentTimeMillis();
-        //6、 使用 tcm 通过 表名 来获取表数据
+        logger.info("Ready to get Source Table structure and information:{}->{}",sourceDataType,sourceTableName);
+//====================== 4、 get Source Table Struct by tableName in sourceData
         Table sourceTable = tcm.createSourceMappingTable(sourceTableName);
                                     end = System.currentTimeMillis();
                                     all+=(end - start);
-                                    System.out.println("\t----get sourceTable info total time spent:" + (end - start)+"\n");
-                                    if (Boolean.TRUE.equals(config.getDebug()))
-                                        sourceTable.outTableInfo();
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get Source Table info total time spent:{}\n",(end - start));
+        if (Boolean.TRUE.equals(debugFlag))
+            logger.info("\n================================== Source Table Info ==================================\n" +
+                    "{}\n",sourceTable.getTableInfo());
 
 
-        //======================================================== getCloneTable ====================================================================
+
 
                                     start = System.currentTimeMillis();
-                                    System.out.println("\n\t(1.2).create '"+cloneTableName+"' in "+cloneDataType);
-        //7、 将该表映射为 Clone Datasource 类型
+        logger.info("Ready to create Clone Table '{}' in {}",cloneTableName,cloneDataType);
+//====================== 5、 get Clone Table based on Source Table
         Table cloneTable = tcm.createCloneTable(sourceTable,cloneTableName);
-        //8、将该表在 Clone Datasource 上创建，并获得 执行结果
-        if(!tcm.createTableInDatasource())
-            throw new TCMException("Create table Failure!!!!!");
+//====================== 6、create Clone Table in clone database
+        tcm.createTableInDatasource();
                                     end = System.currentTimeMillis();
                                     all+=(end - start);
-                                    System.out.println("\t----create table total time spent:" + (end - start)+"\n");
-                                    if (Boolean.TRUE.equals(config.getDebug()))
-                                        cloneTable.outTableInfo();
-                                    System.out.println("----initialization table success !!!\n\n");
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> create Clone Table total time spent:{}\n",(end - start));
+         if (Boolean.TRUE.equals(debugFlag))
+             logger.info("\n================================== Clone Table Info ==================================\n" +
+                     "{}\n",cloneTable.getTableInfo());
 
-//=====================================  Table Data SYNC   =====================================
-
-                                    System.out.println("(2).Read to Sync table data, export "
-                                            +sourceDataType+"."+sourceTableName
-                                            +" ,load to "+cloneDataType+"."+cloneTableName+"\n");
-                                    start = System.currentTimeMillis();
-        //9、将 source 端的表导出
-        if(!tcm.exportTableData())
-            throw new TCMException("export table data Failure!!!!!");
-                                    end = System.currentTimeMillis();
-                                    all+=(end - start);
-                                    System.out.println("\t----export table data total time spent:" + (end - start)+"\n");
 
 
                                     start = System.currentTimeMillis();
-        //10、在 Clone 端上导入表
-        if(!tcm.loadTableData())
-            throw new TCMException("load table data Failure!!!!!");
+        logger.info("Read to Export Source Table data in CSV.");
+//====================== 7、create export data script,and execute export shell.
+        tcm.exportTableData();
                                     end = System.currentTimeMillis();
                                     all+=(end - start);
-                                    System.out.println("\t----load table data total time spent:" + (end - start)+"\n");
-                                    System.out.println("----Sync the table success !!!!");
-                                    System.out.println("Mapping Table and Syncing TableData table time:"+all);
+        logger.info("*********************************** EXPORT INFO ***********************************\n\nexport {}:{} in {} script:'{}'\n",sourceDataType,tcmContext.getFinallySourceTable().getTablename(),
+                tcmContext.getTempDirectory()+tcmContext.getCsvFileName(),tcmContext.getTempDirectory()+tcmContext.getExportShellName());
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> export data total time spent:{}\n\n",(end - start));
+
+
+                                    start = System.currentTimeMillis();
+        logger.info("Read to Load CSV data in Clone Table.");
+//====================== 8、create export data script,and execute export shell.
+        tcm.loadTableData();
+                                    end = System.currentTimeMillis();
+                                    all+=(end - start);
+        logger.info("*********************************** LOAD INFO ***********************************\n\nload data in {}:{} script:'{}'\n",cloneDataType,cloneTableName,tcmContext.getTempDirectory()+tcmContext.getLoadShellName());
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> load data total time spent:{}",(end - start));
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Mapping Table and Syncing TableData table time:{} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",all);
+
+
+
+
+
+        if(Boolean.TRUE.equals(debugFlag)){
+            String exportShellContent = tcmContext.getExportShellContent();
+            String loadDataScriptContent = tcmContext.getLoadDataScriptContent();
+            String loadShellContent = tcmContext.getLoadShellContent();
+            logger.info("\n\n\n\n");
+            logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getExportShellName(),exportShellContent);
+            if(!StringUtil.isNullOrEmpty(tcmContext.getLoadDataScriptName()))
+                logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getLoadDataScriptName(),loadDataScriptContent);
+            logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getLoadShellName(),loadShellContent);
+            logger.info("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        }
     }
-
-
-
 
 }

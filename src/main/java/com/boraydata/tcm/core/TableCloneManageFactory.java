@@ -22,13 +22,11 @@ public class TableCloneManageFactory {
             SyncingTool sourceCommand = SyncingToolFactory.create(sourceType);
             SyncingTool cloneCommand = SyncingToolFactory.create(cloneType);
             tableCloneManage = new TableCloneManage(
-                    tableCloneManageContext.getSourceConfig(),
-                    tableCloneManageContext.getCloneConfig(),
                     sourceMappingTool,
                     cloneMappingTool,
                     sourceCommand,
                     cloneCommand,
-                    tableCloneManageContext.getAttachConfig()
+                    tableCloneManageContext
             );
         }else {
             throw new TCMException("should write complete Config in   *.tcm.core.TableCloneManageFactory.createTableCloneManage");

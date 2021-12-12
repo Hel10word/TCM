@@ -49,7 +49,7 @@ public class GetTableInfoByJDBCMetadataTest {
         System.out.println();
         MappingTool tool = MappingToolFactory.create(config.getDataSourceType());
         assert tool != null;
-        tool.createSourceMappingTable(tcm.getSourceTableByTableName(config,tableName)).outTableInfo();
+        System.out.println(tool.createSourceMappingTable(tcm.getSourceTableByTableName(config,tableName)).getTableInfo());
     }
 
 

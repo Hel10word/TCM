@@ -1,5 +1,6 @@
 package com.boraydata.tcm.core;
 
+import com.boraydata.tcm.TestDataProvider;
 import com.boraydata.tcm.configuration.DatabaseConfig;
 import com.boraydata.tcm.configuration.DatasourceConnectionFactory;
 import org.junit.jupiter.api.Test;
@@ -29,29 +30,27 @@ public class JDBC_StreamTest {
     //========================== PgSQL ===============================
     DatabaseConfig.Builder builderPGSQL = new DatabaseConfig.Builder();
     DatabaseConfig configPGSQL = builderPGSQL
-            .setDatabasename("test_db")
+            .setDatabasename("tydb1")
             .setDataSourceType(DataSourceType.POSTGRES)
-            .setHost("192.168.30.155")
+            .setHost("192.168.120.66")
             .setPort("5432")
-            .setUsername("postgres")
-            .setPassword("")
+            .setUsername("root")
+            .setPassword("123456")
             .create();
 
     private String sql = "select * from lineitem_sf1_pgsql limit 10000;";
 
-    Connection mysqlCon = DatasourceConnectionFactory.createDataSourceConnection(configMySQL);
+    Connection mysqlCon = DatasourceConnectionFactory.createDataSourceConnection(TestDataProvider.configMySQL);
     Connection pgsqlCon = DatasourceConnectionFactory.createDataSourceConnection(configPGSQL);
 
-
     @Test
-    public void foo() throws SQLException {
+    public void foo(){
         long start = System.currentTimeMillis();
         try{
             PreparedStatement stmt = pgsqlCon.prepareStatement(sql);
             stmt.setFetchSize(1000);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()){
-
                 insert(mysqlCon,new String[]{
                         //  0  l_orderkey    integer
                         String.valueOf(rs.getInt("l_orderkey")),
@@ -91,13 +90,12 @@ public class JDBC_StreamTest {
         }catch (SQLException e) {
             e.printStackTrace();
         }
-
-
         long end = System.currentTimeMillis();
         System.out.println("\t---- total time spent:" + (end - start)+"\n");
     }
 
-    public void insert(Connection con, String[] args) throws SQLException {
+    @Test
+    public void insert(Connection con, String[] args){
 
 //        INSERT INTO "lineitem_pgsql" VALUES (1701, 53004, 3005, 2, '2.00', '1914.00', '0.01', '0.04', 'R', 'F', '1992-06-24', '1992-07-12', '1992-06-29', 'COLLECT COD              ', 'SHIP      ', 'ween the pending, final accounts. ');
         String insStr = "INSERT INTO lineitem_sf1_pgsql VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";

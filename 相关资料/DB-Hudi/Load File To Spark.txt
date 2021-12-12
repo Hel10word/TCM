@@ -36,6 +36,4 @@ beeline -u jdbc:hive2://192.168.30.221:10000/test_db -e "TRUNCATE TABLE lineitem
 beeline -u jdbc:hive2://192.168.30.221:10000/test_db -e "drop table lineitem_mysql;"
 
 
-
-
 beeline -u jdbc:hive2://192.168.30.221:10000/test_db -e "LOAD DATA LOCAL INPATH '/usr/local/lineitem.csv' INTO TABLE lineitem_mysql;"

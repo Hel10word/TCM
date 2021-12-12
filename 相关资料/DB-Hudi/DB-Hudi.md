@@ -4,6 +4,14 @@ http://192.168.120.66:50070/dfshealth.html#tab-overview
 
 
 
+Spark
+
+http://192.168.120.66:8080/
+
+http://192.168.120.66:4040/jobs/
+
+
+
 
 
 
@@ -106,3 +114,86 @@ spark.sql(s"drop table test1_hudi_ro").show()
  java -cp lib/*:initialization-1.0.jar com.boray.stream.init.InitializationTool config/test.properties
 
 ![237691534126881416](Imgs-DB-Hudi/237691534126881416.png)
+
+
+
+
+
+一个巨坑的 地方 Spark 解析 CSV 如果需要用到转义字符，那么需要将字段括起来，也就是只有结合 quote 属性才能 使用 escape。
+
+https://spark.apache.org/docs/3.2.0/sql-data-sources-csv.html
+
+经过测试后，发现 **Spark** 所能支持的 CSV 文件，例如
+
+|           |      |
+| --------- | ---- |
+| delimiter | ，   |
+| escape    | 、   |
+| quote     | ”    |
+
+1.  根据 CSV 解析到的 元数据
+
+-   `"\,"` => `\,`
+
+-   `"\""` => `"`
+
+-   `"\\` => `\`
+
+2.  根据 元数据 生成的 CSV 数据
+
+-   `,,,` => `",,,"`
+
+-   `\,` => `"\,"`
+
+
+```scala
+val df = spark.read.option("delimiter", ",").option("escape", "\\").option("quote", "\"").csv(path)
+df.show()
+```
+
+每列数据，会使用 quote 的内容包裹起来，若数据中包含 **escape** 或 **quote** 的数据，则需要在前面加上 escape 来转义。
+
+同样的 **PgSQL** 也会使用，这样的语句导出数据。
+
+```sql
+psql postgres://root:123456@192.168.120.66/test_db -c "\copy (select * from demo) to './demo_pgsql.csv' with DELIMITER ',' csv quote '\"' escape '\\' force quote *;"
+```
+
+**MySQL** 也能够导出
+
+```sql
+mysql -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "select * from demo into outfile '/usr/local/download/demo_mysql.csv' fields terminated by ',' optionally enclosed by '\"' lines terminated by '\n'";
+```
+
+
+
+
+
+-   但是使用 MySQL 无法将数据导出到其他 MySQL 客户端，但是使用如下 MySQL-Shell 会出现一些小问题。
+
+```sql
+mysqlsh -h192.168.30.148 -P3306 -uroot -proot --database test_db -e "util.exportTable('demo','./demo_mysql.csv',{linesTerminatedBy:'\n',fieldsTerminatedBy:',',fieldsOptionallyEnclosed:true,fieldsEnclosedBy:'\"',fieldsEscapedBy:'\\\'})"
+```
+
+​    使用这样的语句，可以将数据导出到我们的客户端，但是MySQL-Shell 对 CSV 的格式有些许不一样，被 quote 的内容包裹起来的数据中，包含 **delimiter** 的内容也会被加上 escape 来转义，因此会出现如下情况：
+
+1.  根据 CSV 解析到的 元数据
+
+-   `"\,"` => `,`
+
+-   `"\""` => `"`
+
+-   `"\\` => `\`
+
+2.  根据 元数据 生成的 CSV 数据
+
+-   `,,,` => `"\,\,\,"`
+
+-   `\,` => `"\\\,"`
+
+
+
+
+
+
+

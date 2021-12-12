@@ -1,14 +1,10 @@
 package com.boraydata.tcm.core;
 
 import com.boraydata.tcm.TestDataProvider;
-import com.boraydata.tcm.configuration.AttachConfig;
 import com.boraydata.tcm.configuration.DatabaseConfig;
-import com.boraydata.tcm.entity.Column;
 import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.mapping.MappingToolFactory;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 /** use manager to clone table for test
  * @author bufan
@@ -41,12 +37,7 @@ class TableCloneManageTest {
     // create the table clone manager
     TableCloneManageContext.Builder tcmcBuilder = new TableCloneManageContext.Builder();
     TableCloneManageContext tcmc = tcmcBuilder
-//            .setSourceConfig(configPGSQL)
-            .setSourceConfig(configMySQL)
-//            .setCloneConfig(configSpark)
-            .setCloneConfig(configMySQL)
-//            .setCloneConfig(configPGSQL)
-            .setAttachConfig(TestDataProvider.getDefAttCfg())
+            .setTcmConfig(TestDataProvider.getDefTcmConfig(configPGSQL,configMySQL))
             .create();
     TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmc);
     String sourceName = "lineitem";
@@ -58,7 +49,7 @@ class TableCloneManageTest {
     public void testGetDatabaseTable(){
         // 获取 SourceConfig 中表的信息 里面包含了 映射到 TCM 的数据类型
         Table sourceTable = tcm.createSourceMappingTable(sourceName);
-        Table tempTable = tcm.getTempTable();
+        Table tempTable = tcmc.getTempTable();
         Table cloneTable = tcm.createCloneTable(sourceTable,cloneName);
 
         String sourceTableSQL = MappingToolFactory.create(tcmc.getSourceConfig().getDataSourceType()).getCreateTableSQL(sourceTable);
@@ -67,10 +58,10 @@ class TableCloneManageTest {
             tempTableSQL = MappingToolFactory.create(tcmc.getSourceConfig().getDataSourceType()).getCreateTableSQL(tempTable);
         String cloneTableSQL = MappingToolFactory.create(tcmc.getCloneConfig().getDataSourceType()).getCreateTableSQL(cloneTable);
 
-        sourceTable.outTableInfo();
+        System.out.println(sourceTable.getTableInfo());
 //        if(tempTable != null)
-//            tempTable.outTableInfo();
-//        cloneTable.outTableInfo();
+//          System.out.println(tempTable.getTableInfo());
+//        System.out.println(cloneTable.getTableInfo());
 
 //        System.out.println("sourceTableSQL:\n"+sourceTableSQL);
 //        System.out.println("\n\ntempTableSQL:\n"+tempTableSQL);
