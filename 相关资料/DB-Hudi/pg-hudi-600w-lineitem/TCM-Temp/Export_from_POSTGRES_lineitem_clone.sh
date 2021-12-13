@@ -1,1 +1,0 @@
-psql postgres://root:123456@192.168.120.66/test_db -c  "\copy lineitem_clone to './TCM-Temp/Export_from_POSTGRES_lineitem_clone.csv' with DELIMITER ',' CSV QUOTE '\"' escape '\\' force quote *;" 2>&1

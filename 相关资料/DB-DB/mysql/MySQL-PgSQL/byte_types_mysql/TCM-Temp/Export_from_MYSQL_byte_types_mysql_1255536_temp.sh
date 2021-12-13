@@ -1,3 +1,0 @@
-mysql -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "insert into byte_types_mysql_1255536_temp select BIN(mybit1) as mybit1,BIN(mybit5) as mybit5,CONCAT('0x',HEX(mybinary)) as mybinary,CONCAT('0x',HEX(myvarbinary)) as myvarbinary,CONCAT('0x',HEX(myblob)) as myblob,CONCAT('0x',HEX(mymediumblob)) as mymediumblob,CONCAT('0x',HEX(mylongblob)) as mylongblob from byte_types_mysql;" 2>&1
-mysqlsh -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "util.exportTable('byte_types_mysql_1255536_temp','./TCM-Temp/MYSQL_to_POSTGRES_byte_types_mysql_m2p.csv',{linesTerminatedBy:'\n',fieldsTerminatedBy:','})" 2>&1
-mysql -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "drop table byte_types_mysql_1255536_temp" 2>&1
