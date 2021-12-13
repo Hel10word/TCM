@@ -1,0 +1,3 @@
+mysql -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "insert into string_types_mysql_6271578_temp select mychar,myvarchar,CONCAT('0x',HEX(mybinary)) as mybinary,CONCAT('0x',HEX(myvarbinary)) as myvarbinary,CONCAT('0x',HEX(myblob)) as myblob,mytext,CONCAT('0x',HEX(mymediumblob)) as mymediumblob,mymediumtext,CONCAT('0x',HEX(mylongblob)) as mylongblob,mylongtext,myenum,myset from string_types_mysql;" 2>&1
+mysqlsh -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "util.exportTable('string_types_mysql_6271578_temp','./TCM-Temp/MYSQL_to_POSTGRES_string_types_mysql_m2p.csv',{linesTerminatedBy:'\n',fieldsTerminatedBy:','})" 2>&1
+mysql -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "drop table string_types_mysql_6271578_temp" 2>&1

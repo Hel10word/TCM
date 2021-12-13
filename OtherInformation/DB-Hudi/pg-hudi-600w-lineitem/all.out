@@ -1,0 +1,145 @@
+2021-12-12T16:13:16,227  [boraydata.tcm.DoIt    ] main INFO : 
+================================== Source Config Info ==================================
+	host:192.168.120.66
+	port:5432
+	username:'root'
+	password:'123456'
+	dataSourceType:POSTGRES
+	databasename:test_db
+	tableName:lineitem_clone
+	url:jdbc:postgresql://192.168.120.66:5432/test_db
+
+================================== Clone Config Info ==================================
+	host:192.168.120.67
+	port:10000
+	username:'rapids'
+	password:'rapids'
+	dataSourceType:HUDI
+	databasename:test_cdc_hudi
+	tableName:lineitem_clone_mor
+	url:jdbc:hive2://192.168.120.67:10000/test_cdc_hudi
+
+
+2021-12-12T16:13:16,235  [boraydata.tcm.DoIt    ] main INFO : Ready to get Source Table structure and information:POSTGRES->lineitem_clone
+2021-12-12T16:13:16,367  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get Source Table info total time spent:132
+
+2021-12-12T16:13:16,371  [boraydata.tcm.DoIt    ] main INFO : 
+================================== Source Table Info ==================================
+	DataSourceType:POSTGRES
+	CatalogName:test_db
+	SchemaName:public
+	TableName:lineitem_clone
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ columns info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	ColumnName=l_orderkey           DataType=integer              UdtType=int4                 Position=1    CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=l_partkey            DataType=integer              UdtType=int4                 Position=2    CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=l_suppkey            DataType=integer              UdtType=int4                 Position=3    CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=l_linenumber         DataType=integer              UdtType=int4                 Position=4    CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=l_quantity           DataType=numeric              UdtType=numeric              Position=5    CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=l_extendedprice      DataType=numeric              UdtType=numeric              Position=6    CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=l_discount           DataType=numeric              UdtType=numeric              Position=7    CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=l_tax                DataType=numeric              UdtType=numeric              Position=8    CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=l_returnflag         DataType=text                 UdtType=text                 Position=9    CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=TEXT
+	ColumnName=l_linestatus         DataType=text                 UdtType=text                 Position=10   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=TEXT
+	ColumnName=l_shipdate           DataType=date                 UdtType=date                 Position=11   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=l_commitdate         DataType=date                 UdtType=date                 Position=12   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=l_receiptdate        DataType=date                 UdtType=date                 Position=13   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=l_shipinstruct       DataType=text                 UdtType=text                 Position=14   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=TEXT
+	ColumnName=l_shipmode           DataType=text                 UdtType=text                 Position=15   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=TEXT
+	ColumnName=l_comment            DataType=text                 UdtType=text                 Position=16   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=TEXT
+	ColumnName=id                   DataType=integer              UdtType=int4                 Position=17   CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+
+
+2021-12-12T16:13:16,371  [boraydata.tcm.DoIt    ] main INFO : Ready to create Clone Table 'lineitem_clone_mor' in HUDI
+2021-12-12T16:13:16,371  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> create Clone Table total time spent:0
+
+2021-12-12T16:13:16,375  [boraydata.tcm.DoIt    ] main INFO : 
+================================== Clone Table Info ==================================
+	DataSourceType:POSTGRES
+	CatalogName:null
+	SchemaName:null
+	TableName:lineitem_clone_mor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ columns info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	ColumnName=l_orderkey           DataType=integer              UdtType=int4                 Position=1    CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=l_partkey            DataType=integer              UdtType=int4                 Position=2    CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=l_suppkey            DataType=integer              UdtType=int4                 Position=3    CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=l_linenumber         DataType=integer              UdtType=int4                 Position=4    CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=l_quantity           DataType=numeric              UdtType=numeric              Position=5    CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=l_extendedprice      DataType=numeric              UdtType=numeric              Position=6    CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=l_discount           DataType=numeric              UdtType=numeric              Position=7    CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=l_tax                DataType=numeric              UdtType=numeric              Position=8    CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=l_returnflag         DataType=text                 UdtType=text                 Position=9    CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=TEXT
+	ColumnName=l_linestatus         DataType=text                 UdtType=text                 Position=10   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=TEXT
+	ColumnName=l_shipdate           DataType=date                 UdtType=date                 Position=11   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=l_commitdate         DataType=date                 UdtType=date                 Position=12   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=l_receiptdate        DataType=date                 UdtType=date                 Position=13   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=l_shipinstruct       DataType=text                 UdtType=text                 Position=14   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=TEXT
+	ColumnName=l_shipmode           DataType=text                 UdtType=text                 Position=15   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=TEXT
+	ColumnName=l_comment            DataType=text                 UdtType=text                 Position=16   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=TEXT
+	ColumnName=id                   DataType=integer              UdtType=int4                 Position=17   CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+
+
+2021-12-12T16:13:16,375  [boraydata.tcm.DoIt    ] main INFO : Read to Export Source Table data in CSV.
+2021-12-12T16:13:16,959  [tcm.syncing.CommandExecutor] main INFO : 			!!!!!!!!!!!!!!!!!!!!!!!!!! Shell Path :./TCM-Temp/Export_from_POSTGRES_lineitem_clone.sh !!!!!!!!!!!!!!!!!!!!!!!!!!!
+2021-12-12T16:13:31,887  [boraydata.tcm.DoIt    ] main INFO : *********************************** EXPORT INFO ***********************************
+
+export POSTGRES:lineitem_clone in ./TCM-Temp/Export_from_POSTGRES_lineitem_clone.csv script:'./TCM-Temp/Export_from_POSTGRES_lineitem_clone.sh'
+
+2021-12-12T16:13:31,887  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> export data total time spent:15511
+
+
+2021-12-12T16:13:31,887  [boraydata.tcm.DoIt    ] main INFO : Read to Load CSV data in Clone Table.
+2021-12-12T16:13:31,890  [tcm.syncing.CommandExecutor] main INFO : 			!!!!!!!!!!!!!!!!!!!!!!!!!! Shell Path :./TCM-Temp/Load_to_HUDI_lineitem_clone_mor.sh !!!!!!!!!!!!!!!!!!!!!!!!!!!
+2021-12-12T16:15:53,002  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark context Web UI available at http://cdc1:4041
+2021-12-12T16:15:53,002  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark context available as 'sc' (master = local[2], app id = local-1639325640768).
+2021-12-12T16:15:53,002  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark session available as 'spark'.
+2021-12-12T16:21:05,000  [boraydata.tcm.DoIt    ] main INFO : *********************************** LOAD INFO ***********************************
+
+load data in HUDI:lineitem_clone_mor script:'./TCM-Temp/Load_to_HUDI_lineitem_clone_mor.sh'
+
+2021-12-12T16:21:05,000  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> load data total time spent:453112
+2021-12-12T16:21:05,001  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Mapping Table and Syncing TableData table time:468755 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2021-12-12T16:21:05,001  [boraydata.tcm.DoIt    ] main INFO : 
+
+
+
+
+2021-12-12T16:21:05,001  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Export_from_POSTGRES_lineitem_clone.sh -------------------------------------------------------------------------------------
+
+psql postgres://root:123456@192.168.120.66/test_db -c  "\copy lineitem_clone to './TCM-Temp/Export_from_POSTGRES_lineitem_clone.csv' with DELIMITER ',' CSV QUOTE '\"' escape '\\' force quote *;" 2>&1
+
+2021-12-12T16:21:05,001  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Load_CSV_to_hudi_MERGE_ON_READ.scala -------------------------------------------------------------------------------------
+
+import scala.collection.JavaConversions._
+import org.apache.spark.sql.SaveMode._
+import org.apache.hudi.DataSourceReadOptions._
+import org.apache.hudi.DataSourceWriteOptions._
+import org.apache.hudi.config.HoodieWriteConfig._
+import org.apache.spark.sql.types._
+
+val schema = new StructType().add("l_orderkey",IntegerType).add("l_partkey",IntegerType).add("l_suppkey",IntegerType).add("l_linenumber",IntegerType).add("l_quantity",StringType).add("l_extendedprice",StringType).add("l_discount",StringType).add("l_tax",StringType).add("l_returnflag",StringType).add("l_linestatus",StringType).add("l_shipdate",DateType).add("l_commitdate",DateType).add("l_receiptdate",DateType).add("l_shipinstruct",StringType).add("l_shipmode",StringType).add("l_comment",StringType).add("id",IntegerType);
+
+val df = spark.read.schema(schema).option("delimiter", ",").option("escape", "\\").option("quote", "\"").csv("hdfs:///HudiTest/Export_from_POSTGRES_lineitem_clone.csv").withColumn("_hoodie_ts",lit(null).cast(TimestampType)).withColumn("_hoodie_date",lit(null).cast(StringType));
+
+df.write.format("org.apache.hudi").option("hoodie.datasource.write.operation","insert").option("hoodie.datasource.write.table.type","MERGE_ON_READ").option("hoodie.embed.timeline.server",false).option("hoodie.table.name","lineitem_clone_mor").option("hoodie.datasource.write.recordkey.field","id").option("hoodie.datasource.write.partitionpath.field","_hoodie_date").option("hoodie.datasource.hive_sync.jdbcurl", "jdbc:hive2://192.168.120.67:10000/test_cdc_hudi").option("hoodie.datasource.hive_sync.database", "test_cdc_hudi").option("hoodie.datasource.hive_sync.username","rapids").option("hoodie.datasource.hive_sync.password","rapids").option("hoodie.datasource.hive_sync.enable",true).option("hoodie.datasource.hive_sync.table","lineitem_clone_mor").option("hoodie.datasource.hive_sync.partition_fields","_hoodie_date").option("hoodie.datasource.hive_sync.partition_extractor_class","org.apache.hudi.hive.MultiPartKeysValueExtractor").option("hoodie.datasource.hive_sync.mode","hms").mode(Append).save("/HudiTest/lineitem_clone_mor");
+
+System.exit(0);
+
+2021-12-12T16:21:05,001  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Load_to_HUDI_lineitem_clone_mor.sh -------------------------------------------------------------------------------------
+
+hdfs dfs -mkdir -p hdfs:///HudiTest/
+hdfs dfs -rm -r /HudiTest/lineitem_clone_mor
+time hdfs dfs -put -f ./TCM-Temp/Export_from_POSTGRES_lineitem_clone.csv hdfs:///HudiTest/
+
+time spark-shell \
+--jars /opt/CDC/spark/jars/hudi-spark-bundle_2.11-0.8.0.jar \
+--master local[2] \
+--driver-class-path $HADOOP_CONF_DIR \
+--deploy-mode client \
+--driver-memory 2G \
+--executor-memory 2G \
+--num-executors 2 \
+--packages org.apache.spark:spark-avro_2.11:2.4.4 \
+--conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' \
+-i ./TCM-Temp/Load_CSV_to_hudi_MERGE_ON_READ.scala
+
+2021-12-12T16:21:05,001  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

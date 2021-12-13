@@ -1,0 +1,146 @@
+====  sourceConfig  ====
+host:192.168.30.148
+port:3306
+username:'root'
+password:'root'
+dataSourceType:MYSQL
+databasename:test_db
+url:jdbc:mysql://192.168.30.148:3306/test_db?useSSL=false
+
+====  cloneConfig  ====
+host:192.168.30.148
+port:3306
+username:'root'
+password:'root'
+dataSourceType:MYSQL
+databasename:test_db
+url:jdbc:mysql://192.168.30.148:3306/test_db?useSSL=false
+
+
+(1).Read to initialization table in MYSQL ,from MYSQL.numeric_types_mysql
+
+	(1.1).get 'numeric_types_mysql' info from MYSQL
+	----get sourceTable info total time spent:408
+
+DataSourceType:MYSQL
+CatalogName:def
+SchemaName:test_db
+TableName:numeric_types_mysql
+========== columns info =============
+ColumnName=myinteger            DataType=int(11)              Position=1    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+ColumnName=mysmallint           DataType=smallint(6)          Position=2    CharMaxLength=0          NumericPrecisionM=5    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT16
+ColumnName=mydecimal            DataType=decimal(65,30)       Position=3    CharMaxLength=0          NumericPrecisionM=65   NumericPrecisionD=30   DatetimePrecision=0    tableCLoneManageType=DECIMAL
+ColumnName=mynumeric            DataType=decimal(65,30)       Position=4    CharMaxLength=0          NumericPrecisionM=65   NumericPrecisionD=30   DatetimePrecision=0    tableCLoneManageType=DECIMAL
+ColumnName=myfloat              DataType=float                Position=5    CharMaxLength=0          NumericPrecisionM=12   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=FLOAT64
+ColumnName=myreal               DataType=double               Position=6    CharMaxLength=0          NumericPrecisionM=22   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=FLOAT64
+ColumnName=mydouble_percision   DataType=double               Position=7    CharMaxLength=0          NumericPrecisionM=22   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=FLOAT64
+ColumnName=myint                DataType=int(11)              Position=8    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+ColumnName=mydec                DataType=decimal(65,30)       Position=9    CharMaxLength=0          NumericPrecisionM=65   NumericPrecisionD=30   DatetimePrecision=0    tableCLoneManageType=DECIMAL
+ColumnName=myfixed              DataType=decimal(65,30)       Position=10   CharMaxLength=0          NumericPrecisionM=65   NumericPrecisionD=30   DatetimePrecision=0    tableCLoneManageType=DECIMAL
+ColumnName=mydouble             DataType=double               Position=11   CharMaxLength=0          NumericPrecisionM=22   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=FLOAT64
+ColumnName=mybit                DataType=bit(1)               Position=12   CharMaxLength=0          NumericPrecisionM=1    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=BYTES
+ColumnName=mytinyint            DataType=tinyint(4)           Position=13   CharMaxLength=0          NumericPrecisionM=3    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT16
+ColumnName=mymediumint          DataType=mediumint(9)         Position=14   CharMaxLength=0          NumericPrecisionM=7    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+ColumnName=mybigint             DataType=bigint(20)           Position=15   CharMaxLength=0          NumericPrecisionM=19   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT64
+ColumnName=mybool               DataType=tinyint(1)           Position=16   CharMaxLength=0          NumericPrecisionM=3    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=BOOLEAN
+ColumnName=myboolean            DataType=tinyint(1)           Position=17   CharMaxLength=0          NumericPrecisionM=3    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=BOOLEAN
+
+	(1.2).create 'numeric_types_m2m_clone' in MYSQL
+Create Table If Not Exists numeric_types_mysql_1006902_temp(
+myinteger LONGTEXT
+,mysmallint LONGTEXT
+,mydecimal LONGTEXT
+,mynumeric LONGTEXT
+,myfloat LONGTEXT
+,myreal LONGTEXT
+,mydouble_percision LONGTEXT
+,myint LONGTEXT
+,mydec LONGTEXT
+,myfixed LONGTEXT
+,mydouble LONGTEXT
+,mybit LONGTEXT
+,mytinyint LONGTEXT
+,mymediumint LONGTEXT
+,mybigint LONGTEXT
+,mybool LONGTEXT
+,myboolean LONGTEXT
+)Engine InnoDB;
+Create Table If Not Exists numeric_types_m2m_clone(
+myinteger int
+,mysmallint smallint
+,mydecimal decimal(65,30)
+,mynumeric decimal(65,30)
+,myfloat float
+,myreal double
+,mydouble_percision double
+,myint int
+,mydec decimal(65,30)
+,myfixed decimal(65,30)
+,mydouble double
+,mybit bit
+,mytinyint tinyint
+,mymediumint mediumint
+,mybigint bigint
+,mybool tinyint
+,myboolean tinyint
+)Engine InnoDB;
+	----create table total time spent:605
+
+DataSourceType:MYSQL
+CatalogName:null
+SchemaName:null
+TableName:numeric_types_m2m_clone
+========== columns info =============
+ColumnName=myinteger            DataType=int(11)              Position=1    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+ColumnName=mysmallint           DataType=smallint(6)          Position=2    CharMaxLength=0          NumericPrecisionM=5    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT16
+ColumnName=mydecimal            DataType=decimal(65,30)       Position=3    CharMaxLength=0          NumericPrecisionM=65   NumericPrecisionD=30   DatetimePrecision=0    tableCLoneManageType=DECIMAL
+ColumnName=mynumeric            DataType=decimal(65,30)       Position=4    CharMaxLength=0          NumericPrecisionM=65   NumericPrecisionD=30   DatetimePrecision=0    tableCLoneManageType=DECIMAL
+ColumnName=myfloat              DataType=float                Position=5    CharMaxLength=0          NumericPrecisionM=12   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=FLOAT64
+ColumnName=myreal               DataType=double               Position=6    CharMaxLength=0          NumericPrecisionM=22   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=FLOAT64
+ColumnName=mydouble_percision   DataType=double               Position=7    CharMaxLength=0          NumericPrecisionM=22   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=FLOAT64
+ColumnName=myint                DataType=int(11)              Position=8    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+ColumnName=mydec                DataType=decimal(65,30)       Position=9    CharMaxLength=0          NumericPrecisionM=65   NumericPrecisionD=30   DatetimePrecision=0    tableCLoneManageType=DECIMAL
+ColumnName=myfixed              DataType=decimal(65,30)       Position=10   CharMaxLength=0          NumericPrecisionM=65   NumericPrecisionD=30   DatetimePrecision=0    tableCLoneManageType=DECIMAL
+ColumnName=mydouble             DataType=double               Position=11   CharMaxLength=0          NumericPrecisionM=22   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=FLOAT64
+ColumnName=mybit                DataType=bit(1)               Position=12   CharMaxLength=0          NumericPrecisionM=1    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=BYTES
+ColumnName=mytinyint            DataType=tinyint(4)           Position=13   CharMaxLength=0          NumericPrecisionM=3    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT16
+ColumnName=mymediumint          DataType=mediumint(9)         Position=14   CharMaxLength=0          NumericPrecisionM=7    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+ColumnName=mybigint             DataType=bigint(20)           Position=15   CharMaxLength=0          NumericPrecisionM=19   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT64
+ColumnName=mybool               DataType=tinyint(1)           Position=16   CharMaxLength=0          NumericPrecisionM=3    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=BOOLEAN
+ColumnName=myboolean            DataType=tinyint(1)           Position=17   CharMaxLength=0          NumericPrecisionM=3    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=BOOLEAN
+----initialization table success !!!
+
+
+(2).Read to Sync table data, export MYSQL.numeric_types_mysql ,load to MYSQL.numeric_types_m2m_clone
+
+	  Excuet Shell : ./TCM-Temp/Export_from_MYSQL_numeric_types_mysql_1006902_temp.sh
+	 Shell Out:mysql: [Warning] Using a password on the command line interface can be insecure.
+	 Shell Out:[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+	 Shell Out:Gathering information...
+	 Shell Out:Preparing data dump for table `test_db`.`numeric_types_mysql_1006902_temp`
+	 Shell Out:Data dump for table `test_db`.`numeric_types_mysql_1006902_temp` will not use an index
+	 Shell Out:Running data dump using 1 thread.
+	 Shell Out:Data dump for table `test_db`.`numeric_types_mysql_1006902_temp` will be written to 1 file
+	 Shell Out:Duration: 00:00:00s
+	 Shell Out:Data size: 487 bytes
+	 Shell Out:Rows written: 2
+	 Shell Out:Bytes written: 487 bytes
+	 Shell Out:Average throughput: 487.00 B/s
+	 Shell Out:
+	 Shell Out:The dump can be loaded using:
+	 Shell Out:util.importTable("./TCM-Temp/MYSQL_to_MYSQL_numeric_types_m2m_clone.csv", {
+	 Shell Out:    "characterSet": "utf8mb4",
+	 Shell Out:    "fieldsTerminatedBy": ",",
+	 Shell Out:    "linesTerminatedBy": "\n",
+	 Shell Out:    "schema": "test_db",
+	 Shell Out:    "table": "numeric_types_mysql_1006902_temp"
+	 Shell Out:})
+	 Shell Out:mysql: [Warning] Using a password on the command line interface can be insecure.
+	----export table data total time spent:491
+
+	  Excuet Shell : ./TCM-Temp/Load_to_MYSQL_numeric_types_m2m_clone.sh
+	 Shell Out:mysql: [Warning] Using a password on the command line interface can be insecure.
+	----load table data total time spent:191
+
+----Sync the table success !!!!
+Mapping Table and Syncing TableData table time:1695

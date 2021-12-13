@@ -1,0 +1,1 @@
+mysqlsh -h 192.168.120.68 -P 3306 -uroot -pMyNewPass4! --database test_db -e "util.exportTable('lineitem','./TCM-Temp/Export_from_MYSQL_lineitem.csv',{linesTerminatedBy:'\n',fieldsTerminatedBy:'|',fieldsOptionallyEnclosed:true,fieldsEnclosedBy:'\"',fieldsEscapedBy:'\\\'})" 2>&1

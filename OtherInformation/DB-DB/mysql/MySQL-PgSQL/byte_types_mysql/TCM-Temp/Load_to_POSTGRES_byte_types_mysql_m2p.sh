@@ -1,0 +1,1 @@
+psql postgres://postgres:@192.168.30.155/test_db -c  "\copy byte_types_mysql_m2p from './TCM-Temp/MYSQL_to_POSTGRES_byte_types_mysql_m2p.csv' with DELIMITER ',';" 2>&1

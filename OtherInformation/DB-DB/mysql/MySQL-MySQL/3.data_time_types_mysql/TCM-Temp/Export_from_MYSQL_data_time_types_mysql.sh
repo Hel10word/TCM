@@ -1,0 +1,1 @@
+mysqlsh -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "util.exportTable('data_time_types_mysql','./TCM-Temp/MYSQL_to_MYSQL_data_time_types_mysql_m2m.csv',{linesTerminatedBy:'\n',fieldsTerminatedBy:','})" 2>&1

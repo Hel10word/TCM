@@ -1,0 +1,1 @@
+mysql -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "load data local infile './TCM-Temp/MYSQL_to_MYSQL_byte_types_mysql_m2m.csv' into table byte_types_mysql_m2m fields terminated by ',';" 2>&1

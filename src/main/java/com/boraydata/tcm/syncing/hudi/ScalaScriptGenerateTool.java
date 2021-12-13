@@ -115,6 +115,7 @@ public class ScalaScriptGenerateTool {
         String options = ".option(\"delimiter\", \""+delimiter+"\").option(\"escape\", \"\\\\\").option(\"quote\", \"\\\"\")";
         this.scalaScript.append("\nval df = spark.read.schema(schema)").append(options)
                 .append(".csv(\"").append(hdfsCsvPath).append("\")")
+//        https://stackoverflow.com/questions/57945174/how-to-convert-timestamp-to-bigint-in-a-pyspark-dataframe
                 .append(".withColumn(\"_hoodie_ts\",lit(null).cast(TimestampType))")
                 .append(".withColumn(\"_hoodie_date\",lit(null).cast(StringType));\n");
         return this;
