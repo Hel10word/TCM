@@ -37,10 +37,10 @@ class TableCloneManageTest {
     // create the table clone manager
     TableCloneManageContext.Builder tcmcBuilder = new TableCloneManageContext.Builder();
     TableCloneManageContext tcmc = tcmcBuilder
-            .setTcmConfig(TestDataProvider.getDefTcmConfig(configPGSQL,configMySQL))
+            .setTcmConfig(TestDataProvider.getDefTcmConfig(configMySQL,configMySQL))
             .create();
     TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmc);
-    String sourceName = "lineitem";
+    String sourceName = "lineitem_sf10_mysql";
     String cloneName = sourceName+"_clone";
 //    String cloneName = "numeric_types_pgsql_clone";
 

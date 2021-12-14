@@ -24,7 +24,7 @@ public class StringUtil {
 //            return string.replaceAll("\\d+",">1");
 
         // e.g. : varchar(16)  -->   varchar
-        return string.replaceAll("\\(.*\\)","");
+        return string.replaceAll("(\\(.*\\)(.*)?)","");
     }
 
     public static String getRandom(){

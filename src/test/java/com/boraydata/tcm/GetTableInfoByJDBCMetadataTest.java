@@ -39,7 +39,7 @@ public class GetTableInfoByJDBCMetadataTest {
             .setPassword("postgres")
             .create();
 
-    String tableName = "lineitem";
+    String tableName = "lineitem_sf10_mysql";
     DatabaseConfig config = mysqlConfig;
 //    DatabaseConfig config = pgsqlConfig;
     @Test
