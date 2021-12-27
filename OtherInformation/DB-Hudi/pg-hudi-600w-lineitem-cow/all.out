@@ -1,4 +1,4 @@
-2021-12-14T02:27:20,040  [boraydata.tcm.DoIt    ] main INFO : 
+2021-12-23T09:58:28,636  [boraydata.tcm.DoIt    ] main INFO : 
 ================================== Source Config Info ==================================
 	host:192.168.120.66
 	port:5432
@@ -20,10 +20,10 @@
 	url:jdbc:hive2://192.168.120.67:10000/test_cdc_hudi
 
 
-2021-12-14T02:27:20,048  [boraydata.tcm.DoIt    ] main INFO : Ready to get Source Table structure and information:POSTGRES->lineitem_clone
-2021-12-14T02:27:21,303  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get Source Table info total time spent:1256
+2021-12-23T09:58:28,644  [boraydata.tcm.DoIt    ] main INFO : Ready to get Source Table structure and information:POSTGRES->lineitem_clone
+2021-12-23T09:58:28,783  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get Source Table info total time spent:139
 
-2021-12-14T02:27:21,308  [boraydata.tcm.DoIt    ] main INFO : 
+2021-12-23T09:58:28,787  [boraydata.tcm.DoIt    ] main INFO : 
 ================================== Source Table Info ==================================
 	DataSourceType:POSTGRES
 	CatalogName:test_db
@@ -49,10 +49,10 @@
 	ColumnName=id                   DataType=integer              UdtType=int4                 Position=17   CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
 
 
-2021-12-14T02:27:21,308  [boraydata.tcm.DoIt    ] main INFO : Ready to create Clone Table 'lineitem_clone_cow' in HUDI
-2021-12-14T02:27:21,308  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> create Clone Table total time spent:0
+2021-12-23T09:58:28,788  [boraydata.tcm.DoIt    ] main INFO : Ready to create Clone Table 'lineitem_clone_cow' in HUDI
+2021-12-23T09:58:28,788  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> create Clone Table total time spent:0
 
-2021-12-14T02:27:21,311  [boraydata.tcm.DoIt    ] main INFO : 
+2021-12-23T09:58:28,791  [boraydata.tcm.DoIt    ] main INFO : 
 ================================== Clone Table Info ==================================
 	DataSourceType:POSTGRES
 	CatalogName:null
@@ -78,36 +78,36 @@
 	ColumnName=id                   DataType=integer              UdtType=int4                 Position=17   CharMaxLength=0          NumericPrecisionM=32   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
 
 
-2021-12-14T02:27:21,312  [boraydata.tcm.DoIt    ] main INFO : Read to Export Source Table data in CSV.
-2021-12-14T02:27:21,322  [tcm.syncing.CommandExecutor] main INFO : 			!!!!!!!!!!!!!!!!!!!!!!!!!! Shell Path :./TCM-Temp/Export_from_POSTGRES_lineitem_clone.sh !!!!!!!!!!!!!!!!!!!!!!!!!!!
-2021-12-14T02:28:37,925  [boraydata.tcm.DoIt    ] main INFO : *********************************** EXPORT INFO ***********************************
+2021-12-23T09:58:28,792  [boraydata.tcm.DoIt    ] main INFO : Read to Export Source Table data in CSV.
+2021-12-23T09:58:28,801  [tcm.syncing.CommandExecutor] main INFO : 			!!!!!!!!!!!!!!!!!!!!!!!!!! Shell Path :./TCM-Temp/Export_from_POSTGRES_lineitem_clone.sh !!!!!!!!!!!!!!!!!!!!!!!!!!!
+2021-12-23T09:58:43,532  [boraydata.tcm.DoIt    ] main INFO : *********************************** EXPORT INFO ***********************************
 
 export POSTGRES:lineitem_clone in ./TCM-Temp/Export_from_POSTGRES_lineitem_clone.csv script:'./TCM-Temp/Export_from_POSTGRES_lineitem_clone.sh'
 
-2021-12-14T02:28:37,925  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> export data total time spent:76613
+2021-12-23T09:58:43,532  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> export data total time spent:14740
 
 
-2021-12-14T02:28:37,925  [boraydata.tcm.DoIt    ] main INFO : Read to Load CSV data in Clone Table.
-2021-12-14T02:28:37,929  [tcm.syncing.CommandExecutor] main INFO : 			!!!!!!!!!!!!!!!!!!!!!!!!!! Shell Path :./TCM-Temp/Load_to_HUDI_lineitem_clone_cow.sh !!!!!!!!!!!!!!!!!!!!!!!!!!!
-2021-12-14T02:29:29,746  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark context Web UI available at http://cdc1:4041
-2021-12-14T02:29:29,747  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark context available as 'sc' (master = local[2], app id = local-1639448955813).
-2021-12-14T02:29:29,747  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark session available as 'spark'.
-2021-12-14T02:36:06,274  [boraydata.tcm.DoIt    ] main INFO : *********************************** LOAD INFO ***********************************
+2021-12-23T09:58:43,533  [boraydata.tcm.DoIt    ] main INFO : Read to Load CSV data in Clone Table.
+2021-12-23T09:58:43,536  [tcm.syncing.CommandExecutor] main INFO : 			!!!!!!!!!!!!!!!!!!!!!!!!!! Shell Path :./TCM-Temp/Load_to_HUDI_lineitem_clone_cow.sh !!!!!!!!!!!!!!!!!!!!!!!!!!!
+2021-12-23T10:00:10,679  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark context Web UI available at http://cdc1:4040
+2021-12-23T10:00:10,679  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark context available as 'sc' (master = yarn, app id = application_1640249124969_0008).
+2021-12-23T10:00:10,679  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark session available as 'spark'.
+2021-12-23T10:02:37,212  [boraydata.tcm.DoIt    ] main INFO : *********************************** LOAD INFO ***********************************
 
 load data in HUDI:lineitem_clone_cow script:'./TCM-Temp/Load_to_HUDI_lineitem_clone_cow.sh'
 
-2021-12-14T02:36:06,275  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> load data total time spent:448349
-2021-12-14T02:36:06,275  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Mapping Table and Syncing TableData table time:526218 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-2021-12-14T02:36:06,275  [boraydata.tcm.DoIt    ] main INFO : 
+2021-12-23T10:02:37,213  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> load data total time spent:233679
+2021-12-23T10:02:37,214  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Mapping Table and Syncing TableData table time:248558 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2021-12-23T10:02:37,214  [boraydata.tcm.DoIt    ] main INFO : 
 
 
 
 
-2021-12-14T02:36:06,275  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Export_from_POSTGRES_lineitem_clone.sh -------------------------------------------------------------------------------------
+2021-12-23T10:02:37,214  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Export_from_POSTGRES_lineitem_clone.sh -------------------------------------------------------------------------------------
 
 psql postgres://root:123456@192.168.120.66/test_db -c  "\copy lineitem_clone to './TCM-Temp/Export_from_POSTGRES_lineitem_clone.csv' with DELIMITER '|' CSV QUOTE '\"' escape '\\' force quote *;" 2>&1
 
-2021-12-14T02:36:06,276  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Load_CSV_to_hudi_COPY_ON_WRITE.scala -------------------------------------------------------------------------------------
+2021-12-23T10:02:37,215  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Load_CSV_to_hudi_COPY_ON_WRITE.scala -------------------------------------------------------------------------------------
 
 import scala.collection.JavaConversions._
 import org.apache.spark.sql.SaveMode._
@@ -124,22 +124,12 @@ df.write.format("org.apache.hudi").option("hoodie.datasource.write.operation","i
 
 System.exit(0);
 
-2021-12-14T02:36:06,276  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Load_to_HUDI_lineitem_clone_cow.sh -------------------------------------------------------------------------------------
+2021-12-23T10:02:37,215  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Load_to_HUDI_lineitem_clone_cow.sh -------------------------------------------------------------------------------------
 
 hdfs dfs -mkdir -p hdfs:///HudiTest/
 hdfs dfs -rm -r /HudiTest/lineitem_clone_cow
 time hdfs dfs -put -f ./TCM-Temp/Export_from_POSTGRES_lineitem_clone.csv hdfs:///HudiTest/
 
-time spark-shell \
---jars /opt/CDC/spark/jars/hudi-spark-bundle_2.11-0.8.0.jar \
---master local[2] \
---driver-class-path $HADOOP_CONF_DIR \
---deploy-mode client \
---driver-memory 2G \
---executor-memory 2G \
---num-executors 2 \
---packages org.apache.spark:spark-avro_2.11:2.4.4 \
---conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' \
--i ./TCM-Temp/Load_CSV_to_hudi_COPY_ON_WRITE.scala
+time spark-shell --jars /opt/CDC/spark/jars/hudi-spark-bundle_2.11-0.8.0.jar --driver-class-path $HADOOP_CONF_DIR --packages org.apache.spark:spark-avro_2.11:2.4.4 --master yarn --deploy-mode client --driver-memory 4g --driver-cores 1 --num-executors 10 --executor-memory 4g --executor-cores 2 --conf spark.default.parallelism=40  -i ./TCM-Temp/Load_CSV_to_hudi_COPY_ON_WRITE.scala
 
-2021-12-14T02:36:06,276  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2021-12-23T10:02:37,215  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -2,7 +2,9 @@ HDFS
 
 http://192.168.120.66:50070/dfshealth.html#tab-overview
 
+Hadoop
 
+http://192.168.120.66:8088/cluster
 
 Spark
 
@@ -11,6 +13,30 @@ http://192.168.120.66:8080/
 http://192.168.120.66:4040/jobs/
 
 
+
+清理 ha节点的 内容
+
+/home/rapids/cdc/hadoop/tmp/nm-local-dir
+
+
+
+
+
+查看当前任务 
+
+yarn application -list
+
+yarn application -kill <appId>
+
+
+
+
+
+连接 Hive  
+
+```sql
+beeline -u jdbc:hive2://192.168.120.67:10000/test_cdc_hudi -n '' -p '' -e ""
+```
 
 
 
@@ -68,54 +94,6 @@ DB-Hudi
 [Spark-Shell](https://spark.apache.org/docs/latest/quick-start.html)   [Spark-Shell Command](https://spark.apache.org/docs/3.2.0/submitting-applications.html)
 
 [Hudi](https://hudi.apache.org/docs/quick-start-guide/)
-
-使用 Spark 连接 hudi
-
-```sh
-cd /opt/CDC/spark/
-
-./bin/spark-shell \
---jars /opt/CDC/kafka/plugins/kafka-connect-hive/hudi-spark-bundle_2.11-0.8.0.jar \
---master local[2] \
---driver-class-path /etc/rapids/cdc/hadoop \
---conf spark.sql.hive.convertMetastoreParquet=false \
---deploy-mode client \
---driver-memory 1G \
---executor-memory 2G \
---num-executors 1 \
---packages org.apache.spark:spark-avro_2.11:2.4.4
-
-
-./bin/spark-shell \
---jars /opt/CDC/spark/jars/hudi-spark-bundle_2.11-0.8.0.jar \
---master local[2] \
---driver-class-path $HADOOP_CONF_DIR \
---conf spark.sql.hive.convertMetastoreParquet=false \
---deploy-mode client \
---driver-memory 2G \
---executor-memory 2G \
---num-executors 2 \
---packages org.apache.spark:spark-avro_2.11:2.4.4
-
-spark.sql(s"show databases").show()
-spark.sql(s"use test_cdc_hudi").show()
-spark.sql(s"show tables").show()
-spark.sql(s"select * from test1_hudi_ro").show()
-spark.sql(s"drop table test1_hudi_ro").show()
-```
-
-
-
-
-
-
-刚刚那封邮件比较旧，我发现运行方式是错误的应该改成这样运行
-
- java -cp lib/*:initialization-1.0.jar com.boray.stream.init.InitializationTool config/test.properties
-
-![237691534126881416](Imgs-DB-Hudi/237691534126881416.png)
-
-
 
 
 

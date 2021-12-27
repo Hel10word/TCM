@@ -34,8 +34,10 @@ package com.boraydata.tcm.core;
  * |              gender|   string|
  *
  *
+ * TimestampType 类型的数据会被转为 Bigint 类型来存储
+ * https://stackoverflow.com/questions/57945174/how-to-convert-timestamp-to-bigint-in-a-pyspark-dataframe
+ *
  */
-
 public enum TableCloneManageType {
 //  tcm Type        Type name       default MySQL type              default PgSQL type
     INT8        ("INT8",        "TINYINT",          "SMALLINT",         "SMALLINT",      "IntegerType"),

@@ -64,7 +64,7 @@ CTM is a tool for initialization table between different datasources . Now suppo
     # default: './TCM-TempData/'  (Optional)
     tempDirectory=./TCM-Temp
     # CSV fields delimiter
-    # default: '|' (Optiona)
+    # default: '|' (Optional)
     delimiter=,
     # output the information of each step.
     # default: 'false' (Optional)
@@ -86,7 +86,7 @@ CTM is a tool for initialization table between different datasources . Now suppo
     # default: N/A (Required)
     primary.key=id
     # partition path field. Value to be used at the partitionPath component of HoodieKey.
-    # default: _hoodie_date (Optiona)
+    # default: _hoodie_date (Optional)
     partition.key=ts
     # The table type for the underlying data, for this write.
     # default: 'MERGE_ON_READ' (Required)
@@ -145,5 +145,4 @@ view to [TCM-Performance](OtherInformation/Data Fabric CDC Init (DB-DB) 性能�
 ## Other
 
 -   The specific execution method can refer to [TableCloneManage.java](src/main/java/com/boraydata/tcm/DoIt.java)
-
 

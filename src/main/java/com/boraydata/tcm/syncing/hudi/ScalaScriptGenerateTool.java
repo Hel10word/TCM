@@ -19,24 +19,25 @@ public class ScalaScriptGenerateTool {
 
     // now support CDC in host 120.66 machine,
     // Hadoop 2.9.0,Zookeeper 3.4.6,Hive 2.3.0,Spark 2.4.4,Scala 2.11,Hudi 0.8
-    String sprakShell2 =
-            "spark-shell \\\n" +
-            "--jars /opt/CDC/spark/jars/hudi-spark-bundle_2.11-0.8.0.jar \\\n" +
-            "--master local[2] \\\n" +
-            "--driver-class-path $HADOOP_CONF_DIR \\\n" +
-            "--deploy-mode client \\\n" +
-            "--driver-memory 2G \\\n" +
-            "--executor-memory 2G \\\n" +
-            "--num-executors 2 \\\n" +
-            "--packages org.apache.spark:spark-avro_2.11:2.4.4 \\\n" +
-            "--conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' \\\n";
+//    String sprakShell2 =
+//            "spark-shell \\\n" +
+////            "--jars /opt/CDC/spark/jars/hudi-spark-bundle_2.11-0.8.0.jar \\\n" +
+////            "--master local[2] \\\n" +
+//            "--driver-class-path $HADOOP_CONF_DIR \\\n" +
+////            "--deploy-mode client \\\n" +
+////            "--driver-memory 2G \\\n" +
+////            "--executor-memory 2G \\\n" +
+////            "--num-executors 2 \\\n" +
+//            "--packages org.apache.spark:spark-avro_2.11:2.4.4 \\\n" +
+//            "--conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' \\\n";
 
     // Hadoop 3.3.1,Hive 3.1.2,Spark 3.1.2,Scala 2.12.13,Hudi 0.9
-    String sprakShell3 =
-            "spark-shell \\\n" +
-            "--jars /usr/local/spark/spark-3.1.2-bin-hadoop3.2/jars/hudi-spark3-bundle_2.12-0.9.0.jar  \\\n" +
-            "--packages org.apache.hudi:hudi-spark3-bundle_2.12:0.9.0,org.apache.spark:spark-avro_2.12:3.0.1 \\\n" +
-            "--conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' \\\n";
+//    String sprakShell3 =
+//            "spark-shell \\\n" +
+////            "--jars /usr/local/spark/spark-3.1.2-bin-hadoop3.2/jars/hudi-spark3-bundle_2.12-0.9.0.jar  \\\n" +
+////            "--packages org.apache.hudi:hudi-spark3-bundle_2.12:0.9.0,org.apache.spark:spark-avro_2.12:3.0.1 \\\n" +
+//            "--packages org.apache.spark:spark-avro_2.12:3.0.1 \\\n" +
+//            "--conf 'spark.serializer=org.apache.spark.serializer.KryoSerializer' \\\n";
 
     StringBuilder scalaScript = new StringBuilder(
 //            "import org.apache.hudi.QuickstartUtils._" +
@@ -64,14 +65,17 @@ public class ScalaScriptGenerateTool {
         return this.scalaScript.toString();
     }
 
-    public String loadCommand(String hdfsSourceDataDir,String localCsvPath,String hdfsCloneDataPath,String scriptPath){
+    public String loadCommand(String hdfsSourceDataDir,String localCsvPath,String hdfsCloneDataPath,String scriptPath,String sparkStartCommand){
         StringBuilder loadShell = new StringBuilder();
         loadShell
                 .append("hdfs dfs -mkdir -p ").append(hdfsSourceDataDir)
                 .append("\nhdfs dfs -rm -r ").append(hdfsCloneDataPath)
-                .append("\ntime hdfs dfs -put -f ").append(localCsvPath).append(" ").append(hdfsSourceDataDir)
-                .append("\n\n").append("time ").append(sprakShell2)
-                .append("-i ").append(scriptPath);
+                .append("\ntime hdfs dfs -put -f ").append(localCsvPath).append(" ").append(hdfsSourceDataDir).append(" 2>&1")
+                // if the CSV File large and disk no space,save part of CSV for execute Spark-Shell
+                .append("\nhead -5 ").append(localCsvPath).append(" > ").append(localCsvPath).append("_first_5_lines")
+                .append("\nrm -f ").append(localCsvPath)
+                .append("\n\n").append("time ").append(sparkStartCommand)
+                .append(" -i ").append(scriptPath);
         return loadShell.toString();
     }
 

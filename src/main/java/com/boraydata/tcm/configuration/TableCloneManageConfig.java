@@ -2,6 +2,8 @@ package com.boraydata.tcm.configuration;
 
 import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.exception.TCMException;
+import com.boraydata.tcm.utils.StringUtil;
+
 import java.util.Properties;
 
 /** Load configuration file information
@@ -18,9 +20,8 @@ public class TableCloneManageConfig {
     private String primaryKey;
     private String partitionKey;
     private String hoodieTableType;
-//    private Boolean hiveNonPartitioned;
-//    private Boolean hiveMultiPartitionKeys;
-//    private String parallel;
+
+    private String sparkCustomCommand;
 
     private String tempDirectory;
     private String delimiter;
@@ -55,6 +56,7 @@ public class TableCloneManageConfig {
         String cloneTableName = props.getProperty("cloneTable",sourceTableName);
 
         //======================================================    Hudi Config   ==================================================
+        // https://hudi.apache.org/docs/configurations
         // put CSV File in HDFS Path
         this.hdfsSourceDataDir = props.getProperty("hdfs.source.data.path");
         // Hudi Data Save Path
@@ -65,7 +67,10 @@ public class TableCloneManageConfig {
         this.hoodieTableType = props.getProperty("hudi.table.type","MERGE_ON_READ");
 //        this.hiveNonPartitioned = Boolean.parseBoolean(props.getProperty("hive.non.partitioned", "false").toLowerCase());
 //        this.hiveMultiPartitionKeys = Boolean.parseBoolean(props.getProperty("hive.multi.partition.keys", "false").toLowerCase());
-//        this.parallel = props.getProperty("parallel","8");
+
+        //======================================================    Spark Config   ==================================================
+
+        this.sparkCustomCommand = props.getProperty("spark.custom.command");
 
         //======================================================    TCM Tools Config   ==================================================
         // save temp files directory
@@ -110,8 +115,10 @@ public class TableCloneManageConfig {
             this.hdfsSourceDataDir += "/";
         if(!this.tempDirectory.substring(tempDirectory.length()-1).equals("/"))
             this.tempDirectory += "/";
-        if(this.hoodieTableType != null && this.hoodieTableType.length() != 0){
-            if(!this.hoodieTableType.equals("MERGE_ON_READ") && !this.hoodieTableType.equals("COPY_ON_WRITE")){
+        if(this.getCloneConfig().getDataSourceType().equals(DataSourceType.HUDI)){
+            if(StringUtil.isNullOrEmpty(this.sparkCustomCommand)){
+                throw new TCMException("if you set cloneDataType is HUID , the 'spark.custom.command' should set");
+            }else if(!this.hoodieTableType.equals("MERGE_ON_READ") && !this.hoodieTableType.equals("COPY_ON_WRITE")){
                 throw new TCMException("if you set cloneDataType is HUID , the 'hudi.table.type' should be 'MERGE_ON_READ' or 'COPY_ON_WRITE'");
             }
         }
@@ -145,6 +152,10 @@ public class TableCloneManageConfig {
 
     public String getHoodieTableType() {
         return hoodieTableType;
+    }
+
+    public String getSparkCustomCommand() {
+        return sparkCustomCommand;
     }
 
     public String getTempDirectory() {

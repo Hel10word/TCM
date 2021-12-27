@@ -45,7 +45,7 @@ public class HudiSyncingTool implements SyncingTool {
         FileUtil.WriteMsgToFile(scriptContent,scriptPath);
         tcmContext.setLoadDataScriptName(scriptName);
 
-        return hudiTool.loadCommand(hdfsSourceDataDir,localCsvPath,tcmConfig.getHdfsCloneDataPath(),scriptPath);
+        return hudiTool.loadCommand(hdfsSourceDataDir,localCsvPath,tcmConfig.getHdfsCloneDataPath(),scriptPath,tcmConfig.getSparkCustomCommand());
     }
 
 }
