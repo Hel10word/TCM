@@ -145,8 +145,6 @@ mysql -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "select * fr
 
 
 
-
-
 -   但是使用 MySQL 无法将数据导出到其他 MySQL 客户端，但是使用如下 MySQL-Shell 会出现一些小问题。
 
 ```sql
@@ -168,10 +166,3 @@ mysqlsh -h192.168.30.148 -P3306 -uroot -proot --database test_db -e "util.export
 -   `,,,` => `"\,\,\,"`
 
 -   `\,` => `"\\\,"`
-
-
-
-
-
-
-
