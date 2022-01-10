@@ -206,13 +206,13 @@ public class PgsqlMappingTool implements MappingTool {
      */
     @Override
     public String getCreateTableSQL(Table table) {
-        if(table.getTablename() == null)
+        if(table.getTableName() == null)
             throw new TCMException("Failed in create table SQL,Because ‘Table.TableName’ is null. You should set one ."+table.getDataSourceType().name());
         StringBuilder stringBuilder = new StringBuilder("Create Table If Not Exists ");
-        if(table.getSchemaname() == null)
-            stringBuilder.append(table.getTablename()).append("(\n");
+        if(table.getSchemaName() == null)
+            stringBuilder.append(table.getTableName()).append("(\n");
         else
-            stringBuilder.append(table.getSchemaname()).append(".").append(table.getTablename()).append("(\n");
+            stringBuilder.append(table.getSchemaName()).append(".").append(table.getTableName()).append("(\n");
         List<Column> columns = table.getColumns();
         for(Column column : columns){
             if(column.getDataType() == null)

@@ -1,15 +1,11 @@
 package com.boraydata.tcm;
 
 import com.boraydata.tcm.configuration.TableCloneManageConfig;
-import com.boraydata.tcm.configuration.DatabaseConfig;
-import com.boraydata.tcm.configuration.DatasourceConnectionFactory;
-import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.core.TableCloneManage;
 import com.boraydata.tcm.core.TableCloneManageContext;
 import com.boraydata.tcm.core.TableCloneManageFactory;
 import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.exception.TCMException;
-import com.boraydata.tcm.utils.FileUtil;
 import com.boraydata.tcm.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 /** TCM - Table Clone Manage and Table Data Sync
@@ -117,7 +112,7 @@ public class DoIt {
         tcm.exportTableData();
                                     end = System.currentTimeMillis();
                                     all+=(end - start);
-        logger.info("*********************************** EXPORT INFO ***********************************\n\nexport {}:{} in {} script:'{}'\n",sourceDataType,tcmContext.getFinallySourceTable().getTablename(),
+        logger.info("*********************************** EXPORT INFO ***********************************\n\nexport {}:{} in {} script:'{}'\n",sourceDataType,tcmContext.getFinallySourceTable().getTableName(),
                 tcmContext.getTempDirectory()+tcmContext.getCsvFileName(),tcmContext.getTempDirectory()+tcmContext.getExportShellName());
         logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> export data total time spent:{}\n\n",(end - start));
 

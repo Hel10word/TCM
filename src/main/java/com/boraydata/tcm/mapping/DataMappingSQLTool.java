@@ -83,7 +83,7 @@ public class DataMappingSQLTool {
             sbSQL.append(",");
         }
         sbSQL.deleteCharAt(sbSQL.length()-1);
-        sbSQL.append(" from ").append(table.getTablename()).append(";");
+        sbSQL.append(" from ").append(table.getTableName()).append(";");
         return sbSQL.toString();
     }
 }

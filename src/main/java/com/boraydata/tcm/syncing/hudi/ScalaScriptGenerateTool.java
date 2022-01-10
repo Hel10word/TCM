@@ -6,9 +6,7 @@ import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.core.TableCloneManageType;
 import com.boraydata.tcm.entity.Column;
 import com.boraydata.tcm.entity.Table;
-import com.boraydata.tcm.utils.FileUtil;
 
-import java.io.File;
 import java.util.List;
 
 /** Generate different Scala script according to the configuration file
@@ -60,7 +58,7 @@ public class ScalaScriptGenerateTool {
 
         this
                 .setSchema(table).setDF(delimiter,hdfsSourceFilePath)
-                .setWrite(hoodieTableType,table.getTablename(),primaryKey,partitionKey,dbConfig.getUrl(),dbConfig.getDatabasename(),dbConfig.getUsername(),dbConfig.getPassword(),hdfsCloneDataPath)
+                .setWrite(hoodieTableType,table.getTableName(),primaryKey,partitionKey,dbConfig.getUrl(),dbConfig.getDatabasename(),dbConfig.getUsername(),dbConfig.getPassword(),hdfsCloneDataPath)
                 .setScalaEnd();
         return this.scalaScript.toString();
     }

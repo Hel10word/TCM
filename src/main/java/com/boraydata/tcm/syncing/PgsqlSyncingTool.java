@@ -1,13 +1,10 @@
 package com.boraydata.tcm.syncing;
 
-import com.boraydata.tcm.configuration.TableCloneManageConfig;
 import com.boraydata.tcm.configuration.DatabaseConfig;
 import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.core.TableCloneManageContext;
 import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.mapping.DataMappingSQLTool;
-import com.boraydata.tcm.utils.FileUtil;
-import com.boraydata.tcm.utils.StringUtil;
 
 /**  Export and Load Table Data in PgSQL,by shell statements.
  * @author bufan
@@ -21,7 +18,7 @@ public class PgsqlSyncingTool implements SyncingTool {
         boolean hudiFlag = DataSourceType.HUDI.equals(tcmContext.getCloneConfig().getDataSourceType());
         String exportSQL = "";
         if(tcmContext.getTempTable() == null)
-            exportSQL = table.getTablename();
+            exportSQL = table.getTableName();
         else
             exportSQL = DataMappingSQLTool.getMappingDataSQL(table,tcmContext.getCloneConfig().getDataSourceType());
         String csvPath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
@@ -35,7 +32,7 @@ public class PgsqlSyncingTool implements SyncingTool {
     @Override
     public String loadFile(TableCloneManageContext tcmContext) {
         String csvPath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
-        String tablename = tcmContext.getCloneTable().getTablename();
+        String tablename = tcmContext.getCloneTable().getTableName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
         return loadCommand(tcmContext.getCloneConfig(), csvPath,tablename,delimiter);
     }

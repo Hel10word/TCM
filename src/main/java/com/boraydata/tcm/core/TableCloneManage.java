@@ -88,12 +88,12 @@ public class TableCloneManage {
             ps.setString(1,tableName);
             ResultSet rs = ps.executeQuery();
             LinkedList<Column> columns = new LinkedList<>();
-            String tablecatalog = null;
+            String tableCatalog = null;
             String tableSchema = null;
             while (rs.next()){
                 Column column = new Column();
-                if (StringUtil.isNullOrEmpty(tablecatalog))
-                    tablecatalog = rs.getString(dsType.TableCatalog);
+                if (StringUtil.isNullOrEmpty(tableCatalog))
+                    tableCatalog = rs.getString(dsType.TableCatalog);
                 if (StringUtil.isNullOrEmpty(tableSchema))
                     tableSchema = rs.getString(dsType.TableSchema);
                 column.setDataSourceType(dsType);
@@ -111,15 +111,15 @@ public class TableCloneManage {
                 column.setDatetimePrecision(rs.getInt(dsType.DatetimePrecision));
                 columns.add(column);
             }
-            if(StringUtil.isNullOrEmpty(tablecatalog)&&StringUtil.isNullOrEmpty(tableSchema))
+            if(StringUtil.isNullOrEmpty(tableCatalog)&&StringUtil.isNullOrEmpty(tableSchema))
                 throw new TCMException("Not Found Table '"+tableName+"' in "
                         +dbConfig.getDataSourceType().toString()+"."
                         +dbConfig.getDatabasename()+" , you should sure it exist.");
             Table table = new Table();
             table.setDataSourceType(dsType);
-            table.setCatalogname(tablecatalog);
-            table.setSchemaname(tableSchema);
-            table.setTablename(tableName);
+            table.setCatalogName(tableCatalog);
+            table.setSchemaName(tableSchema);
+            table.setTableName(tableName);
             table.setColumns(columns);
             return table;
         }catch (SQLException e) {
@@ -176,14 +176,14 @@ public class TableCloneManage {
         for (Column col : clone.getColumns())
             col.setDataType(TableCloneManageType.TEXT.getOutDataType(table.getDataSourceType()));
         clone.setDataSourceType(table.getDataSourceType());
-        clone.setTablename(table.getTablename()+"_"+StringUtil.getRandom()+"_temp");
+        clone.setTableName(table.getTableName()+"_"+StringUtil.getRandom()+"_temp");
         return clone;
     }
 
     // generate CloneTable
     // ========================================  CloneTable  ======================================
     public Table createCloneTable(Table table){
-        return createCloneTable(table,table.getTablename());
+        return createCloneTable(table,table.getTableName());
     }
     public Table createCloneTable(Table table,String tableName){
         Table cloneTable = createCloneTable(table, tableName, this.cloneMappingTool, this.tableCloneManageContext);
@@ -197,7 +197,7 @@ public class TableCloneManage {
             cloneTable = table.clone();
         }else
             cloneTable = mappingTool.createCloneMappingTable(table);
-        cloneTable.setTablename(tableName);
+        cloneTable.setTableName(tableName);
 
         tcmContext.setCloneTable(cloneTable);
         return cloneTable;
@@ -229,7 +229,7 @@ public class TableCloneManage {
         // check the TempTable,at present, only MySQL needs to create temp table
         if(tempTable != null && DataSourceType.MYSQL.equals(sourceType)){
             if(!createTableInDatasource(tempTable,sourceConfig,sourceMappingTool, outSQLFlag, sqlScriptPath))
-                throw new TCMException("Create TempTable is Failed!!! in "+sourceType.toString()+"."+tempTable.getTablename());
+                throw new TCMException("Create TempTable is Failed!!! in "+sourceType.toString()+"."+tempTable.getTableName());
         }
         if(cloneTable != null)
             return createTableInDatasource(cloneTable,cloneConfig,cloneMappingTool, outSQLFlag, sqlScriptPath);
@@ -256,7 +256,7 @@ public class TableCloneManage {
                         +dbConfig.getDataSourceType().name()+"."
                         +dbConfig.getDataSourceType().TableCatalog+"."
                         +dbConfig.getDataSourceType().TableSchema+"."
-                        +table.getTablename()+" is FAILED !!!");
+                        +table.getTableName()+" is FAILED !!!");
             }
         }catch (Exception e){
             throw new TCMException("Failed to create clone table,maybe datasource connection unable use!!! -> "+dbConfig.getDataSourceType().toString());
@@ -273,11 +273,11 @@ public class TableCloneManage {
         String sourceType = this.tableCloneManageContext.getSourceConfig().getDataSourceType().toString();
         Table table = this.tableCloneManageContext.getFinallySourceTable();
 
-        String exportShellName = "Export_from_"+sourceType+"_"+table.getTablename()+".sh";
+        String exportShellName = "Export_from_"+sourceType+"_"+table.getTableName()+".sh";
         this.tableCloneManageContext.setExportShellName(exportShellName);
         String exportShellPath = this.tableCloneManageContext.getTempDirectory()+exportShellName;
 
-        String csvFileName = "Export_from_"+sourceType+"_"+table.getTablename()+".csv";
+        String csvFileName = "Export_from_"+sourceType+"_"+table.getTableName()+".csv";
         this.tableCloneManageContext.setCsvFileName(csvFileName);
 
         String exportCommand = this.sourceSyncingTool.exportFile(this.tableCloneManageContext);
@@ -296,7 +296,7 @@ public class TableCloneManage {
         String cloneType = this.tableCloneManageContext.getCloneConfig().getDataSourceType().toString();
         Table table = this.tableCloneManageContext.getCloneTable();
 
-        String loadShellName = "Load_to_"+cloneType+"_"+table.getTablename()+".sh";
+        String loadShellName = "Load_to_"+cloneType+"_"+table.getTableName()+".sh";
         this.tableCloneManageContext.setLoadShellName(loadShellName);
         String loadShellPath = this.tableCloneManageContext.getTempDirectory()+loadShellName;
         String loadCommand = this.cloneSyncingTool.loadFile(this.tableCloneManageContext);

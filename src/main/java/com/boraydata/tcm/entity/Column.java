@@ -9,27 +9,26 @@ import com.boraydata.tcm.core.TableCloneManageType;
  * @data 2021/8/25
  */
 public class Column implements Cloneable {
-    // 数据库类型
     private DataSourceType dataSourceType;
     // Catalog
-    private String TableCatalog;
+    private String tableCatalog;
     // Schema
-    private String TableSchema;
-    private String TableName;
-    private String ColumnName;
-    private String DataType;
+    private String tableSchema;
+    private String tableName;
+    private String columnName;
+    private String dataType;
     // standard data type
-    private String UdtType;
-    private Integer OrdinalPosition;
+    private String udtType;
+    private Integer ordinalPosition;
     // Char data type length
-    private Long CharMaxLength;
+    private Long charMaxLength;
     // numeric data type length
-    private Integer NumericPrecisionM;
+    private Integer numericPrecisionM;
     // numeric data type precision
-    private Integer NumericPrecisionD;
+    private Integer numericPrecisionD;
     // time data type precision
-    private Integer DatetimePrecision;
-    private Boolean IsNullAble;
+    private Integer datetimePrecision;
+    private Boolean isNullAble;
     // mapping tcm data type
     private TableCloneManageType tableCloneManageType;
 
@@ -49,7 +48,7 @@ public class Column implements Cloneable {
     }
 
     public String getColumnInfo(){
-        return this.TableCatalog+"."+this.TableSchema+"."+this.TableName+"  col: "+this.ColumnName+"  type:"+this.DataType;
+        return this.tableCatalog +"."+this.tableSchema +"."+this.tableName +"  col: "+this.columnName +"  type:"+this.dataType;
     }
 
     public Column setTableCloneManageType(TableCloneManageType tableCloneManageType) {
@@ -58,110 +57,110 @@ public class Column implements Cloneable {
     }
 
     public String getTableCatalog() {
-        return TableCatalog;
+        return tableCatalog;
     }
 
     public Column setTableCatalog(String tableCatalog) {
-        TableCatalog = tableCatalog;
+        this.tableCatalog = tableCatalog;
         return this;
     }
 
     public String getTableSchema() {
-        return TableSchema;
+        return tableSchema;
     }
 
     public Column setTableSchema(String tableSchema) {
-        TableSchema = tableSchema;
+        this.tableSchema = tableSchema;
         return this;
     }
 
     public String getTableName() {
-        return TableName;
+        return tableName;
     }
 
     public Column setTableName(String tableName) {
-        TableName = tableName;
+        this.tableName = tableName;
         return this;
     }
 
     public String getColumnName() {
-        return ColumnName;
+        return columnName;
     }
 
     public Column setColumnName(String columnName) {
-        ColumnName = columnName;
+        this.columnName = columnName;
         return this;
     }
 
     public String getDataType() {
-        return DataType;
+        return dataType;
     }
 
     public Column setDataType(String dataType) {
-        DataType = dataType;
+        this.dataType = dataType;
         return this;
     }
 
     public String getUdtType() {
-        return UdtType;
+        return udtType;
     }
 
     public Column setUdtType(String udtType) {
-        UdtType = udtType;
+        this.udtType = udtType;
         return this;
     }
 
     public Integer getOrdinalPosition() {
-        return OrdinalPosition;
+        return ordinalPosition;
     }
 
     public Column setOrdinalPosition(Integer ordinalPosition) {
-        OrdinalPosition = ordinalPosition;
+        this.ordinalPosition = ordinalPosition;
         return this;
     }
 
     public Boolean getNullAble() {
-        return IsNullAble;
+        return isNullAble;
     }
 
     public Column setNullAble(Boolean nullAble) {
-        IsNullAble = nullAble;
+        isNullAble = nullAble;
         return this;
     }
 
     public Long getCharMaxLength() {
-        return CharMaxLength;
+        return charMaxLength;
     }
 
     public Column setCharMaxLength(Long charMaxLength) {
-        CharMaxLength = charMaxLength;
+        this.charMaxLength = charMaxLength;
         return this;
     }
 
     public Integer getNumericPrecisionM() {
-        return NumericPrecisionM;
+        return numericPrecisionM;
     }
 
     public Column setNumericPrecisionM(Integer numericPrecisionM) {
-        NumericPrecisionM = numericPrecisionM;
+        this.numericPrecisionM = numericPrecisionM;
         return this;
     }
 
     public Integer getNumericPrecisionD() {
-        return NumericPrecisionD;
+        return numericPrecisionD;
     }
 
     public Column setNumericPrecisionD(Integer numericPrecisionD) {
-        NumericPrecisionD = numericPrecisionD;
+        this.numericPrecisionD = numericPrecisionD;
         return this;
     }
 
     public Integer getDatetimePrecision() {
-        return DatetimePrecision;
+        return datetimePrecision;
     }
 
     public Column setDatetimePrecision(Integer datetimePrecision) {
-        DatetimePrecision = datetimePrecision;
+        this.datetimePrecision = datetimePrecision;
         return this;
     }
 
@@ -170,24 +169,24 @@ public class Column implements Cloneable {
     public String toString() {
         return "Column{" +
                 "dataSourceType=" + dataSourceType +
-                ", TableCatalog='" + TableCatalog + '\'' +
-                ", TableSchema='" + TableSchema + '\'' +
-                ", TableName='" + TableName + '\'' +
-                ", ColumnName='" + ColumnName + '\'' +
-                ", DataType='" + DataType + '\'' +
-                ", UdtType='" + UdtType + '\'' +
-                ", OrdinalPosition=" + OrdinalPosition +
-                ", CharMaxLength=" + CharMaxLength +
-                ", NumericPrecisionM=" + NumericPrecisionM +
-                ", NumericPrecisionD=" + NumericPrecisionD +
-                ", DatetimePrecision=" + DatetimePrecision +
-                ", IsNullAble=" + IsNullAble +
+                ", TableCatalog='" + tableCatalog + '\'' +
+                ", TableSchema='" + tableSchema + '\'' +
+                ", TableName='" + tableName + '\'' +
+                ", ColumnName='" + columnName + '\'' +
+                ", DataType='" + dataType + '\'' +
+                ", UdtType='" + udtType + '\'' +
+                ", OrdinalPosition=" + ordinalPosition +
+                ", CharMaxLength=" + charMaxLength +
+                ", NumericPrecisionM=" + numericPrecisionM +
+                ", NumericPrecisionD=" + numericPrecisionD +
+                ", DatetimePrecision=" + datetimePrecision +
+                ", IsNullAble=" + isNullAble +
                 ", tableCloneManageType=" + tableCloneManageType +
                 '}';
     }
 
     public String getInfo(){
-        return String.format("ColumnName=%-20s DataType=%-20s UdtType=%-20s Position=%-4d CharMaxLength=%-10d NumericPrecisionM=%-4d NumericPrecisionD=%-4d DatetimePrecision=%-4d tableCLoneManageType=%s\n",ColumnName,DataType,UdtType,OrdinalPosition,CharMaxLength,NumericPrecisionM,NumericPrecisionD,DatetimePrecision,tableCloneManageType);
+        return String.format("ColumnName=%-20s DataType=%-20s UdtType=%-20s Position=%-4d CharMaxLength=%-10d NumericPrecisionM=%-4d NumericPrecisionD=%-4d DatetimePrecision=%-4d tableCLoneManageType=%s\n", columnName, dataType, udtType, ordinalPosition, charMaxLength, numericPrecisionM, numericPrecisionD, datetimePrecision,tableCloneManageType);
     }
 
     public Column clone(){

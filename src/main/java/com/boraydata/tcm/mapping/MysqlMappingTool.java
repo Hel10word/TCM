@@ -136,9 +136,9 @@ public class MysqlMappingTool implements MappingTool {
      */
     @Override
     public String getCreateTableSQL(Table table) {
-        if(table.getTablename() == null)
+        if(table.getTableName() == null)
             throw new TCMException("Failed in create table SQL,Because ‘Table.TableName’ is null. You should set one ."+table.getDataSourceType().name());
-        StringBuilder stringBuilder = new StringBuilder("Create Table If Not Exists "+table.getTablename()+"(\n");
+        StringBuilder stringBuilder = new StringBuilder("Create Table If Not Exists "+table.getTableName()+"(\n");
         List<Column> columns = table.getColumns();
         for(Column column : columns){
             if(column.getDataType() == null)

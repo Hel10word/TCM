@@ -7,7 +7,6 @@ import com.boraydata.tcm.core.TableCloneManageContext;
 import com.boraydata.tcm.core.TableCloneManageFactory;
 import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.configuration.DatasourceConnectionFactory;
-import com.boraydata.tcm.exception.TCMException;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -84,7 +83,7 @@ public class MySQL_PgSQL_Test {
 
         Table cloneTable = tcm.createCloneTable(sourceTable);
 
-        cloneTable.setTablename(tableName);
+        cloneTable.setTableName(tableName);
 
         boolean flag = tcm.createTableInDatasource();
         if(flag)

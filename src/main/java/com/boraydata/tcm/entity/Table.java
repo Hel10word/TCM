@@ -12,10 +12,10 @@ import java.util.List;
 public class Table implements Cloneable {
     private DataSourceType dataSourceType;
     // Catalog
-    private String catalogname;
+    private String catalogName;
     // Schema
-    private String schemaname;
-    private String tablename;
+    private String schemaName;
+    private String tableName;
     // When the table data source type be modified, this can record the most original type.
     private DataSourceType sourceType;
     private List<Column> columns = new LinkedList<>();
@@ -32,30 +32,30 @@ public class Table implements Cloneable {
         return this;
     }
 
-    public String getCatalogname() {
-        return catalogname;
+    public String getCatalogName() {
+        return catalogName;
     }
 
-    public Table setCatalogname(String catalogname) {
-        this.catalogname = catalogname;
+    public Table setCatalogName(String catalogName) {
+        this.catalogName = catalogName;
         return this;
     }
 
-    public String getSchemaname() {
-        return schemaname;
+    public String getSchemaName() {
+        return schemaName;
     }
 
-    public Table setSchemaname(String schemaname) {
-        this.schemaname = schemaname;
+    public Table setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
         return this;
     }
 
-    public String getTablename() {
-        return tablename;
+    public String getTableName() {
+        return tableName;
     }
 
-    public Table setTablename(String tablename) {
-        this.tablename = tablename;
+    public Table setTableName(String tableName) {
+        this.tableName = tableName;
         return this;
     }
 
@@ -81,9 +81,9 @@ public class Table implements Cloneable {
         StringBuilder info = new StringBuilder();
         info
                 .append("\tDataSourceType:").append(this.dataSourceType).append("\n")
-                .append("\tCatalogName:").append(this.catalogname).append("\n")
-                .append("\tSchemaName:").append(this.schemaname).append("\n")
-                .append("\tTableName:").append(this.tablename).append("\n")
+                .append("\tCatalogName:").append(this.catalogName).append("\n")
+                .append("\tSchemaName:").append(this.schemaName).append("\n")
+                .append("\tTableName:").append(this.tableName).append("\n")
                 .append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ columns info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
         for(Column column : columns)
             info.append("\t").append(column.getInfo());
@@ -94,9 +94,9 @@ public class Table implements Cloneable {
     public String toString() {
         return "Table{" +
                 "dataSourceType=" + dataSourceType +
-                ", catalogname='" + catalogname + '\'' +
-                ", schemaname='" + schemaname + '\'' +
-                ", tablename='" + tablename + '\'' +
+                ", catalogname='" + catalogName + '\'' +
+                ", schemaname='" + schemaName + '\'' +
+                ", tablename='" + tableName + '\'' +
                 ", columns=" + columns +
                 '}';
     }
@@ -109,8 +109,8 @@ public class Table implements Cloneable {
             for(Column column : this.columns)
                 cloneList.add(column.clone());
             table.setColumns(cloneList);
-            table.setCatalogname(null);
-            table.setSchemaname(null);
+            table.setCatalogName(null);
+            table.setSchemaName(null);
             table.setSourceType(dataSourceType);
         }catch (CloneNotSupportedException e){
             e.printStackTrace();

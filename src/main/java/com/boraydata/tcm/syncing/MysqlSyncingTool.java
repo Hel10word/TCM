@@ -1,12 +1,10 @@
 package com.boraydata.tcm.syncing;
 
-import com.boraydata.tcm.configuration.TableCloneManageConfig;
 import com.boraydata.tcm.configuration.DatabaseConfig;
 import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.core.TableCloneManageContext;
 import com.boraydata.tcm.entity.Table;
 import com.boraydata.tcm.mapping.DataMappingSQLTool;
-import com.boraydata.tcm.utils.StringUtil;
 
 
 /** Export and Load Table Data in MySQL,by shell statements.
@@ -45,10 +43,10 @@ public class MysqlSyncingTool implements SyncingTool {
 
     private String exportCommand(DatabaseConfig config,Table table, String csvPath,String delimiter,boolean tempFlag,String tempMappingSQL,boolean hudiFlag) {
         String exportStr = "";
-        String tableName = table.getTablename();
+        String tableName = table.getTableName();
         // Write data to temp table
         if(Boolean.TRUE.equals(tempFlag))
-            exportStr += getConnectCommand(config, "mysql").replace("?","insert into "+table.getTablename()+" "+tempMappingSQL)+"\n";
+            exportStr += getConnectCommand(config, "mysql").replace("?","insert into "+table.getTableName()+" "+tempMappingSQL)+"\n";
 
         exportStr += completeExportCommand(getConnectCommand(config,"mysqlsh"),csvPath,tableName,delimiter,hudiFlag)+"\n";
         // drop temp table
@@ -60,7 +58,7 @@ public class MysqlSyncingTool implements SyncingTool {
     @Override
     public String loadFile(TableCloneManageContext tcmContext) {
         String csvPath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
-        String tablename = tcmContext.getCloneTable().getTablename();
+        String tablename = tcmContext.getCloneTable().getTableName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
         return loadCommand(tcmContext.getCloneConfig(), csvPath,tablename,delimiter);
     }

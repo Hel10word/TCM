@@ -65,12 +65,14 @@ public class GetTableInfoByJDBCMetadataTest {
                 System.out.println("TABLE_NAME:"+rs.getString("TABLE_NAME"));
             ResultSet colRet = metaData.getColumns(null, "%", tableName, "%");
             while (colRet.next()){
+                String tableCat = colRet.getString("TABLE_CAT");
+                String tableSchem = colRet.getString("TABLE_SCHEM");
                 String columnName = colRet.getString("COLUMN_NAME");
                 String columnType = colRet.getString("TYPE_NAME");
                 int datasize = colRet.getInt("COLUMN_SIZE");
                 int decimal_digits = colRet.getInt("DECIMAL_DIGITS");
                 int num_prec_radix = colRet.getInt("NUM_PREC_RADIX");
-                System.out.printf("COLUMN_NAME:%-20s TYPE_NAME:%-20s COLUMN_SIZE:%-10d DECIMAL_DIGITS:%-10d NUM_PREC_RADIX:%-10d\n",columnName,columnType,datasize,decimal_digits,num_prec_radix);
+                System.out.printf("TABLE_CAT:%-20s TABLE_SCHEM:%-20s COLUMN_NAME:%-20s TYPE_NAME:%-20s COLUMN_SIZE:%-10d DECIMAL_DIGITS:%-10d NUM_PREC_RADIX:%-10d\n",tableCat,tableSchem,columnName,columnType,datasize,decimal_digits,num_prec_radix);
             }
         } catch (SQLException e) {
             e.printStackTrace();
