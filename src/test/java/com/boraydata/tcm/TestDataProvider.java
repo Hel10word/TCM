@@ -29,12 +29,12 @@ public class TestDataProvider {
     //========================== PgSQL ===============================
     public static DatabaseConfig.Builder builderPGSQL = new DatabaseConfig.Builder();
     public static DatabaseConfig configPGSQL = builderPGSQL
-            .setDatabasename("test_db")
+            .setDatabasename("sf10")
             .setDataSourceType(DataSourceType.POSTGRES)
-            .setHost("192.168.30.155")
+            .setHost("192.168.120.73")
             .setPort("5432")
             .setUsername("postgres")
-            .setPassword("")
+            .setPassword("rdpadmin")
             .create();
 
     //========================== Hudi ===============================

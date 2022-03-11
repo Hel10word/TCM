@@ -87,6 +87,8 @@ public class MysqlMappingTool implements MappingTool {
      */
     @Override
     public Table createSourceMappingTable(Table table) {
+        if(table.getColumns() == null || table.getColumns().isEmpty())
+            throw new TCMException("Table.getColumns() is null or empty \n"+table.getTableInfo());
         List<Column> columns = table.getColumns();
         for (Column column : columns){
             if (StringUtil.isNullOrEmpty(column.getDataType()))
@@ -95,10 +97,13 @@ public class MysqlMappingTool implements MappingTool {
             if (relation == null)
                 throw new TCMException("not found DataType relation in "+column.getColumnInfo());
             String colName = StringUtil.dataTypeFormat(column.getDataType());
-            if(relation != null && "TINYINT".equalsIgnoreCase(colName) && column.getCharMaxLength() == 1)
+            if("TINYINT".equalsIgnoreCase(colName) && column.getCharMaxLength() == 1)
                 relation = TableCloneManageType.BOOLEAN;
             column.setTableCloneManageType(relation);
         }
+        table.setColumns(columns);
+        if(table.getDataSourceType() == null)
+            table.setDataSourceType(DataSourceType.MYSQL);
         return table;
     }
 
@@ -116,6 +121,8 @@ public class MysqlMappingTool implements MappingTool {
     @Override
     public Table createCloneMappingTable(Table table) {
         Table cloneTable = table.clone();
+        if(table.getDataSourceType() != null && DataSourceType.MYSQL.equals(table.getDataSourceType()))
+            return cloneTable;
         for (Column col : cloneTable.getColumns())
             col.setDataType(col.getTableCloneManageType().getOutDataType(DataSourceType.MYSQL));
         cloneTable.setDataSourceType(DataSourceType.MYSQL);
@@ -145,20 +152,32 @@ public class MysqlMappingTool implements MappingTool {
                 throw new TCMException("Create Table SQL is fail,Because unable use null type:"+column.getColumnInfo());
             String colDataType = StringUtil.dataTypeFormat(column.getDataType());
             stringBuilder.append(column.getColumnName()).append(" ");
+//            if(table.getDataSourceType() != null && DataSourceType.MYSQL.equals(table.getDataSourceType())){
+//                stringBuilder.append(column.getDataType());
+//                if (Boolean.FALSE.equals(column.getNullAble()))
+//                    stringBuilder.append(" not NULL");
+//                stringBuilder.append("\n,");
+//                continue;
+//            }
             if(
-                    "DECIMAL".equalsIgnoreCase(colDataType) ||
-                    "NUMERIC".equalsIgnoreCase(colDataType) ||
-                    "DEC".equalsIgnoreCase(colDataType) ||
-                    "FIXED".equalsIgnoreCase(colDataType)
+//                    "BIT".equalsIgnoreCase(colDataType) ||
+                    "FLOAT".equalsIgnoreCase(colDataType) ||
+//                    "REAL".equalsIgnoreCase(colDataType) ||
+                    "DOUBLE".equalsIgnoreCase(colDataType) ||
+//                    "DOUBLE PRECISION".equalsIgnoreCase(colDataType) ||
+                    "DECIMAL".equalsIgnoreCase(colDataType)
+//                    "NUMERIC".equalsIgnoreCase(colDataType) ||
+//                    "DEC".equalsIgnoreCase(colDataType) ||
+//                    "FIXED".equalsIgnoreCase(colDataType)
             ){
                 stringBuilder.append(colDataType);
-                if(column.getNumericPrecisionM() != null){
-                    if(column.getNumericPrecisionM() > 0 && column.getNumericPrecisionM() <= 65)
+                if(column.getNumericPrecisionM() != null && column.getNumericPrecisionM() != 0){
+                    if(column.getNumericPrecisionM() >= 1 && column.getNumericPrecisionM() <= 65)
                         stringBuilder.append("("+column.getNumericPrecisionM());
                     else
                         stringBuilder.append("(65");
-                    if(column.getNumericPrecisionD() != null){
-                        if(column.getNumericPrecisionD() > 0 && column.getNumericPrecisionD() <= 30)
+                    if(column.getNumericPrecisionD() != null && column.getNumericPrecisionD() != 0 ){
+                        if(column.getNumericPrecisionD() >= 1 && column.getNumericPrecisionD() <= 30)
                             stringBuilder.append(","+column.getNumericPrecisionD());
                         else
                             stringBuilder.append(",30");
@@ -220,7 +239,10 @@ public class MysqlMappingTool implements MappingTool {
                 else {
                     // nothing to do
                 }
-            }else if("DATETIME".equalsIgnoreCase(colDataType)||"TIME".equalsIgnoreCase(colDataType)){
+            }else if(
+                    "DATETIME".equalsIgnoreCase(colDataType)||
+                    "TIME".equalsIgnoreCase(colDataType)
+            ){
                 stringBuilder.append(colDataType);
                 if(column.getDatetimePrecision() != null && column.getDatetimePrecision() > 0 && column.getDatetimePrecision() <= 6)
                     stringBuilder.append("(").append(column.getDatetimePrecision()).append(")");

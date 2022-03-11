@@ -47,7 +47,7 @@ public enum TableCloneManageType {
     FLOAT32     ("FLOAT32",     "FLOAT",            "REAL",             "FLOAT",         "FloatType"),
     FLOAT64     ("FLOAT64",     "DOUBLE",           "DOUBLE PRECISION", "DOUBLE",        "DoubleType"),
     BOOLEAN     ("BOOLEAN",     "TINYINT(1)",       "BOOLEAN",          "BOOLEAN",       "BooleanType"),
-    STRING      ("STRING",      "VARCHAR",          "TEXT",             "STRING",        "StringType"),
+    STRING      ("STRING",      "VARCHAR",          "VARCHAR",             "STRING",        "StringType"),
     BYTES       ("BYTES",       "VARBINARY",        "BYTEA",            "BINARY",        "BinaryType"),
     DECIMAL     ("'Decimal'",   "DECIMAL",          "DECIMAL",          "DECIMAL",       "StringType"),
     DATE        ("'Date'",      "DATE",             "DATE",             "DATE",          "DateType"),

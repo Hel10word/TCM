@@ -23,6 +23,13 @@ public class TableCloneManageConfig {
 
     private String sparkCustomCommand;
 
+    private Boolean getSourceTableSQL;
+    private Boolean getCloneTableSQL;
+    private Boolean createTableInClone;
+    private Boolean executeExportScript;
+    private Boolean executeImportScript;
+    private String csvFileName;
+    private String memsqlColumnStore;
     private String tempDirectory;
     private String delimiter;
     private Boolean debug;
@@ -73,6 +80,23 @@ public class TableCloneManageConfig {
         this.sparkCustomCommand = props.getProperty("spark.custom.command");
 
         //======================================================    TCM Tools Config   ==================================================
+        // get source table sql statement
+        this.getSourceTableSQL = Boolean.parseBoolean(props.getProperty("getSourceTableSQL","false").toLowerCase());
+        // get clone table sql statement
+        this.getCloneTableSQL = Boolean.parseBoolean(props.getProperty("getCloneTableSQL","false").toLowerCase());
+        // create clone table in clone database
+        this.createTableInClone = Boolean.parseBoolean(props.getProperty("createTableInClone","true").toLowerCase());
+        // execute export csv shell script
+        this.executeExportScript = Boolean.parseBoolean(props.getProperty("executeExportScript","true").toLowerCase());
+        // execute import csv shell script
+        this.executeImportScript = Boolean.parseBoolean(props.getProperty("executeImportScript","true").toLowerCase());
+
+        // use column store in memsql
+        this.memsqlColumnStore = props.getProperty("memsqlColumnStore","");
+
+        // export csv file name,default:  "Export_from_"+SourceDatabases.Type+"_"+SourceTable.Name+".csv"  => Export_from_POSTGRES_lineitem.csv
+        this.csvFileName = props.getProperty("csvFileName","");
+
         // save temp files directory
         this.tempDirectory = props.getProperty("tempDirectory","./TCM-TempData/");
         // delimiter field in csv
@@ -111,9 +135,9 @@ public class TableCloneManageConfig {
         this.cloneConfig.setTableName(cloneTableName);
 
 
-        if(!this.hdfsSourceDataDir.substring(hdfsSourceDataDir.length()-1).equals("/"))
+        if(!StringUtil.isNullOrEmpty(this.hdfsSourceDataDir)&&!this.hdfsSourceDataDir.substring(hdfsSourceDataDir.length()-1).equals("/"))
             this.hdfsSourceDataDir += "/";
-        if(!this.tempDirectory.substring(tempDirectory.length()-1).equals("/"))
+        if(!StringUtil.isNullOrEmpty(this.tempDirectory)&&!this.tempDirectory.substring(tempDirectory.length()-1).equals("/"))
             this.tempDirectory += "/";
         if(this.getCloneConfig().getDataSourceType().equals(DataSourceType.HUDI)){
             if(StringUtil.isNullOrEmpty(this.sparkCustomCommand)){
@@ -156,6 +180,34 @@ public class TableCloneManageConfig {
 
     public String getSparkCustomCommand() {
         return sparkCustomCommand;
+    }
+
+    public Boolean getGetSourceTableSQL() {
+        return getSourceTableSQL;
+    }
+
+    public Boolean getGetCloneTableSQL() {
+        return getCloneTableSQL;
+    }
+
+    public Boolean getExecuteExportScript() {
+        return executeExportScript;
+    }
+
+    public Boolean getExecuteImportScript() {
+        return executeImportScript;
+    }
+
+    public String getCsvFileName() {
+        return csvFileName;
+    }
+
+    public Boolean getCreateTableInClone() {
+        return createTableInClone;
+    }
+
+    public String getMemsqlColumnStore() {
+        return memsqlColumnStore;
     }
 
     public String getTempDirectory() {

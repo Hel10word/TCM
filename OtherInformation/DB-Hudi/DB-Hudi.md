@@ -1,3 +1,5 @@
+CDC 120.66 root/rdpadmin rapids/rdpuser
+
 HDFS
 
 http://192.168.120.66:50070/dfshealth.html#tab-overview

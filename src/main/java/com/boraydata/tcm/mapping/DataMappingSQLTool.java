@@ -13,8 +13,8 @@ import java.util.Properties;
  * @data 2021/11/5
  */
 public class DataMappingSQLTool {
-    final static String TRUE = "_TRUE";
-    final static String FALSE = "_FALSE";
+    static String TRUE = "_TRUE";
+    static String FALSE = "_FALSE";
     static Properties mappingPts;
     static {
         mappingPts = new Properties();

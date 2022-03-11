@@ -37,13 +37,13 @@ public class HudiSyncingTool implements SyncingTool {
         String scriptContent = hudiTool.initSriptFile(cloneTable,hdfsSourceFileName,cloneConfig,tcmConfig);
 
         String scriptName = "Load_CSV_to_hudi_"+tcmConfig.getHoodieTableType()+".scala";
-        String scriptPath = tcmContext.getTempDirectory()+scriptName;
-        String localCsvPath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
+        String scriptPath = "./"+scriptName;
+        String localCsvPath = "./"+tcmContext.getCsvFileName();
 
-        tcmContext.setLoadDataScriptContent(scriptContent);
+        tcmContext.setLoadDataInHudiScalaScriptContent(scriptContent);
 
         FileUtil.WriteMsgToFile(scriptContent,scriptPath);
-        tcmContext.setLoadDataScriptName(scriptName);
+        tcmContext.setLoadDataInHudiScalaScriptName(scriptName);
 
         return hudiTool.loadCommand(hdfsSourceDataDir,localCsvPath,tcmConfig.getHdfsCloneDataPath(),scriptPath,tcmConfig.getSparkCustomCommand());
     }

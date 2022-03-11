@@ -3,8 +3,6 @@ package com.boraydata.tcm.core;
 import com.boraydata.tcm.configuration.TableCloneManageConfig;
 import com.boraydata.tcm.configuration.DatabaseConfig;
 import com.boraydata.tcm.entity.Table;
-import com.boraydata.tcm.exception.TCMException;
-import com.boraydata.tcm.utils.StringUtil;
 
 /** Initiates the connection information of the data sources
  * @author bufan
@@ -23,18 +21,21 @@ public class TableCloneManageContext {
     private String csvFileName;
     private String exportShellName;
     private String loadShellName;
-    private String loadDataScriptName;
+    private String loadDataInHudiScalaScriptName;
     private String tempDirectory;
 
+    private String sourceTableSQL;
+    private String cloneTableSQL;
     private String exportShellContent;
     private String loadShellContent;
-    private String loadDataScriptContent;
+    private String loadDataInHudiScalaScriptContent;
 
     private TableCloneManageContext(Builder builder){
         this.sourceConfig = builder.sourceConfig;
         this.cloneConfig = builder.cloneConfig;
         this.tcmConfig = builder.tcmConfig;
         this.tempDirectory = builder.tcmConfig.getTempDirectory();
+        this.csvFileName = builder.tcmConfig.getCsvFileName();
     }
 
     public Table getFinallySourceTable(){
@@ -109,17 +110,35 @@ public class TableCloneManageContext {
         return this;
     }
 
-    public String getLoadDataScriptName() {
-        return loadDataScriptName;
+    public String getLoadDataInHudiScalaScriptName() {
+        return loadDataInHudiScalaScriptName;
     }
 
-    public TableCloneManageContext setLoadDataScriptName(String loadDataScriptName) {
-        this.loadDataScriptName = loadDataScriptName;
+    public TableCloneManageContext setLoadDataInHudiScalaScriptName(String loadDataInHudiScalaScriptName) {
+        this.loadDataInHudiScalaScriptName = loadDataInHudiScalaScriptName;
         return this;
     }
 
     public String getTempDirectory() {
         return tempDirectory;
+    }
+
+    public String getSourceTableSQL() {
+        return sourceTableSQL;
+    }
+
+    public TableCloneManageContext setSourceTableSQL(String sourceTableSQL) {
+        this.sourceTableSQL = sourceTableSQL;
+        return this;
+    }
+
+    public String getCloneTableSQL() {
+        return cloneTableSQL;
+    }
+
+    public TableCloneManageContext setCloneTableSQL(String cloneTableSQL) {
+        this.cloneTableSQL = cloneTableSQL;
+        return this;
     }
 
     public String getExportShellContent() {
@@ -140,12 +159,12 @@ public class TableCloneManageContext {
         return this;
     }
 
-    public String getLoadDataScriptContent() {
-        return loadDataScriptContent;
+    public String getLoadDataInHudiScalaScriptContent() {
+        return loadDataInHudiScalaScriptContent;
     }
 
-    public TableCloneManageContext setLoadDataScriptContent(String loadDataScriptContent) {
-        this.loadDataScriptContent = loadDataScriptContent;
+    public TableCloneManageContext setLoadDataInHudiScalaScriptContent(String loadDataInHudiScalaScriptContent) {
+        this.loadDataInHudiScalaScriptContent = loadDataInHudiScalaScriptContent;
         return this;
     }
 

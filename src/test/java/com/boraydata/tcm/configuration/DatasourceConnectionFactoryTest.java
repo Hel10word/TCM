@@ -18,14 +18,23 @@ import java.util.List;
 class DatasourceConnectionFactoryTest {
 
     DatabaseConfig.Builder builderMySQL = new DatabaseConfig.Builder();
+//    DatabaseConfig configMySQL = builderMySQL
+//            .setDatabasename("robot")
+//            .setDataSourceType(DataSourceType.MYSQL)
+//            .setHost("192.168.30.169")
+//            .setPort("3306")
+//            .setUsername("root")
+//            .setPassword("root")
+//            .create();
     DatabaseConfig configMySQL = builderMySQL
-            .setDatabasename("test_db")
+            .setDatabasename("memsql")
             .setDataSourceType(DataSourceType.MYSQL)
-            .setHost("192.168.30.148")
+            .setHost("192.168.120.69")
             .setPort("3306")
             .setUsername("root")
-            .setPassword("root")
+            .setPassword("rdpuser")
             .create();
+
 
     DatabaseConfig.Builder builderPgSQL = new DatabaseConfig.Builder();
     DatabaseConfig configPgSQL = builderPgSQL
@@ -47,12 +56,13 @@ class DatasourceConnectionFactoryTest {
     public void executeQuerySQLTest(){
         // http://www.postgres.cn/docs/12/infoschema-columns.html
         String sql = "select * from information_schema.COLUMNS where table_name in ('object_types_pgsql')";
+//        String sql = "show tables";
 //        String sql = configMySQL.getDataSourceType().SQL_AllTableInfo;
 //        String sql = configMySQL.getDataSourceType().SQL_TableInfoByTableName.replace("?","'boolean_mysql'");
 //        String sql = "select * from lineitem_mysql";
-        System.out.println(sql);
+//        System.out.println(sql);
 //        List list = DatasourceConnectionFactory.executeQuerySQL(configMySQL, sql);
-        List list = DatasourceConnectionFactory.executeQuerySQL(configPgSQL, sql);
+        List list = DatasourceConnectionFactory.executeQuerySQL(configMySQL, sql);
         list.forEach(System.out::println);
 //        System.out.println(list.get(0).toString());
     }

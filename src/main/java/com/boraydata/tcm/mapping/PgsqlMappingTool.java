@@ -143,6 +143,8 @@ public class PgsqlMappingTool implements MappingTool {
      */
     @Override
     public Table createSourceMappingTable(Table table) {
+        if(table.getColumns() == null || table.getColumns().isEmpty())
+            throw new TCMException("Table.getColumns() is null or empty \n"+table.getTableInfo());
         List<Column> columns = table.getColumns();
         for (Column column : columns){
             if (StringUtil.isNullOrEmpty(column.getDataType()))
@@ -166,6 +168,8 @@ public class PgsqlMappingTool implements MappingTool {
             column.setTableCloneManageType(relation);
         }
         table.setColumns(columns);
+        if(table.getDataSourceType() == null)
+            table.setDataSourceType(DataSourceType.POSTGRES);
         return table;
     }
 
@@ -183,9 +187,10 @@ public class PgsqlMappingTool implements MappingTool {
     @Override
     public Table createCloneMappingTable(Table table) {
         Table cloneTable = table.clone();
-        for (Column col : cloneTable.getColumns()){
+        if(table.getDataSourceType() != null && DataSourceType.POSTGRES.equals(table.getDataSourceType()))
+            return cloneTable;
+        for (Column col : cloneTable.getColumns())
             col.setDataType(col.getTableCloneManageType().getOutDataType(DataSourceType.POSTGRES));
-        }
         cloneTable.setDataSourceType(DataSourceType.POSTGRES);
         return cloneTable;
     }
@@ -222,13 +227,19 @@ public class PgsqlMappingTool implements MappingTool {
             if (
                     "BIT".equalsIgnoreCase(colDataType) ||
                     "BIT VARYING".equalsIgnoreCase(colDataType) ||
+                    "BYTEA".equalsIgnoreCase(colDataType) ||
                     "CHARACTER".equalsIgnoreCase(colDataType) ||
-                    "CHARACTER VARYING".equalsIgnoreCase(colDataType)
+                    "CHARACTER VARYING".equalsIgnoreCase(colDataType) ||
+                    "VARCHAR".equalsIgnoreCase(colDataType) ||
+                    "CHAR".equalsIgnoreCase(colDataType)
             ){
                 stringBuilder.append(colDataType);
                 if(column.getCharMaxLength() != null && column.getCharMaxLength() > 0)
                     stringBuilder.append("(").append(column.getCharMaxLength()).append(")");
-            }else if ("NUMERIC".equalsIgnoreCase(colDataType)){
+            }else if (
+                    "NUMERIC".equalsIgnoreCase(colDataType) ||
+                    "DECIMAL".equalsIgnoreCase(colDataType)
+            ){
                 stringBuilder.append(colDataType);
                 if(column.getNumericPrecisionM() != null && column.getNumericPrecisionM() > 0){
                     stringBuilder.append("(").append(column.getNumericPrecisionM());

@@ -111,10 +111,10 @@ public class DoIt {
 //====================== 7、create export data script,and execute export shell.
         tcm.exportTableData();
                                     end = System.currentTimeMillis();
-                                    all+=(end - start);
+            all+=(end-start);
         logger.info("*********************************** EXPORT INFO ***********************************\n\nexport {}:{} in {} script:'{}'\n",sourceDataType,tcmContext.getFinallySourceTable().getTableName(),
                 tcmContext.getTempDirectory()+tcmContext.getCsvFileName(),tcmContext.getTempDirectory()+tcmContext.getExportShellName());
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> export data total time spent:{}\n\n",(end - start));
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> export data total time spent:{}\n\n",(end-start));
 
 
                                     start = System.currentTimeMillis();
@@ -122,9 +122,9 @@ public class DoIt {
 //====================== 8、create export data script,and execute export shell.
         tcm.loadTableData();
                                     end = System.currentTimeMillis();
-                                    all+=(end - start);
+            all+=(end-start);
         logger.info("*********************************** LOAD INFO ***********************************\n\nload data in {}:{} script:'{}'\n",cloneDataType,cloneTableName,tcmContext.getTempDirectory()+tcmContext.getLoadShellName());
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> load data total time spent:{}",(end - start));
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> load data total time spent:{}",(end-start));
         logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Mapping Table and Syncing TableData table time:{} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",all);
 
 
@@ -133,12 +133,12 @@ public class DoIt {
 
         if(Boolean.TRUE.equals(debugFlag)){
             String exportShellContent = tcmContext.getExportShellContent();
-            String loadDataScriptContent = tcmContext.getLoadDataScriptContent();
+            String loadDataScriptContent = tcmContext.getLoadDataInHudiScalaScriptContent();
             String loadShellContent = tcmContext.getLoadShellContent();
             logger.info("\n\n\n\n");
             logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getExportShellName(),exportShellContent);
-            if(!StringUtil.isNullOrEmpty(tcmContext.getLoadDataScriptName()))
-                logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getLoadDataScriptName(),loadDataScriptContent);
+            if(!StringUtil.isNullOrEmpty(tcmContext.getLoadDataInHudiScalaScriptName()))
+                logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getLoadDataInHudiScalaScriptName(),loadDataScriptContent);
             logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getLoadShellName(),loadShellContent);
             logger.info("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         }

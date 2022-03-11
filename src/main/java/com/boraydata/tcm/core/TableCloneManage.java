@@ -51,6 +51,8 @@ public class TableCloneManage {
     private MappingTool cloneMappingTool;
     private SyncingTool sourceSyncingTool;
     private SyncingTool cloneSyncingTool;
+    private DatabaseConfig sourceConfig;
+    private DatabaseConfig cloneConfig;
     private TableCloneManageContext tableCloneManageContext;
 
     public TableCloneManage() { }
@@ -64,14 +66,24 @@ public class TableCloneManage {
         this.sourceSyncingTool = sourceSyncingTool;
         this.cloneSyncingTool = cloneSyncingTool;
         this.tableCloneManageContext = tableCloneManageContext;
+        this.sourceConfig = this.tableCloneManageContext.getSourceConfig();
+        this.cloneConfig = this.tableCloneManageContext.getCloneConfig();
     }
 
     // find the mapping relationship of each field
     // =======================================  Generate Source Mapping Table Object and Temple Table Object  ==============================
     public Table createSourceMappingTable(String tableName){
-        Table sourceMappingTable = createSourceMappingTable(tableName, this.sourceMappingTool, this.tableCloneManageContext.getSourceConfig());
+        Table sourceMappingTable = createSourceMappingTable(tableName, this.sourceMappingTool, this.sourceConfig);
         checkRelationship(sourceMappingTable,this.tableCloneManageContext);
         this.tableCloneManageContext.setSourceTable(sourceMappingTable);
+
+        Table finallTable = this.tableCloneManageContext.getFinallySourceTable();
+        String createTableSQL = sourceMappingTool.getCreateTableSQL(finallTable);
+        this.tableCloneManageContext.setSourceTableSQL(createTableSQL);
+        if(Boolean.TRUE.equals(this.tableCloneManageContext.getTcmConfig().getGetSourceTableSQL())){
+            String sqlFilePath = this.tableCloneManageContext.getTempDirectory()+finallTable.getDataSourceType()+"_"+finallTable.getTableName()+".sql";
+            FileUtil.WriteMsgToFile(createTableSQL,sqlFilePath);
+        }
         return sourceMappingTable;
     }
     private Table createSourceMappingTable(String tableName,MappingTool mappingTool,DatabaseConfig dbConfig){
@@ -183,68 +195,69 @@ public class TableCloneManage {
     // generate CloneTable
     // ========================================  CloneTable  ======================================
     public Table createCloneTable(Table table){
-        return createCloneTable(table,table.getTableName());
+        return createCloneTable(table, table.getTableName());
     }
     public Table createCloneTable(Table table,String tableName){
-        Table cloneTable = createCloneTable(table, tableName, this.cloneMappingTool, this.tableCloneManageContext);
-        this.tableCloneManageContext.setCloneTable(cloneTable);
-        return cloneTable;
-    }
-    private Table createCloneTable(Table table,String tableName,MappingTool mappingTool,TableCloneManageContext tcmContext){
-        DataSourceType cloneType = tcmContext.getCloneConfig().getDataSourceType();
-        Table cloneTable;
-        if(table.getDataSourceType().equals(cloneType) || mappingTool == null) {
-            cloneTable = table.clone();
-        }else
-            cloneTable = mappingTool.createCloneMappingTable(table);
-        cloneTable.setTableName(tableName);
 
-        tcmContext.setCloneTable(cloneTable);
-        return cloneTable;
+        Table cloneTable;
+        if(this.cloneMappingTool == null) {
+            cloneTable = table.clone();
+        }else{
+            cloneTable = this.cloneMappingTool.createCloneMappingTable(table);
+            this.tableCloneManageContext.setCloneTable(cloneTable);
+            String createTableSQL = cloneMappingTool.getCreateTableSQL(cloneTable);
+            this.tableCloneManageContext.setCloneTableSQL(createTableSQL);
+            if(Boolean.TRUE.equals(this.tableCloneManageContext.getTcmConfig().getGetCloneTableSQL())){
+                String sqlFilePath = this.tableCloneManageContext.getTempDirectory()+cloneTable.getDataSourceType()+"_"+tableName+".sql";
+                FileUtil.WriteMsgToFile(createTableSQL,sqlFilePath);
+            }
+        }
+        return cloneTable.setTableName(tableName);
     }
 
 
     // ========================================  Create TempTable && CloneTable in Databases ===========================
     public boolean createTableInDatasource(){
-        return createTableInDatasource(this.sourceMappingTool,this.cloneMappingTool,this.tableCloneManageContext);
+        if(Boolean.TRUE.equals(this.tableCloneManageContext.getTcmConfig().getCreateTableInClone())) {
+            return createTableInDatasource(this.sourceMappingTool, this.cloneMappingTool, this.tableCloneManageContext);
+        }else{
+            logger.warn("not create table in clone databases");
+            return true;
+        }
     }
     private boolean createTableInDatasource(MappingTool sourceMappingTool,MappingTool cloneMappingTool,TableCloneManageContext tcmContext){
-        DatabaseConfig sourceConfig = tcmContext.getSourceConfig();
-        DataSourceType sourceType = sourceConfig.getDataSourceType();
-        DatabaseConfig cloneConfig = tcmContext.getCloneConfig();
-        DataSourceType cloneType = cloneConfig.getDataSourceType();
+        DataSourceType sourceType = this.sourceConfig.getDataSourceType();
+        DataSourceType cloneType = this.cloneConfig.getDataSourceType();
 
         Table tempTable = tcmContext.getTempTable();
         Table cloneTable = tcmContext.getCloneTable();
-        TableCloneManageConfig tcmConfig = tcmContext.getTcmConfig();
-        Boolean outSQLFlag = tcmConfig.getDebug();
-        String sqlScriptPath = tcmConfig.getTempDirectory()+"createTableIn_"+cloneConfig.getDataSourceType().toString()+".sql";
 
         if(DataSourceType.HUDI.equals(cloneType))
             return true;
-//        else
-//            throw new TCMException("should create cloneMappingTool,check "+cloneType.toString());
+        if(Boolean.FALSE.equals(this.tableCloneManageContext.getTcmConfig().getCreateTableInClone()))
+            return true;
 
 
         // check the TempTable,at present, only MySQL needs to create temp table
         if(tempTable != null && DataSourceType.MYSQL.equals(sourceType)){
-            if(!createTableInDatasource(tempTable,sourceConfig,sourceMappingTool, outSQLFlag, sqlScriptPath))
-                throw new TCMException("Create TempTable is Failed!!! in "+sourceType.toString()+"."+tempTable.getTableName());
+            createTableInDatasource(sourceConfig,this.tableCloneManageContext.getSourceTableSQL());
         }
         if(cloneTable != null)
-            return createTableInDatasource(cloneTable,cloneConfig,cloneMappingTool, outSQLFlag, sqlScriptPath);
+            return createTableInDatasource(cloneConfig,this.tableCloneManageContext.getCloneTableSQL());
         else
             throw new TCMException("Unable find CloneTable in TCM.");
     }
 
     // ========================================  Execute SQL By JDBC===========================
-    private boolean createTableInDatasource(Table table,DatabaseConfig dbConfig,MappingTool mappingTool,boolean outSQLFlag,String sqlScriptPath){
+    private boolean createTableInDatasource(DatabaseConfig dbConfig,String sql){
 
         try (Connection conn = DatasourceConnectionFactory.createDataSourceConnection(dbConfig);
              Statement statement = conn.createStatement()){
-            String sql = mappingTool.getCreateTableSQL(table);
-            if(Boolean.TRUE.equals(outSQLFlag))
-                FileUtil.WriteMsgToFile(sql,sqlScriptPath);
+            String memsqlColumnStore = this.tableCloneManageContext.getTcmConfig().getMemsqlColumnStore();
+            if(dbConfig.getDataSourceType().equals(DataSourceType.MYSQL) && !StringUtil.isNullOrEmpty(memsqlColumnStore)) {
+                sql = sql.replace(");", ",UNIQUE KEY pk (l_orderkey, l_linenumber) UNENFORCED RELY,SHARD KEY (" + memsqlColumnStore + ") USING CLUSTERED COLUMNSTORE \n );");
+//                System.out.println(sql);
+            }
             try {
                 int i = statement.executeUpdate(sql);
                 if (i == 0)
@@ -255,10 +268,9 @@ public class TableCloneManage {
                 throw new TCMException("pls check SQL!! create table in "
                         +dbConfig.getDataSourceType().name()+"."
                         +dbConfig.getDataSourceType().TableCatalog+"."
-                        +dbConfig.getDataSourceType().TableSchema+"."
-                        +table.getTableName()+" is FAILED !!!");
+                        +dbConfig.getDataSourceType().TableSchema+"\n"+sql+" \nis FAILED !!!");
             }
-        }catch (Exception e){
+        }catch (TCMException | SQLException e){
             throw new TCMException("Failed to create clone table,maybe datasource connection unable use!!! -> "+dbConfig.getDataSourceType().toString());
         }
     }
@@ -266,7 +278,7 @@ public class TableCloneManage {
 
 
     // ========================================  Export CSV ===========================
-    public boolean exportTableData(){
+    public Boolean exportTableData(){
         if(DataSourceType.HUDI.equals(this.tableCloneManageContext.getSourceConfig().getDataSourceType()))
             return true;
 
@@ -277,22 +289,33 @@ public class TableCloneManage {
         this.tableCloneManageContext.setExportShellName(exportShellName);
         String exportShellPath = this.tableCloneManageContext.getTempDirectory()+exportShellName;
 
-        String csvFileName = "Export_from_"+sourceType+"_"+table.getTableName()+".csv";
-        this.tableCloneManageContext.setCsvFileName(csvFileName);
+        if(StringUtil.isNullOrEmpty(this.tableCloneManageContext.getCsvFileName()) || this.tableCloneManageContext.getCsvFileName().length() == 0) {
+            String csvFileName = "Export_from_" + sourceType + "_" + table.getTableName() + ".csv";
+            this.tableCloneManageContext.setCsvFileName(csvFileName);
+        }
 
         String exportCommand = this.sourceSyncingTool.exportFile(this.tableCloneManageContext);
 
         this.tableCloneManageContext.setExportShellContent(exportCommand);
 
         if(FileUtil.WriteMsgToFile(exportCommand,exportShellPath)){
-           return CommandExecutor.executeShell(exportShellPath,this.tableCloneManageContext.getTcmConfig().getDebug());
+            Boolean debug = this.tableCloneManageContext.getTcmConfig().getDebug();
+            CommandExecutor commandExecutor = new CommandExecutor();
+            String shellOut = "not execute Export shell script !!!";
+            if(Boolean.TRUE.equals(this.tableCloneManageContext.getTcmConfig().getExecuteExportScript())){
+                shellOut = commandExecutor.executeShell(this.tableCloneManageContext.getTempDirectory(),exportShellName,debug);
+            }
+            if(StringUtil.isNullOrEmpty(shellOut))
+                return false;
+            logger.info(shellOut);
+            return true;
         }
         return false;
     }
 
     // ========================================  Load CSV ===========================
 
-    public boolean loadTableData(){
+    public Boolean loadTableData(){
         String cloneType = this.tableCloneManageContext.getCloneConfig().getDataSourceType().toString();
         Table table = this.tableCloneManageContext.getCloneTable();
 
@@ -304,7 +327,16 @@ public class TableCloneManage {
         this.tableCloneManageContext.setLoadShellContent(loadCommand);
 
         if(FileUtil.WriteMsgToFile(loadCommand,loadShellPath)){
-            return CommandExecutor.executeShell(loadShellPath,this.tableCloneManageContext.getTcmConfig().getDebug());
+            Boolean debug = this.tableCloneManageContext.getTcmConfig().getDebug();
+            CommandExecutor commandExecutor = new CommandExecutor();
+            String shellOut = "not execute Import shell script !!!";
+            if(Boolean.TRUE.equals(this.tableCloneManageContext.getTcmConfig().getExecuteImportScript())){
+                shellOut = commandExecutor.executeShell(this.tableCloneManageContext.getTempDirectory(),loadShellName, debug);
+            }
+            if(StringUtil.isNullOrEmpty(shellOut))
+                return false;
+            logger.info(shellOut);
+            return true;
         }
         return false;
 

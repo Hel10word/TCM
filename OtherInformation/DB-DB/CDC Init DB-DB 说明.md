@@ -433,26 +433,26 @@ https://www.postgresql.org/docs/13/datatype-pg-lsn.html
 
 https://dev.mysql.com/doc/refman/5.7/en/numeric-types.html
 
-| MySQL Data       | Range                                                        | TCM Type | PgSQL            |
-| ---------------- | ------------------------------------------------------------ | -------- | ---------------- |
-| INTEGER          | -2147483648 ~ 2147483647                                     | INT32    | INT              |
-| SMALLINT         | -32768 ~ 32767                                               | INT16    | SMALLINT         |
-| DECIMAL[(M,D)]   | 1<=M<=65;default 10;  1<=D<=30;default 0;                    | DECIMAL  | DECIMAL          |
-| NUMERIC[(M,D)]   | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
-| FLOAT(p)         | 0<=p<23,results in a 4-byte single-precision FLOAT；24<=p<53,results in a 8-byte double-precision DOUBLE； | FLOAT64  | DOUBLE PRECISION |
-| REAL             | as a synonym for DOUBLE PRECISION                            | FLOAT64  | DOUBLE PRECISION |
-| DOUBLE PRECISION | 1<=M<=65;default 10;  1<=D<=30;default 0;                    | FLOAT64  | DOUBLE PRECISION |
-| INT              | as a synonym for INTEGER                                     | INT32    | INT              |
-| DEC              | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
-| FIXED[(M,D)]     | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
-| DOUBLE           | as a synonym for DOUBLE PRECISION                            | FLOAT64  | DOUBLE PRECISION |
-| BIT[M]           | 1<=M<=64;default 1;                                          | BYTES    | BYTES            |
-| TINYINT(1)       |                                                              | BOOLEAN  | BOOLEAN          |
-| TINYINT[M]       | 1<=M<=225;default 4;                                         | INT8     | SMALLINT         |
-| MEDIUMINT        | -8388608 ~ 8388607                                           | INT32    | INT              |
-| BIGINT           | -2^63^ （-9223372036854775808）~ 2^63^-1（9223372036854775807） | INT64    | BIGINT           |
-| BOOL             | 0 and 1； the values `TRUE` and `FALSE` are merely aliases for `1` and `0`. | BOOLEAN  | BOOLEAN          |
-| BOOLEAN          | 0 and 1； the values `TRUE` and `FALSE` are merely aliases for `1` and `0`. | BOOLEAN  | BOOLEAN          |
+| MySQL Data              | Range                                                        | TCM Type | PgSQL            |
+| ----------------------- | ------------------------------------------------------------ | -------- | ---------------- |
+| INTEGER                 | -2147483648 ~ 2147483647                                     | INT32    | INT              |
+| SMALLINT[(M)]           | -32768 ~ 32767,0<=M<=65535                                   | INT16    | SMALLINT         |
+| DECIMAL[(M,D)]          | 1<=M<=65;default 10;  1<=D<=30;default 0;                    | DECIMAL  | DECIMAL          |
+| NUMERIC[(M,D)]          | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
+| FLOAT(p)                | 0<=p<23,results in a 4-byte single-precision FLOAT；24<=p<53,results in a 8-byte double-precision DOUBLE； | FLOAT64  | DOUBLE PRECISION |
+| REAL                    | as a synonym for DOUBLE PRECISION                            | FLOAT64  | DOUBLE PRECISION |
+| DOUBLE PRECISION[(M,D)] | 1<=M<=65;default 10;  1<=D<=30;default 0;                    | FLOAT64  | DOUBLE PRECISION |
+| INT                     | as a synonym for INTEGER                                     | INT32    | INT              |
+| DEC                     | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
+| FIXED[(M,D)]            | as a synonym for DECIMAL                                     | DECIMAL  | DECIMAL          |
+| DOUBLE[(M,D)]           | as a synonym for DOUBLE PRECISION                            | FLOAT64  | DOUBLE PRECISION |
+| BIT[M]                  | 1<=M<=64;default 1;                                          | BYTES    | BYTES            |
+| TINYINT(1)              |                                                              | BOOLEAN  | BOOLEAN          |
+| TINYINT[M]              | 1<=M<=225;default 4;                                         | INT8     | SMALLINT         |
+| MEDIUMINT               | -8388608 ~ 8388607                                           | INT32    | INT              |
+| BIGINT                  | -2^63^ （-9223372036854775808）~ 2^63^-1（9223372036854775807） | INT64    | BIGINT           |
+| BOOL                    | 0 and 1； the values `TRUE` and `FALSE` are merely aliases for `1` and `0`. | BOOLEAN  | BOOLEAN          |
+| BOOLEAN                 | 0 and 1； the values `TRUE` and `FALSE` are merely aliases for `1` and `0`. | BOOLEAN  | BOOLEAN          |
 
 [MySQL-(M,D) ]:https://dev.mysql.com/doc/refman/5.7/en/floating-point-types.html
 

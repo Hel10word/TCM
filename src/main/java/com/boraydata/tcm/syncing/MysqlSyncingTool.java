@@ -36,7 +36,7 @@ public class MysqlSyncingTool implements SyncingTool {
         String tempMappingSQL = "";
         if(Boolean.TRUE.equals(tempFlag))
             tempMappingSQL = DataMappingSQLTool.getMappingDataSQL(tcmContext.getSourceTable(),tcmContext.getCloneConfig().getDataSourceType());
-        String csvPath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
+        String csvPath = "./"+tcmContext.getCsvFileName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
         return exportCommand(tcmContext.getSourceConfig(),table,csvPath,delimiter,tempFlag,tempMappingSQL,hudiFlag);
     }
@@ -57,7 +57,7 @@ public class MysqlSyncingTool implements SyncingTool {
 
     @Override
     public String loadFile(TableCloneManageContext tcmContext) {
-        String csvPath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
+        String csvPath = "./"+tcmContext.getCsvFileName();
         String tablename = tcmContext.getCloneTable().getTableName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
         return loadCommand(tcmContext.getCloneConfig(), csvPath,tablename,delimiter);
@@ -74,7 +74,7 @@ public class MysqlSyncingTool implements SyncingTool {
      * @Return: String : mysql -h 127.0.0.1 -P 3306 -uroot  -proot --datavase test_db -e "?"
      */
     private String getConnectCommand(DatabaseConfig config,String command){
-        return String.format("%s -h %s -P %s -u%s -p%s --database %s -e \"?\" 2>&1",
+        return String.format("%s -h %s -P %s -u%s -p%s --database %s -e \"?\"",
                 command,
                 config.getHost(),
                 config.getPort(),

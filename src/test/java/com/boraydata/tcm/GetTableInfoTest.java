@@ -6,18 +6,16 @@ import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.core.TableCloneManage;
 import com.boraydata.tcm.mapping.MappingTool;
 import com.boraydata.tcm.mapping.MappingToolFactory;
+import org.checkerframework.checker.units.qual.Time;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 /** use JDBC Metadata show table info
  * @author bufan
  * @data 2021/10/20
  */
-public class GetTableInfoByJDBCMetadataTest {
+public class GetTableInfoTest {
 
     DatabaseConfig.Builder mysql = new DatabaseConfig.Builder();
     DatabaseConfig mysqlConfig = mysql
@@ -39,12 +37,16 @@ public class GetTableInfoByJDBCMetadataTest {
             .setPassword("postgres")
             .create();
 
-    String tableName = "lineitem_sf10_mysql";
+    String tableName = "test";
     DatabaseConfig config = mysqlConfig;
 //    DatabaseConfig config = pgsqlConfig;
     @Test
     public void test(){
-        showTableInfo(config,tableName);
+
+        showTableInfoBySQL(config,tableName);
+
+        showTableInfoByJdbcMetadata(config,tableName);
+
         TableCloneManage tcm =  new TableCloneManage();
         System.out.println();
         MappingTool tool = MappingToolFactory.create(config.getDataSourceType());
@@ -53,27 +55,62 @@ public class GetTableInfoByJDBCMetadataTest {
     }
 
 
+    public void showTableInfoBySQL(DatabaseConfig config,String tableName){
+//        String sql = String.format("select * from information_schema.COLUMNS where table_name in ('%s')",tableName);
+        String sql = "select * from information_schema.COLUMNS where table_name in (?)";
+        try(Connection con = DatasourceConnectionFactory.createDataSourceConnection(config);
+            PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1,tableName);
+            ResultSet colAllRet = ps.executeQuery();
+            StringBuilder sb = new StringBuilder("Show Table Info By Sql Query :\n\n");
+            while (colAllRet.next()){
+                ResultSetMetaData rsmd = colAllRet.getMetaData();
+                int count = rsmd.getColumnCount();
+                for (int i = 1;i<=count;i++){
+                    String columnName = rsmd.getColumnName(i);
+                    sb.append(String.format("%s:%-20s",columnName,colAllRet.getString(columnName)));
+                }
+                sb.append("\n");
+            }
+            System.out.println(sb.toString());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     /**
      * "%" 表示所有任意的（字段）
      */
-    public void showTableInfo(DatabaseConfig config,String tableName){
-        Connection con = DatasourceConnectionFactory.createDataSourceConnection(config);
-        try {
+    public void showTableInfoByJdbcMetadata(DatabaseConfig config,String tableName){
+        try(Connection con = DatasourceConnectionFactory.createDataSourceConnection(config)) {
             DatabaseMetaData metaData = con.getMetaData();
-            ResultSet rs = metaData.getTables(null, "%", tableName, new String[]{"TABLE"});
-            while (rs.next())
-                System.out.println("TABLE_NAME:"+rs.getString("TABLE_NAME"));
-            ResultSet colRet = metaData.getColumns(null, "%", tableName, "%");
-            while (colRet.next()){
-                String tableCat = colRet.getString("TABLE_CAT");
-                String tableSchem = colRet.getString("TABLE_SCHEM");
-                String columnName = colRet.getString("COLUMN_NAME");
-                String columnType = colRet.getString("TYPE_NAME");
-                int datasize = colRet.getInt("COLUMN_SIZE");
-                int decimal_digits = colRet.getInt("DECIMAL_DIGITS");
-                int num_prec_radix = colRet.getInt("NUM_PREC_RADIX");
-                System.out.printf("TABLE_CAT:%-20s TABLE_SCHEM:%-20s COLUMN_NAME:%-20s TYPE_NAME:%-20s COLUMN_SIZE:%-10d DECIMAL_DIGITS:%-10d NUM_PREC_RADIX:%-10d\n",tableCat,tableSchem,columnName,columnType,datasize,decimal_digits,num_prec_radix);
+//            ResultSet rs = metaData.getTables(null, "%", tableName, new String[]{"TABLE"});
+//            while (rs.next())
+//                System.out.println("TABLE_NAME:"+rs.getString("TABLE_NAME"));
+//            ResultSet colRet = metaData.getColumns(null, "%", tableName, "%");
+//            while (colRet.next()){
+//                String tableCat = colRet.getString("TABLE_CAT");
+//                String tableSchem = colRet.getString("TABLE_SCHEM");
+//                String columnName = colRet.getString("COLUMN_NAME");
+//                String columnType = colRet.getString("TYPE_NAME");
+//                int datasize = colRet.getInt("COLUMN_SIZE");
+//                int decimal_digits = colRet.getInt("DECIMAL_DIGITS");
+//                int num_prec_radix = colRet.getInt("NUM_PREC_RADIX");
+//                System.out.printf("TABLE_CAT:%-20s TABLE_SCHEM:%-20s COLUMN_NAME:%-20s TYPE_NAME:%-20s COLUMN_SIZE:%-10d DECIMAL_DIGITS:%-10d NUM_PREC_RADIX:%-10d\n",tableCat,tableSchem,columnName,columnType,datasize,decimal_digits,num_prec_radix);
+//            }
+            ResultSet colAllRet = metaData.getColumns(null, "%", tableName, "%");
+            StringBuilder sb = new StringBuilder("Show Table Info By JDBC Metadata :\n\n");
+            while (colAllRet.next()){
+                ResultSetMetaData rsmd = colAllRet.getMetaData();
+                int count = rsmd.getColumnCount();
+                for (int i = 1;i<=count;i++){
+                    String columnName = rsmd.getColumnName(i);
+                    sb.append(String.format("%s:%-20s",columnName,colAllRet.getString(columnName)));
+                }
+                sb.append("\n");
             }
+            System.out.println(sb.toString());
         } catch (SQLException e) {
             e.printStackTrace();
         }
