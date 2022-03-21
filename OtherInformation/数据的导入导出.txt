@@ -1,0 +1,73 @@
+
+
+ 可以将数据查询 然后  >  outFile
+https://dev.mysql.com/doc/refman/5.7/en/select-into.html 
+-- MySQL 数据导出
+SELECT * INTO OUTFILE '/tmp/result.txt' FROM router_role;
+  FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+  LINES TERMINATED BY '\n'
+  FROM router_role;
+	
+-- 查看当前  配置的默认路径	
+show variables like '%secure%';
+
+-- mysql 数据导入
+
+mysql -h 192.168.30.200 -P 3306 -uroot -proot --database test_db -c "load data local infile '/usr/local/lineitem1.tbl' into table lineitem_1 fields terminated by '|' lines terminated by '|\n';"
+
+mysql -h 192.168.30.200 -P 3306 -uroot -proot --database test_db -c "select * from lineitem_1 limit 10 into outfile '/usr/local/lineitem_1_limit_10.csv' fields terminated by "," escaped by '' optionally enclosed by '' lines terminated by '\n';"
+
+
+
+	
+	PgSQL 的导入导出 可以使用 pg_dump  -t 可以设置表名  可以通过 --insert 指令来 指定导出 inster 语句，但是会附带 catalog
+	
+	pg_dump -h 192.168.30.155 -p 5432 -U postgres -t lineitem_1 test_db > /usr/local/lineitem1.sql
+	
+	会导出包括表结构的内容
+	CREATE TABLE public.lineitem_1
+	secure_file_priv 参数是只读参数，不能使用set global命令修改。
+	
+	
+	
+	-sN
+	https://dev.mysql.com/doc/refman/5.7/en/mysql-command-options.html#option_mysql_skip-column-names
+	
+	
+	
+-- mysql 客户端 导出、导入
+--导出
+mysql -h 192.168.30.200 -P 3306 -uroot -proot --database test_db -sN -e "select * from lineitem_1 limit 10" | sed 's/"/""/g;s/\t/,/g;s/\n//g' > /usr/local/lineitem_1_limit_10.csv
+--导入
+mysql -h 192.168.30.200 -P 3306 -uroot -proot --database test_db -e "load data local infile '/usr/local/lineitem_1_limit_10.csv' into table lineitem fields terminated by ',' lines terminated by '\n';"
+
+	
+	
+
+
+-- PgSQL 数据导出  
+psql postgres://postgres:postgres@192.168.30.155/test_db -c "\copy lineitem_1 to '/usr/local/lineitem_1.csv' with csv;"
+
+PgSQL 数据导入
+
+-- 将结尾的 | 删除掉
+sed -i 's/|$//g' *.tbl
+
+
+psql postgres://postgres:postgres@192.168.30.155/test_db -c "copy lineitem_1 from '/usr/local/lineitem1.tbl' DELIMITER '|';"
+
+
+psql -h 192.168.30.202 -p 5432 -U postgres -d pgdb2 -c "copy lineitem_1 from '/usr/local/lineitem1.tbl' DELIMITER '|';"
+
+
+
+
+
+
+-- 在 客户端上 导出 5 条数据 然后插入到表中
+-- 导出
+psql postgres://postgres:postgres@192.168.30.155/test_db -c "\copy (select * from lineitem_1 limit 5) to '/usr/local/lineitem_1_limit_5.csv' with csv;"
+--导入
+psql postgres://postgres:postgres@192.168.30.155/test_db -c "\copy lineitem from '/usr/local/lineitem_1_limit_5.csv' with csv;"
+
+

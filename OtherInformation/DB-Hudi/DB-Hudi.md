@@ -56,12 +56,6 @@ mysql -h 192.168.120.68 -P 3306 -u root -pMyNewPass4!
 
 
 
-查看磁盘占用与大文件
-
-du -sh /
-
-df -h /
-
 
 
 DB-Hudi

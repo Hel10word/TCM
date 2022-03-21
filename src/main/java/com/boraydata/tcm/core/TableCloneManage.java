@@ -14,6 +14,10 @@ import com.boraydata.tcm.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.LinkedList;
 
@@ -81,7 +85,9 @@ public class TableCloneManage {
         String createTableSQL = sourceMappingTool.getCreateTableSQL(finallTable);
         this.tableCloneManageContext.setSourceTableSQL(createTableSQL);
         if(Boolean.TRUE.equals(this.tableCloneManageContext.getTcmConfig().getGetSourceTableSQL())){
-            String sqlFilePath = this.tableCloneManageContext.getTempDirectory()+finallTable.getDataSourceType()+"_"+finallTable.getTableName()+".sql";
+            String fileName = finallTable.getDataSourceType()+"_"+finallTable.getTableName()+".sql";
+            this.tableCloneManageContext.setSourceTableSQLFileName(fileName);
+            String sqlFilePath = this.tableCloneManageContext.getTempDirectory()+fileName;
             FileUtil.WriteMsgToFile(createTableSQL,sqlFilePath);
         }
         return sourceMappingTable;
@@ -208,7 +214,9 @@ public class TableCloneManage {
             String createTableSQL = cloneMappingTool.getCreateTableSQL(cloneTable);
             this.tableCloneManageContext.setCloneTableSQL(createTableSQL);
             if(Boolean.TRUE.equals(this.tableCloneManageContext.getTcmConfig().getGetCloneTableSQL())){
-                String sqlFilePath = this.tableCloneManageContext.getTempDirectory()+cloneTable.getDataSourceType()+"_"+tableName+".sql";
+                String fileName = cloneTable.getDataSourceType()+"_"+tableName+".sql";
+                this.tableCloneManageContext.setCloneTableSQLFileName(fileName);
+                String sqlFilePath = this.tableCloneManageContext.getTempDirectory()+fileName;
                 FileUtil.WriteMsgToFile(createTableSQL,sqlFilePath);
             }
         }
@@ -340,5 +348,47 @@ public class TableCloneManage {
         }
         return false;
 
+    }
+
+
+
+
+
+
+    // ========================================  Delete Cache File  ===========================
+    // https://cloud.tencent.com/developer/article/1703463
+    public void deleteCache(){
+        String dir = this.tableCloneManageContext.getTempDirectory();
+        String sourcFile = this.tableCloneManageContext.getSourceTableSQLFileName();
+        String cloneFile = this.tableCloneManageContext.getCloneTableSQLFileName();
+        String csvFile = this.tableCloneManageContext.getCsvFileName();
+        String exportShellName = this.tableCloneManageContext.getExportShellName();
+        String loadShellName = this.tableCloneManageContext.getLoadShellName();
+
+        if(StringUtil.isNullOrEmpty(dir) || !FileUtil.IsDirectory(dir))
+            return;
+
+
+        if(!StringUtil.isNullOrEmpty(sourcFile))
+            deleteCache(dir+sourcFile);
+        if(!StringUtil.isNullOrEmpty(cloneFile))
+            deleteCache(dir+cloneFile);
+        if(!StringUtil.isNullOrEmpty(exportShellName))
+            deleteCache(dir+exportShellName);
+        if(!StringUtil.isNullOrEmpty(loadShellName))
+            deleteCache(dir+loadShellName);
+        if(!StringUtil.isNullOrEmpty(csvFile) && Boolean.TRUE.equals(this.tableCloneManageContext.getTcmConfig().getExecuteExportScript()))
+            deleteCache(dir+csvFile);
+
+
+
+    }
+    private void deleteCache(String filePath){
+        Path path = Paths.get(filePath);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new TCMException("Unable Delete Cache File:"+filePath,e);
+        }
     }
 }

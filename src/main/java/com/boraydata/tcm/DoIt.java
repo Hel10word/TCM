@@ -24,6 +24,7 @@ public class DoIt {
     public static void main(String[] args)  {
 
         Logger logger = LoggerFactory.getLogger(DoIt.class);
+        Boolean deleteFlag;
         Boolean debugFlag;
         String sourceTableName;
         String cloneTableName;
@@ -53,6 +54,7 @@ public class DoIt {
 //====================== 1. read the properties file and initialize the information.
             config.loadLocalConfig(properties);
 
+            deleteFlag = config.getDeleteCache();
             debugFlag = config.getDebug();
             sourceTableName = config.getSourceConfig().getTableName();
             cloneTableName = config.getCloneConfig().getTableName();
@@ -130,6 +132,11 @@ public class DoIt {
 
 
 
+        if(Boolean.TRUE.equals(deleteFlag)){
+            tcm.deleteCache();
+        }
+
+
 
         if(Boolean.TRUE.equals(debugFlag)){
             String exportShellContent = tcmContext.getExportShellContent();
@@ -142,6 +149,9 @@ public class DoIt {
             logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getLoadShellName(),loadShellContent);
             logger.info("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         }
+
+
+
     }
 
 }

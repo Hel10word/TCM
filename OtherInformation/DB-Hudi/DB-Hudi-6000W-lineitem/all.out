@@ -1,0 +1,168 @@
+2021-12-21T09:47:51,503  [boraydata.tcm.DoIt    ] main INFO : 
+================================== Source Config Info ==================================
+	host:192.168.30.148
+	port:3306
+	username:'root'
+	password:'root'
+	dataSourceType:MYSQL
+	databasename:test_db
+	tableName:lineitem_sf10_mysql
+	url:jdbc:mysql://192.168.30.148:3306/test_db?useSSL=false
+
+================================== Clone Config Info ==================================
+	host:192.168.30.39
+	port:10000
+	username:''
+	password:''
+	dataSourceType:HUDI
+	databasename:test_db
+	tableName:lineitem_sf10_mysql_cow
+	url:jdbc:hive2://192.168.30.39:10000/test_db
+
+
+2021-12-21T09:47:51,511  [boraydata.tcm.DoIt    ] main INFO : Ready to get Source Table structure and information:MYSQL->lineitem_sf10_mysql
+2021-12-21T09:47:52,166  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get Source Table info total time spent:655
+
+2021-12-21T09:47:52,170  [boraydata.tcm.DoIt    ] main INFO : 
+================================== Source Table Info ==================================
+	DataSourceType:MYSQL
+	CatalogName:def
+	SchemaName:test_db
+	TableName:lineitem_sf10_mysql
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ columns info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	ColumnName=id                   DataType=bigint(20) unsigned  UdtType=bigint               Position=1    CharMaxLength=0          NumericPrecisionM=20   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT64
+	ColumnName=l_orderkey           DataType=int(11)              UdtType=int                  Position=2    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=L_PARTKEY            DataType=int(11)              UdtType=int                  Position=3    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=L_SUPPKEY            DataType=int(11)              UdtType=int                  Position=4    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=L_LINENUMBER         DataType=int(11)              UdtType=int                  Position=5    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=L_QUANTITY           DataType=decimal(15,2)        UdtType=decimal              Position=6    CharMaxLength=0          NumericPrecisionM=15   NumericPrecisionD=2    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=L_EXTENDEDPRICE      DataType=decimal(15,2)        UdtType=decimal              Position=7    CharMaxLength=0          NumericPrecisionM=15   NumericPrecisionD=2    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=L_DISCOUNT           DataType=decimal(15,2)        UdtType=decimal              Position=8    CharMaxLength=0          NumericPrecisionM=15   NumericPrecisionD=2    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=L_TAX                DataType=decimal(15,2)        UdtType=decimal              Position=9    CharMaxLength=0          NumericPrecisionM=15   NumericPrecisionD=2    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=L_RETURNFLAG         DataType=char(1)              UdtType=char                 Position=10   CharMaxLength=1          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=STRING
+	ColumnName=L_LINESTATUS         DataType=char(1)              UdtType=char                 Position=11   CharMaxLength=1          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=STRING
+	ColumnName=L_SHIPDATE           DataType=date                 UdtType=date                 Position=12   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=L_COMMITDATE         DataType=date                 UdtType=date                 Position=13   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=L_RECEIPTDATE        DataType=date                 UdtType=date                 Position=14   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=L_SHIPINSTRUCT       DataType=char(25)             UdtType=char                 Position=15   CharMaxLength=25         NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=STRING
+	ColumnName=L_SHIPMODE           DataType=char(10)             UdtType=char                 Position=16   CharMaxLength=10         NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=STRING
+	ColumnName=L_COMMENT            DataType=varchar(44)          UdtType=varchar              Position=17   CharMaxLength=44         NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=STRING
+
+
+2021-12-21T09:47:52,171  [boraydata.tcm.DoIt    ] main INFO : Ready to create Clone Table 'lineitem_sf10_mysql_cow' in HUDI
+2021-12-21T09:47:52,171  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> create Clone Table total time spent:0
+
+2021-12-21T09:47:52,175  [boraydata.tcm.DoIt    ] main INFO : 
+================================== Clone Table Info ==================================
+	DataSourceType:MYSQL
+	CatalogName:null
+	SchemaName:null
+	TableName:lineitem_sf10_mysql_cow
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ columns info ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	ColumnName=id                   DataType=bigint(20) unsigned  UdtType=bigint               Position=1    CharMaxLength=0          NumericPrecisionM=20   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT64
+	ColumnName=l_orderkey           DataType=int(11)              UdtType=int                  Position=2    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=L_PARTKEY            DataType=int(11)              UdtType=int                  Position=3    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=L_SUPPKEY            DataType=int(11)              UdtType=int                  Position=4    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=L_LINENUMBER         DataType=int(11)              UdtType=int                  Position=5    CharMaxLength=0          NumericPrecisionM=10   NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=INT32
+	ColumnName=L_QUANTITY           DataType=decimal(15,2)        UdtType=decimal              Position=6    CharMaxLength=0          NumericPrecisionM=15   NumericPrecisionD=2    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=L_EXTENDEDPRICE      DataType=decimal(15,2)        UdtType=decimal              Position=7    CharMaxLength=0          NumericPrecisionM=15   NumericPrecisionD=2    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=L_DISCOUNT           DataType=decimal(15,2)        UdtType=decimal              Position=8    CharMaxLength=0          NumericPrecisionM=15   NumericPrecisionD=2    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=L_TAX                DataType=decimal(15,2)        UdtType=decimal              Position=9    CharMaxLength=0          NumericPrecisionM=15   NumericPrecisionD=2    DatetimePrecision=0    tableCLoneManageType=DECIMAL
+	ColumnName=L_RETURNFLAG         DataType=char(1)              UdtType=char                 Position=10   CharMaxLength=1          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=STRING
+	ColumnName=L_LINESTATUS         DataType=char(1)              UdtType=char                 Position=11   CharMaxLength=1          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=STRING
+	ColumnName=L_SHIPDATE           DataType=date                 UdtType=date                 Position=12   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=L_COMMITDATE         DataType=date                 UdtType=date                 Position=13   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=L_RECEIPTDATE        DataType=date                 UdtType=date                 Position=14   CharMaxLength=0          NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=DATE
+	ColumnName=L_SHIPINSTRUCT       DataType=char(25)             UdtType=char                 Position=15   CharMaxLength=25         NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=STRING
+	ColumnName=L_SHIPMODE           DataType=char(10)             UdtType=char                 Position=16   CharMaxLength=10         NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=STRING
+	ColumnName=L_COMMENT            DataType=varchar(44)          UdtType=varchar              Position=17   CharMaxLength=44         NumericPrecisionM=0    NumericPrecisionD=0    DatetimePrecision=0    tableCLoneManageType=STRING
+
+
+2021-12-21T09:47:52,176  [boraydata.tcm.DoIt    ] main INFO : Read to Export Source Table data in CSV.
+2021-12-21T09:47:52,186  [tcm.syncing.CommandExecutor] main INFO : 			!!!!!!!!!!!!!!!!!!!!!!!!!! Shell Path :./TCM-Temp/Export_from_MYSQL_lineitem_sf10_mysql.sh !!!!!!!!!!!!!!!!!!!!!!!!!!!
+2021-12-21T09:47:55,033  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :[33mWARNING: [0mUsing a password on the command line interface can be insecure.
+2021-12-21T09:47:55,099  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Gathering information...
+2021-12-21T09:47:55,119  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Preparing data dump for table `test_db`.`lineitem_sf10_mysql`
+2021-12-21T09:47:55,119  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Data dump for table `test_db`.`lineitem_sf10_mysql` will use column `id` as an index
+2021-12-21T09:47:55,119  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Running data dump using 1 thread.
+2021-12-21T09:47:55,120  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Data dump for table `test_db`.`lineitem_sf10_mysql` will be written to 1 file
+2021-12-21T10:12:05,559  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Duration: 00:24:10s
+2021-12-21T10:12:05,560  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Data size: 9.38 GB
+2021-12-21T10:12:05,560  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Rows written: 59986052
+2021-12-21T10:12:05,560  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Bytes written: 9.38 GB
+2021-12-21T10:12:05,560  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Average throughput: 6.47 MB/s
+2021-12-21T10:12:05,560  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :
+2021-12-21T10:12:05,560  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :The dump can be loaded using:
+2021-12-21T10:12:05,560  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :util.importTable("./TCM-Temp/Export_from_MYSQL_lineitem_sf10_mysql.csv", {
+2021-12-21T10:12:05,560  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :    "characterSet": "utf8mb4",
+2021-12-21T10:12:05,560  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :    "fieldsEnclosedBy": "\"",
+2021-12-21T10:12:05,561  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :    "fieldsEscapedBy": "\\",
+2021-12-21T10:12:05,561  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :    "fieldsOptionallyEnclosed": true,
+2021-12-21T10:12:05,561  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :    "fieldsTerminatedBy": "|",
+2021-12-21T10:12:05,561  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :    "linesTerminatedBy": "\n",
+2021-12-21T10:12:05,561  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :    "schema": "test_db",
+2021-12-21T10:12:05,561  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :    "table": "lineitem_sf10_mysql"
+2021-12-21T10:12:05,561  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :})
+2021-12-21T10:12:06,153  [boraydata.tcm.DoIt    ] main INFO : *********************************** EXPORT INFO ***********************************
+
+export MYSQL:lineitem_sf10_mysql in ./TCM-Temp/Export_from_MYSQL_lineitem_sf10_mysql.csv script:'./TCM-Temp/Export_from_MYSQL_lineitem_sf10_mysql.sh'
+
+2021-12-21T10:12:06,153  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> export data total time spent:1453978
+
+
+2021-12-21T10:12:06,154  [boraydata.tcm.DoIt    ] main INFO : Read to Load CSV data in Clone Table.
+2021-12-21T10:12:06,157  [tcm.syncing.CommandExecutor] main INFO : 			!!!!!!!!!!!!!!!!!!!!!!!!!! Shell Path :./TCM-Temp/Load_to_HUDI_lineitem_sf10_mysql_cow.sh !!!!!!!!!!!!!!!!!!!!!!!!!!!
+2021-12-21T10:15:45,132  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell ::: loading settings :: url = jar:file:/usr/local/spark/spark-3.1.2-bin-hadoop3.2/jars/ivy-2.4.0.jar!/org/apache/ivy/core/settings/ivysettings.xml
+2021-12-21T10:15:45,897  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :0    [main] WARN  org.apache.hadoop.util.NativeCodeLoader  - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-12-21T10:15:54,464  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark context Web UI available at http://192.168.30.221:4040
+2021-12-21T10:15:54,464  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark context available as 'sc' (master = spark://192.168.30.221:7078, app id = app-20211221101554-0022).
+2021-12-21T10:15:54,464  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :Spark session available as 'spark'.
+2021-12-21T10:24:19,912  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :514015 [main] WARN  org.apache.hadoop.hive.conf.HiveConf  - HiveConf of name hive.hwi.listen.host does not exist
+2021-12-21T10:24:24,068  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :518172 [main] WARN  org.apache.hadoop.hive.conf.HiveConf  - HiveConf of name hive.hwi.listen.host does not exist
+2021-12-21T10:24:26,833  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :520937 [main] WARN  org.apache.hadoop.hive.conf.HiveConf  - HiveConf of name hive.hwi.listen.host does not exist
+2021-12-21T10:24:30,789  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :524892 [HMSHandler #0] WARN  hive.log  - Updating partition stats fast for: lineitem_sf10_mysql_cow
+2021-12-21T10:24:30,815  [tcm.syncing.CommandExecutor] main INFO : 			Shell Shell :524919 [HMSHandler #0] WARN  hive.log  - Updated size to 2667537045
+2021-12-21T10:24:32,261  [boraydata.tcm.DoIt    ] main INFO : *********************************** LOAD INFO ***********************************
+
+load data in HUDI:lineitem_sf10_mysql_cow script:'./TCM-Temp/Load_to_HUDI_lineitem_sf10_mysql_cow.sh'
+
+2021-12-21T10:24:32,261  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> load data total time spent:746107
+2021-12-21T10:24:32,262  [boraydata.tcm.DoIt    ] main INFO : >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Mapping Table and Syncing TableData table time:2200740 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2021-12-21T10:24:32,262  [boraydata.tcm.DoIt    ] main INFO : 
+
+
+
+
+2021-12-21T10:24:32,262  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Export_from_MYSQL_lineitem_sf10_mysql.sh -------------------------------------------------------------------------------------
+
+mysqlsh -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "util.exportTable('lineitem_sf10_mysql','./TCM-Temp/Export_from_MYSQL_lineitem_sf10_mysql.csv',{linesTerminatedBy:'\n',fieldsTerminatedBy:'|',fieldsOptionallyEnclosed:true,fieldsEnclosedBy:'\"',fieldsEscapedBy:'\\\'})" 2>&1
+
+
+2021-12-21T10:24:32,263  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Load_CSV_to_hudi_COPY_ON_WRITE.scala -------------------------------------------------------------------------------------
+
+import scala.collection.JavaConversions._
+import org.apache.spark.sql.SaveMode._
+import org.apache.hudi.DataSourceReadOptions._
+import org.apache.hudi.DataSourceWriteOptions._
+import org.apache.hudi.config.HoodieWriteConfig._
+import org.apache.spark.sql.types._
+
+val schema = new StructType().add("id",LongType).add("l_orderkey",IntegerType).add("L_PARTKEY",IntegerType).add("L_SUPPKEY",IntegerType).add("L_LINENUMBER",IntegerType).add("L_QUANTITY",StringType).add("L_EXTENDEDPRICE",StringType).add("L_DISCOUNT",StringType).add("L_TAX",StringType).add("L_RETURNFLAG",StringType).add("L_LINESTATUS",StringType).add("L_SHIPDATE",DateType).add("L_COMMITDATE",DateType).add("L_RECEIPTDATE",DateType).add("L_SHIPINSTRUCT",StringType).add("L_SHIPMODE",StringType).add("L_COMMENT",StringType);
+
+val df = spark.read.schema(schema).option("delimiter", "|").option("escape", "\\").option("quote", "\"").csv("hdfs:///HudiTest/Export_from_MYSQL_lineitem_sf10_mysql.csv").withColumn("_hoodie_ts",lit(null).cast(TimestampType)).withColumn("_hoodie_date",lit(null).cast(StringType));
+
+df.write.format("org.apache.hudi").option("hoodie.datasource.write.operation","insert").option("hoodie.datasource.write.table.type","COPY_ON_WRITE").option("hoodie.embed.timeline.server",false).option("hoodie.table.name","lineitem_sf10_mysql_cow").option("hoodie.datasource.write.recordkey.field","id").option("hoodie.datasource.write.partitionpath.field","_hoodie_date").option("hoodie.datasource.hive_sync.jdbcurl", "jdbc:hive2://192.168.30.39:10000/test_db").option("hoodie.datasource.hive_sync.database", "test_db").option("hoodie.datasource.hive_sync.username","").option("hoodie.datasource.hive_sync.password","").option("hoodie.datasource.hive_sync.enable",true).option("hoodie.datasource.hive_sync.table","lineitem_sf10_mysql_cow").option("hoodie.datasource.hive_sync.partition_fields","_hoodie_date").option("hoodie.datasource.hive_sync.partition_extractor_class","org.apache.hudi.hive.MultiPartKeysValueExtractor").option("hoodie.datasource.hive_sync.mode","hms").mode(Append).save("/HudiTest/lineitem_sf10_mysql_cow");
+
+System.exit(0);
+
+2021-12-21T10:24:32,263  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------- Load_to_HUDI_lineitem_sf10_mysql_cow.sh -------------------------------------------------------------------------------------
+
+hdfs dfs -mkdir -p hdfs:///HudiTest/
+hdfs dfs -rm -r /HudiTest/lineitem_sf10_mysql_cow
+time hdfs dfs -put -f ./TCM-Temp/Export_from_MYSQL_lineitem_sf10_mysql.csv hdfs:///HudiTest/
+head -5 ./TCM-Temp/Export_from_MYSQL_lineitem_sf10_mysql.csv > ./TCM-Temp/Export_from_MYSQL_lineitem_sf10_mysql.csv_first_5_lines
+rm -f ./TCM-Temp/Export_from_MYSQL_lineitem_sf10_mysql.csv
+
+time spark-shell --jars /usr/local/spark/spark-3.1.2-bin-hadoop3.2/jars/hudi-spark3-bundle_2.12-0.9.0.jar  --packages org.apache.spark:spark-avro_2.12:3.0.1 --conf spark.serializer=org.apache.spark.serializer.KryoSerializer --master spark://192.168.30.221:7078 --conf spark.dymaicAllcation.enabled=true --conf spark.default.parallelism=100 -i ./TCM-Temp/Load_CSV_to_hudi_COPY_ON_WRITE.scala
+
+2021-12-21T10:24:32,263  [boraydata.tcm.DoIt    ] main INFO : ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

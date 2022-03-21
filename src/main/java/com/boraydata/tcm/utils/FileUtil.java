@@ -38,7 +38,7 @@ public class FileUtil {
                 file.getParentFile().mkdirs();
             file.createNewFile();
         }catch (IOException e){
-            throw new TCMException("Create '"+path+"' failed");
+            throw new TCMException("Create '"+path+"' failed , Content: "+msg);
         }
         try(BufferedWriter br = new BufferedWriter(new FileWriter(file))){
             br.write(msg);

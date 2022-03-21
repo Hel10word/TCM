@@ -60,6 +60,9 @@ CTM is a tool for initialization table between different datasources . Now suppo
 3.  TCM Configs
 
     ```properties
+    # delete cache file
+    # default: true (Optional)
+    deleteCache=true
     # During the running process, the path of some temporary files is generated.
     # default: './TCM-TempData/'  (Optional)
     tempDirectory=./TCM-Temp
@@ -68,7 +71,7 @@ CTM is a tool for initialization table between different datasources . Now suppo
     delimiter=,
     # output the information of each step.
     # default: 'false' (Optional)
-    debug=true
+    debug=false
     ```
 
     
@@ -93,6 +96,29 @@ CTM is a tool for initialization table between different datasources . Now suppo
     hudi.table.type=COPY_ON_WRITE
     ```
 
+4.  Advanced Configure 
+
+    ```properties
+    # Whether to generate  the sql statement of the Source table, and the sql file is saved in the 'tempDirectory'  
+    # default: falase (Optional)
+    getSourceTableSQL=true
+    # Whether to generate  the sql statement of the Clone table, and the sql file is saved in the 'tempDirectory'  
+    # default: falase (Optional)
+    getCloneTableSQL=true
+    # Whether to create a clone table, if not, you need to specify an existing table according to 'cloneTable'. 
+    # default: true (Optional)
+    createTableInClone=false
+    # Whether to execute Export scripts
+    # default: true (Optional)
+    executeExportScript=false
+    # Whether to execute Import scripts
+# default: true (Optional)
+    executeImportScript=false
+    # CSV filename required during import and export 
+    # default: Export_'from_DatasourceType'_'TableName'.csv (Optional)
+    # csvFileName=""
+    ```
+    
     
 
 -   Run the following java command to synchronize table data using TCM.

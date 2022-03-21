@@ -18,6 +18,8 @@ public class TableCloneManageContext {
     private Table tempTable;
     private Table cloneTable;
 
+    private String sourceTableSQLFileName;
+    private String cloneTableSQLFileName;
     private String csvFileName;
     private String exportShellName;
     private String loadShellName;
@@ -80,6 +82,24 @@ public class TableCloneManageContext {
 
     public TableCloneManageContext setCloneTable(Table cloneTable) {
         this.cloneTable = cloneTable;
+        return this;
+    }
+
+    public String getSourceTableSQLFileName() {
+        return sourceTableSQLFileName;
+    }
+
+    public TableCloneManageContext setSourceTableSQLFileName(String sourceTableSQLFileName) {
+        this.sourceTableSQLFileName = sourceTableSQLFileName;
+        return this;
+    }
+
+    public String getCloneTableSQLFileName() {
+        return cloneTableSQLFileName;
+    }
+
+    public TableCloneManageContext setCloneTableSQLFileName(String cloneTableSQLFileName) {
+        this.cloneTableSQLFileName = cloneTableSQLFileName;
         return this;
     }
 

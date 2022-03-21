@@ -30,6 +30,7 @@ public class TableCloneManageConfig {
     private Boolean executeImportScript;
     private String csvFileName;
     private String memsqlColumnStore;
+    private Boolean deleteCache;
     private String tempDirectory;
     private String delimiter;
     private Boolean debug;
@@ -97,6 +98,9 @@ public class TableCloneManageConfig {
         // export csv file name,default:  "Export_from_"+SourceDatabases.Type+"_"+SourceTable.Name+".csv"  => Export_from_POSTGRES_lineitem.csv
         this.csvFileName = props.getProperty("csvFileName","");
 
+
+        // save temp files directory
+        this.deleteCache = Boolean.parseBoolean(props.getProperty("deleteCache","true").toLowerCase());
         // save temp files directory
         this.tempDirectory = props.getProperty("tempDirectory","./TCM-TempData/");
         // delimiter field in csv
@@ -208,6 +212,10 @@ public class TableCloneManageConfig {
 
     public String getMemsqlColumnStore() {
         return memsqlColumnStore;
+    }
+
+    public Boolean getDeleteCache() {
+        return deleteCache;
     }
 
     public String getTempDirectory() {
