@@ -170,6 +170,8 @@ public class PgsqlMappingTool implements MappingTool {
         table.setColumns(columns);
         if(table.getDataSourceType() == null)
             table.setDataSourceType(DataSourceType.POSTGRES);
+        if(table.getSourceType() == null)
+            table.setSourceType(DataSourceType.POSTGRES);
         return table;
     }
 

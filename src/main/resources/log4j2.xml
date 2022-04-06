@@ -5,7 +5,6 @@
 <!-- "status" here refers to the log4j internal logging level.
      Refer to the root logger's "level" property to set the RapidsDB log level. -->
 <Configuration status="warn" monitorInterval="60">
-
     <Properties>
         <Property name="rootLoggingLevel">info</Property>
 
@@ -22,17 +21,15 @@
             %m%n        = print the message associated with the log event, followed by the line separator.
         -->
         <Property name="consolePattern">%d{ISO8601} %style{%marker}{red} [%-22c{3}] %t %-5p: %m%n</Property>
-        <Property name="filePattern"   >%d{ISO8601} %style{%marker}{red} [%-22c{3}] %t %-5p: %m%n</Property>
-
+<!--        <Property name="filePattern"   >%d{ISO8601} %style{%marker}{red} [%-22c{3}] %t %-5p: %m%n</Property>-->
     </Properties>
 
     <Appenders>
         <!-- Where to log to. Must be referenced by a logger below. -->
 
         <!-- Log to the console -->
-        <Console
-                name="KConsole"
-                target="SYSTEM_OUT">
+        <Console name="Console" target="SYSTEM_OUT">
+        <!--   default format  -->
             <PatternLayout pattern="${consolePattern}"/>
         </Console>
 
@@ -62,8 +59,7 @@
 <!--        </Logger>-->
 
         <!-- The root logger, the main logging level and which appenders to log to. -->
-        <Root level="all">
-
+        <Root level="info">
             <!-- Let's accept all log messages to start with, then filter them down.
                  We will accept any message that has the "SECURE" marker on it, or
                  any log message that meets the minimum log level given in
@@ -74,8 +70,9 @@
                 <ThresholdFilter level="${rootLoggingLevel}" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
 
-            <AppenderRef ref="KConsole"/>
+            <AppenderRef ref="Console"/>
         </Root>
+<!--        <Logger name="org.apache.hive" level="info"/>-->
     </Loggers>
 
 </Configuration>

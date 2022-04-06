@@ -1,9 +1,8 @@
 package com.boraydata.tcm.syncing;
 
-import java.io.BufferedReader;
+import com.boraydata.tcm.exception.TCMException;
 import java.io.File;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  * @author bufan
@@ -11,7 +10,8 @@ import java.io.InputStreamReader;
  */
 public class CommandExecutor {
 
-    public String executeShell(String dir,String shellScriptName, boolean outFlag){
+    public static String executeShell(String dir,String shellScriptName, boolean outFlag){
+        System.out.println("Execute Shell Path:"+dir+shellScriptName);
         ProcessBuilder pb = new ProcessBuilder();
         pb.command("sh",shellScriptName);
         pb.directory(new File(dir));
@@ -33,6 +33,7 @@ public class CommandExecutor {
                 try {
                     runningStatus = p.waitFor();
                 }catch (InterruptedException e){
+                    throw new TCMException("Failed to Execute Shell by executeShell -> "+dir+shellScriptName,e);
                 }
                 p.destroy();
                 stdInput.close();

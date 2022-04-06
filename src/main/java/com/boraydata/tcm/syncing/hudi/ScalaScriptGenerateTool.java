@@ -12,6 +12,8 @@ import java.util.List;
 /** Generate different Scala script according to the configuration file
  * @author bufan
  * @data 2021/12/1
+ *
+ * https://hudi.apache.org/docs/writing_data
  */
 public class ScalaScriptGenerateTool {
 
@@ -70,7 +72,7 @@ public class ScalaScriptGenerateTool {
                 .append("\nhdfs dfs -rm -r ").append(hdfsCloneDataPath)
                 .append("\ntime hdfs dfs -put -f ").append(localCsvPath).append(" ").append(hdfsSourceDataDir).append(" 2>&1")
                 // if the CSV File large and disk no space,save part of CSV for execute Spark-Shell
-                .append("\nhead -5 ").append(localCsvPath).append(" > ").append(localCsvPath).append("_first_5_lines")
+                .append("\nhead -5 ").append(localCsvPath).append(" > ").append(localCsvPath).append("_sample_data")
                 .append("\nrm -f ").append(localCsvPath)
                 .append("\n\n").append("time ").append(sparkStartCommand)
                 .append(" -i ").append(scriptPath);

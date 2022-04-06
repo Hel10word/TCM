@@ -104,6 +104,8 @@ public class MysqlMappingTool implements MappingTool {
         table.setColumns(columns);
         if(table.getDataSourceType() == null)
             table.setDataSourceType(DataSourceType.MYSQL);
+        if(table.getSourceType() == null)
+            table.setSourceType(DataSourceType.MYSQL);
         return table;
     }
 

@@ -11,6 +11,7 @@
 
     <build>
         <plugins>
+            <!--     跳过 junit 5 的测试       -->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
@@ -18,29 +19,46 @@
                     <skipTests>true</skipTests>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.22.2</version>
-            </plugin>
+            <!--     跳过 junit 5 的测试       -->
+<!--            <plugin>-->
+<!--                <artifactId>maven-failsafe-plugin</artifactId>-->
+<!--                <version>2.22.2</version>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
                     <descriptorRefs>
+<!--                        使用的描述符，按此描述进行打包，此处配置一个zip.xml表示打zip包,如果写 jar-with-dependencies 表示 默认配置文件-->
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+<!--                    输出最终的名称-->
+                    <finalName>TCM</finalName>
+<!--                    配置是否添加id到名称中，若为true，当前示例中，则为jsw-test-zip.zip，false即不添加，只是jsw-test.zip； -->
+<!--                     若同时打多个包，则可设为true，分别添加id以作区分-->
+<!--                    <appendAssemblyId>true</appendAssemblyId>-->
+<!--                     打包的输出目录，可自定义，${project.build.directory}为编译输出目录，即target目录 -->
+<!--                    <outputDirectory>${project.build.directory}</outputDirectory>-->
                     <archive>
+<!--                        设置 jar 包指定的主类-->
                         <manifest>
                             <mainClass>com.boraydata.tcm.DoIt</mainClass>
                         </manifest>
                     </archive>
+<!--                    <descriptors>-->
+<!--                        &lt;!&ndash; 使用的描述符，按此描述进行打包，此处配置一个zip.xml表示打zip包 &ndash;&gt;-->
+<!--                        <descriptor>src/main/assembly/assembly-with-TCM.xml</descriptor>-->
+<!--                    </descriptors>-->
                 </configuration>
                 <executions>
                     <execution>
+<!--                        id 标识,唯一即可-->
                         <id>make-assembly</id>
+<!--                        设置 package 阶段进行-->
                         <phase>package</phase>
                         <goals>
+<!--                            只运行一次-->
                             <goal>single</goal>
                         </goals>
                     </execution>
@@ -62,13 +80,19 @@
     <properties>
         <spark.version>2.4.4</spark.version>
         <scala.binary.version>2.11</scala.binary.version>
-        <log4j2.version>2.15.0</log4j2.version>
+        <log4j2.version>2.17.1</log4j2.version>
     </properties>
 
     <dependencies>
 
+<!--        <dependency>-->
+<!--            <groupId>com.boraydata</groupId>-->
+<!--            <artifactId>rapids-jdbc</artifactId>-->
+<!--            <version>4.0.7-SNAPSHOT</version>-->
+<!--        </dependency>-->
+
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
-        <!--    MySQL 5.7    -->
+<!--            MySQL 5.7    -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -80,7 +104,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.18</version>
+            <version>42.3.1</version>
         </dependency>
 
 <!--        <dependency>-->
@@ -135,6 +159,8 @@
 <!--            <groupId>org.apache.hive</groupId>-->
 <!--            <artifactId>hive-jdbc</artifactId>-->
 <!--            <version>3.1.2</version>-->
+<!--            <version>2.3.0</version>-->
+<!--            <classifier>standalone</classifier>-->
 <!--            <scope>test</scope>-->
 <!--        </dependency>-->
         <!--    Test    -->

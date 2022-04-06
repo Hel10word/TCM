@@ -6,7 +6,6 @@ import com.boraydata.tcm.core.DataSourceType;
 import com.boraydata.tcm.core.TableCloneManage;
 import com.boraydata.tcm.mapping.MappingTool;
 import com.boraydata.tcm.mapping.MappingToolFactory;
-import org.checkerframework.checker.units.qual.Time;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
@@ -31,15 +30,15 @@ public class GetTableInfoTest {
     DatabaseConfig pgsqlConfig = pgsql
             .setDatabasename("test_db")
             .setDataSourceType(DataSourceType.POSTGRES)
-            .setHost("192.168.30.155")
+            .setHost("192.168.30.31")
             .setPort("5432")
-            .setUsername("postgres")
-            .setPassword("postgres")
+            .setUsername("root")
+            .setPassword("root")
             .create();
 
-    String tableName = "test";
-    DatabaseConfig config = mysqlConfig;
-//    DatabaseConfig config = pgsqlConfig;
+    String tableName = "lineitem_sf1";
+//    DatabaseConfig config = mysqlConfig;
+    DatabaseConfig config = pgsqlConfig;
     @Test
     public void test(){
 
@@ -47,7 +46,7 @@ public class GetTableInfoTest {
 
         showTableInfoByJdbcMetadata(config,tableName);
 
-        TableCloneManage tcm =  new TableCloneManage();
+        TableCloneManage tcm = TestDataProvider.getTCM(config, config);
         System.out.println();
         MappingTool tool = MappingToolFactory.create(config.getDataSourceType());
         assert tool != null;
@@ -58,6 +57,7 @@ public class GetTableInfoTest {
     public void showTableInfoBySQL(DatabaseConfig config,String tableName){
 //        String sql = String.format("select * from information_schema.COLUMNS where table_name in ('%s')",tableName);
         String sql = "select * from information_schema.COLUMNS where table_name in (?)";
+//        String sql = "load data local infile '/usr/local/extended/app/TCM-Temp-mysql/Export_from_MYSQL_lineitem_mysql.csv' into table test fields terminated by '|';";
         try(Connection con = DatasourceConnectionFactory.createDataSourceConnection(config);
             PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1,tableName);

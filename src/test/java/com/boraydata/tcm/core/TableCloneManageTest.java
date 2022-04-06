@@ -68,6 +68,7 @@ class TableCloneManageTest {
 //        System.out.println("\n\ncloneTableSQL:\n"+cloneTableSQL);
     }
 
+    // 获取在同种类型的数据库建表 的 SQL
     @Test
     public void testCreateTableInSameDB(){
         Table lineitem = tcm.createSourceMappingTable(sourceName);

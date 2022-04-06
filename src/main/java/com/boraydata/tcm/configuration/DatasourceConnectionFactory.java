@@ -53,7 +53,7 @@ public class DatasourceConnectionFactory {
         StringBuilder url = new StringBuilder();
         String dbType = databaseConfig.getDataSourceType().toString();
         // Hudi、Spark、Hive default use Hive_Driver
-        if(DataSourceType.HUDI.toString().equals(dbType))
+        if(DataSourceType.HUDI.toString().equals(dbType) || DataSourceType.HIVE.toString().equals(dbType))
             dbType = "SPARK";
 
         url.append(dscPropers.getProperty(dbType));
@@ -79,6 +79,10 @@ public class DatasourceConnectionFactory {
 
     // use DatabaseConfig to create connection
     public static Connection createDataSourceConnection(DatabaseConfig databaseConfig){
+        String dbType = databaseConfig.getDataSourceType().toString();
+        // Hudi、Spark、Hive default use Hive_Driver
+        if(DataSourceType.HUDI.toString().equals(dbType) || DataSourceType.HIVE.toString().equals(dbType))
+            dbType = "SPARK";
         Driver driver = null;
         Properties properties = new Properties();
         // appending user
@@ -99,7 +103,7 @@ public class DatasourceConnectionFactory {
         try {
             Class<?> aClass = Class.forName(databaseConfig.getDriver() != null
                     ? databaseConfig.getDriver()
-                    : dscPropers.getProperty(dataSourceType.toString() + "_Driver"));
+                    : dscPropers.getProperty(dbType + "_Driver"));
             driver = (Driver)aClass.newInstance();
             return driver.connect(jdbcUrl,properties);
         }catch (ClassNotFoundException e){
@@ -121,6 +125,7 @@ public class DatasourceConnectionFactory {
                 Connection conn = createDataSourceConnection(databaseConfig);
                 Statement statement = conn.createStatement()
         ) {
+//            boolean execute = statement.execute(sql);
             ResultSet rs = statement.executeQuery(sql);
             ResultSetMetaData md = rs.getMetaData();
             int columnCount = md.getColumnCount();
@@ -135,6 +140,29 @@ public class DatasourceConnectionFactory {
         }catch (SQLException e){
             throw new TCMException("executeQuery is fail, in "+databaseConfig.getUrl());
         }
+    }
+
+
+    public static void showQueryBySQL(DatabaseConfig config, String sql){
+        try(Connection con = DatasourceConnectionFactory.createDataSourceConnection(config);
+            PreparedStatement ps = con.prepareStatement(sql)){
+
+            ResultSet resultSet = ps.executeQuery();
+            StringBuilder sb = new StringBuilder("Show Query By SQL:\n" + sql + "\n");
+            while (resultSet.next()){
+                ResultSetMetaData rsmd = resultSet.getMetaData();
+                int count = rsmd.getColumnCount();
+                for (int i = 1;i <= count;i++){
+                    String columnName = rsmd.getColumnName(i);
+                    sb.append(String.format("%s:%-20s",columnName,resultSet.getString(columnName)));
+                }
+                sb.append("\n");
+            }
+            System.out.println(sb.toString());
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
     }
 
 

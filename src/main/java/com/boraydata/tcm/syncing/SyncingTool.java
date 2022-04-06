@@ -21,8 +21,13 @@ import com.boraydata.tcm.core.TableCloneManageContext;
  *
  */
 public interface SyncingTool{
-    // generate export table data command
-    String exportFile(TableCloneManageContext tcmContext);
-    // generate load table data command
-    String loadFile(TableCloneManageContext tcmContext);
+    // generate export table data information
+    String getExportInfo(TableCloneManageContext tcmContext);
+    // generate load table data information
+    String getLoadInfo(TableCloneManageContext tcmContext);
+
+    // execute export data operate
+    Boolean executeExport(TableCloneManageContext tcmContext);
+    // execute load data operate
+    Boolean executeLoad(TableCloneManageContext tcmContext);
 }

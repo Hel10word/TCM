@@ -20,6 +20,8 @@ public class TableCloneManageConfig {
     private String primaryKey;
     private String partitionKey;
     private String hoodieTableType;
+    private Boolean nonPartition;
+    private Boolean multiPartitionKeys;
 
     private String sparkCustomCommand;
 
@@ -27,9 +29,9 @@ public class TableCloneManageConfig {
     private Boolean getCloneTableSQL;
     private Boolean createTableInClone;
     private Boolean executeExportScript;
-    private Boolean executeImportScript;
+    private Boolean executeLoadScript;
     private String csvFileName;
-    private String memsqlColumnStore;
+//    private String memsqlColumnStore;
     private Boolean deleteCache;
     private String tempDirectory;
     private String delimiter;
@@ -66,19 +68,21 @@ public class TableCloneManageConfig {
         //======================================================    Hudi Config   ==================================================
         // https://hudi.apache.org/docs/configurations
         // put CSV File in HDFS Path
-        this.hdfsSourceDataDir = props.getProperty("hdfs.source.data.path");
+        this.hdfsSourceDataDir = props.getProperty("hdfsSourceDataPath");
         // Hudi Data Save Path
-        this.hdfsCloneDataPath = props.getProperty("hdfs.clone.data.path");
-        this.primaryKey = props.getProperty("primary.key");
-        this.partitionKey = props.getProperty("partition.key","_hoodie_date");
+        this.hdfsCloneDataPath = props.getProperty("hdfsCloneDataPath");
+        this.primaryKey = props.getProperty("primaryKey");
+        this.partitionKey = props.getProperty("partitionKey","_hoodie_date");
         // The table type for the underlying data, for this write.   e.g MERGE_ON_READ、COPY_ON_WRITE
-        this.hoodieTableType = props.getProperty("hudi.table.type","MERGE_ON_READ");
+        this.hoodieTableType = props.getProperty("hudiTableType","MERGE_ON_READ");
 //        this.hiveNonPartitioned = Boolean.parseBoolean(props.getProperty("hive.non.partitioned", "false").toLowerCase());
 //        this.hiveMultiPartitionKeys = Boolean.parseBoolean(props.getProperty("hive.multi.partition.keys", "false").toLowerCase());
+        this.nonPartition = Boolean.parseBoolean(props.getProperty("nonPartition", "false").toLowerCase());
+        this.multiPartitionKeys = Boolean.parseBoolean(props.getProperty("multiPartitionKeys", "false").toLowerCase());
 
         //======================================================    Spark Config   ==================================================
 
-        this.sparkCustomCommand = props.getProperty("spark.custom.command");
+        this.sparkCustomCommand = props.getProperty("sparkCustomCommand");
 
         //======================================================    TCM Tools Config   ==================================================
         // get source table sql statement
@@ -90,10 +94,10 @@ public class TableCloneManageConfig {
         // execute export csv shell script
         this.executeExportScript = Boolean.parseBoolean(props.getProperty("executeExportScript","true").toLowerCase());
         // execute import csv shell script
-        this.executeImportScript = Boolean.parseBoolean(props.getProperty("executeImportScript","true").toLowerCase());
+        this.executeLoadScript = Boolean.parseBoolean(props.getProperty("executeLoadScript","true").toLowerCase());
 
         // use column store in memsql
-        this.memsqlColumnStore = props.getProperty("memsqlColumnStore","");
+//        this.memsqlColumnStore = props.getProperty("memsqlColumnStore","");
 
         // export csv file name,default:  "Export_from_"+SourceDatabases.Type+"_"+SourceTable.Name+".csv"  => Export_from_POSTGRES_lineitem.csv
         this.csvFileName = props.getProperty("csvFileName","");
@@ -112,6 +116,9 @@ public class TableCloneManageConfig {
 
         if (sourceDataType.equalsIgnoreCase("hudi")) {
             throw new TCMException("sourceDataType unable to be "+sourceDataType);
+        }
+        if (cloneDataType.equalsIgnoreCase("hive")) {
+            cloneDataType = "hudi";
         }
 
         DatabaseConfig.Builder sourceBuilder = new DatabaseConfig.Builder()
@@ -182,6 +189,14 @@ public class TableCloneManageConfig {
         return hoodieTableType;
     }
 
+    public Boolean getNonPartition() {
+        return nonPartition;
+    }
+
+    public Boolean getMultiPartitionKeys() {
+        return multiPartitionKeys;
+    }
+
     public String getSparkCustomCommand() {
         return sparkCustomCommand;
     }
@@ -198,8 +213,8 @@ public class TableCloneManageConfig {
         return executeExportScript;
     }
 
-    public Boolean getExecuteImportScript() {
-        return executeImportScript;
+    public Boolean getExecuteLoadScript() {
+        return executeLoadScript;
     }
 
     public String getCsvFileName() {
@@ -210,9 +225,9 @@ public class TableCloneManageConfig {
         return createTableInClone;
     }
 
-    public String getMemsqlColumnStore() {
-        return memsqlColumnStore;
-    }
+//    public String getMemsqlColumnStore() {
+//        return memsqlColumnStore;
+//    }
 
     public Boolean getDeleteCache() {
         return deleteCache;

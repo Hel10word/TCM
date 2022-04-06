@@ -11,39 +11,16 @@ import org.junit.jupiter.api.Test;
  * @data 2021/11/5
  */
 class DataMappingSQLToolTest {
-
-
-
-
+    DataMappingSQLTool tool = new DataMappingSQLTool();
 
     @Test
-    public void testGetSQL(){
+    public void getMappingDataSQLTest(){
 
-        DataMappingSQLTool dmSQLt = new DataMappingSQLTool();
-        MappingTool pgMapping = MappingToolFactory.create(DataSourceType.POSTGRES);
-        MappingTool mysqlMapping = MappingToolFactory.create(DataSourceType.MYSQL);
+        Table testTable = TestDataProvider.getTable(DataSourceType.MYSQL, "testTable");
+//        Table testTable = TestDataProvider.getTable(DataSourceType.POSTGRES, "testTable");
+        String mappingDataSQL = DataMappingSQLTool.getMappingDataSQL(testTable, DataSourceType.HUDI);
 
-        TableCloneManage tcm = TestDataProvider.getTCM(TestDataProvider.configMySQL, TestDataProvider.configPGSQL);
-//        TableCloneManage tcm = TestDataProvider.getTCM(TestDataProvider.configPGSQL, TestDataProvider.configMySQL);
-        Table sourceTable = tcm.createSourceMappingTable("test");
-//        Table cloneTable = tcm.createCloneTable(sourceTable);
-//        Table source_cloneTable = mysqlMapping.createCloneMappingTable(cloneTable);
-        System.out.println("create Table in MySQL\n"
-                +mysqlMapping.getCreateTableSQL(mysqlMapping.createCloneMappingTable(sourceTable))+
-                "\n\n");
-
-
-        System.out.println("\n\n\ncreate Table in PgSQL\n"
-                +pgMapping.getCreateTableSQL(pgMapping.createCloneMappingTable(sourceTable))+
-                "\n\n");
-//        System.out.println(sql+"\n");
-        System.out.println(sourceTable.getTableInfo());
-//        List list = DatasourceConnectionFactory.executeQuerySQL(TestDataProvider.configPGSQL, sql);
-//        list.forEach(System.out::println);
+        System.out.println(mappingDataSQL);
     }
-
-
-
-
 
 }

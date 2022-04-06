@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /** TCM - Table Clone Manage and Table Data Sync
@@ -39,15 +40,15 @@ public class DoIt {
 
         String configFilePath;
         if(args == null || args.length <= 0)
-//            configFilePath = "./config.properties";
+//            configFilePath = "./test.properties";
             throw new TCMException("you should incoming properties File.");
         else
             configFilePath = args[0];
 
-        if(!new File(configFilePath).exists())
-            throw new TCMException("the '"+configFilePath+"' properties File is not found.");
+//        if(!new File(configFilePath).exists())
+//            throw new TCMException("the '"+configFilePath+"' properties File is not found.");
         try(FileInputStream in = new FileInputStream(configFilePath)){
-//        try(InputStream in = DoIt.class.getClassLoader().getResourceAsStream("./config.properties")){
+//        try(InputStream in = DoIt.class.getClassLoader().getResourceAsStream("./test.properties")){
             properties = new Properties();
             properties.load(in);
             config = TableCloneManageConfig.getInstance();
@@ -84,11 +85,12 @@ public class DoIt {
 //====================== 4、 get Source Table Struct by tableName in sourceData
         Table sourceTable = tcm.createSourceMappingTable(sourceTableName);
                                     end = System.currentTimeMillis();
+                                    Long getSourceTable = end-start;
                                     all+=(end - start);
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get Source Table info total time spent:{}\n",(end - start));
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> get Source Table info total time spent:{}",getSourceTable);
         if (Boolean.TRUE.equals(debugFlag))
             logger.info("\n================================== Source Table Info ==================================\n" +
-                    "{}\n",sourceTable.getTableInfo());
+                    "{}",sourceTable.getTableInfo());
 
 
 
@@ -100,58 +102,72 @@ public class DoIt {
 //====================== 6、create Clone Table in clone database
         tcm.createTableInDatasource();
                                     end = System.currentTimeMillis();
+                                    Long createCloneTable = end-start;
                                     all+=(end - start);
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> create Clone Table total time spent:{}\n",(end - start));
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> create Clone Table total time spent:{}",createCloneTable);
          if (Boolean.TRUE.equals(debugFlag))
              logger.info("\n================================== Clone Table Info ==================================\n" +
-                     "{}\n",cloneTable.getTableInfo());
+                     "{}",cloneTable.getTableInfo());
 
 
 
                                     start = System.currentTimeMillis();
-        logger.info("Read to Export Source Table data in CSV.");
+        logger.info("*********************************** EXPORT INFO ***********************************");
+                ;
 //====================== 7、create export data script,and execute export shell.
         tcm.exportTableData();
                                     end = System.currentTimeMillis();
+                                    Long exportFromSource = end-start;
             all+=(end-start);
-        logger.info("*********************************** EXPORT INFO ***********************************\n\nexport {}:{} in {} script:'{}'\n",sourceDataType,tcmContext.getFinallySourceTable().getTableName(),
-                tcmContext.getTempDirectory()+tcmContext.getCsvFileName(),tcmContext.getTempDirectory()+tcmContext.getExportShellName());
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> export data total time spent:{}\n\n",(end-start));
+        logger.info("\nexport '{}:{}'\ncsvPath:{}\nscript:{}",sourceDataType,tcmContext.getFinallySourceTable().getTableName()
+                ,tcmContext.getTempDirectory()+tcmContext.getCsvFileName(),tcmContext.getTempDirectory()+tcmContext.getExportShellName());
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> export data total time spent:{}",exportFromSource);
 
+        logger.info("");
 
                                     start = System.currentTimeMillis();
-        logger.info("Read to Load CSV data in Clone Table.");
+        logger.info("*********************************** LOAD INFO ***********************************");
 //====================== 8、create export data script,and execute export shell.
         tcm.loadTableData();
                                     end = System.currentTimeMillis();
+                                    Long loadInClone = end-start;
             all+=(end-start);
-        logger.info("*********************************** LOAD INFO ***********************************\n\nload data in {}:{} script:'{}'\n",cloneDataType,cloneTableName,tcmContext.getTempDirectory()+tcmContext.getLoadShellName());
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> load data total time spent:{}",(end-start));
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Mapping Table and Syncing TableData table time:{} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",all);
-
-
-
+        logger.info("\nload data in '{}:{}'\nscript:{}",cloneDataType,cloneTableName,tcmContext.getTempDirectory()+tcmContext.getLoadShellName());
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> load data total time spent:{}",loadInClone);
+//        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Mapping Table and Syncing TableData table time:{} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",all);
 
         if(Boolean.TRUE.equals(deleteFlag)){
             tcm.deleteCache();
         }
 
-
-
         if(Boolean.TRUE.equals(debugFlag)){
-            String exportShellContent = tcmContext.getExportShellContent();
-            String loadDataScriptContent = tcmContext.getLoadDataInHudiScalaScriptContent();
-            String loadShellContent = tcmContext.getLoadShellContent();
+//            String exportShellContent = tcmContext.getExportShellContent();
+//            String loadDataScriptContent = tcmContext.getLoadDataInHudiScalaScriptContent();
+//            String loadShellContent = StringUtil.isNullOrEmpty(tcmContext.getLoadShellContent())?"No script file is generated,maybe load data by JDBC. ":tcmContext.getLoadShellContent();
             logger.info("\n\n\n\n");
-            logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getExportShellName(),exportShellContent);
-            if(!StringUtil.isNullOrEmpty(tcmContext.getLoadDataInHudiScalaScriptName()))
-                logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getLoadDataInHudiScalaScriptName(),loadDataScriptContent);
-            logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getLoadShellName(),loadShellContent);
-            logger.info("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            logger.info(tcmContext.toString());
+//            logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getExportShellName(),exportShellContent);
+//            if(!StringUtil.isNullOrEmpty(tcmContext.getLoadDataInHudiScalaScriptName()))
+//                logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getLoadDataInHudiScalaScriptName(),loadDataScriptContent);
+//            logger.info("------------------------------------------------------------------------------------- {} -------------------------------------------------------------------------------------\n\n{}\n",tcmContext.getLoadShellName(),loadShellContent);
+//            logger.info("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         }
 
-
-
+        String resultInfo = String.format(
+                        "\n" +
+                        "%-20s |%15s\n" +
+                        "%-20s |%15s ms \n" +
+                        "%-20s |%15s ms \n" +
+                        "%-20s |%15s ms \n" +
+                        "%-20s |%15s ms \n" +
+                        "%-20s |%15s ms \n"
+                        ,"Step","SpendTime",
+                        "GetSourceTable",getSourceTable,
+                        "CreateCloneTable",createCloneTable,
+                        "ExportFromSource",exportFromSource,
+                        "LoadInClone",loadInClone,
+                        "TotalTime",all);
+        logger.info("\n{}\n",resultInfo);
     }
 
 }

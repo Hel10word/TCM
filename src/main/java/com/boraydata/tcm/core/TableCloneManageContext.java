@@ -17,6 +17,8 @@ public class TableCloneManageContext {
     private Table sourceTable;
     private Table tempTable;
     private Table cloneTable;
+    private String tempTableCreateSQL;
+    private String tempTableSelectSQL;
 
     private String sourceTableSQLFileName;
     private String cloneTableSQLFileName;
@@ -82,6 +84,24 @@ public class TableCloneManageContext {
 
     public TableCloneManageContext setCloneTable(Table cloneTable) {
         this.cloneTable = cloneTable;
+        return this;
+    }
+
+    public String getTempTableCreateSQL() {
+        return tempTableCreateSQL;
+    }
+
+    public TableCloneManageContext setTempTableCreateSQL(String tempTableCreateSQL) {
+        this.tempTableCreateSQL = tempTableCreateSQL;
+        return this;
+    }
+
+    public String getTempTableSelectSQL() {
+        return tempTableSelectSQL;
+    }
+
+    public TableCloneManageContext setTempTableSelectSQL(String tempTableSelectSQL) {
+        this.tempTableSelectSQL = tempTableSelectSQL;
         return this;
     }
 

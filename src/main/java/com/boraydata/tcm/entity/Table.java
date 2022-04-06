@@ -102,7 +102,7 @@ public class Table implements Cloneable {
     }
 
     public Table clone() {
-        Table table = null;
+        Table table = new Table();
         try {
             table = (Table) super.clone();
             List<Column> cloneList = new LinkedList<>();
@@ -111,7 +111,8 @@ public class Table implements Cloneable {
             table.setColumns(cloneList);
             table.setCatalogName(null);
             table.setSchemaName(null);
-            table.setSourceType(dataSourceType);
+            table.setDataSourceType(null);
+            table.setSourceType(sourceType);
         }catch (CloneNotSupportedException e){
             e.printStackTrace();
         }

@@ -66,7 +66,24 @@ public enum DataSourceType {
         null,
         null,
         null
-    );
+                ),
+        HIVE(
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+        );
 
     public static DataSourceType getTypeByStr(String str){
         if(str.equals(DataSourceType.MYSQL.toString()) || str.equalsIgnoreCase("mysql"))
