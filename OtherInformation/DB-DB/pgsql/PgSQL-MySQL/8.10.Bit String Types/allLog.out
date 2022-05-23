@@ -3,7 +3,7 @@ host:192.168.30.155
 port:5432
 username:'postgres'
 password:''
-dataSourceType:POSTGRES
+dataSourceEnum:POSTGRES
 databasename:test_db
 url:jdbc:postgresql://192.168.30.155:5432/test_db
 
@@ -12,7 +12,7 @@ host:192.168.30.148
 port:3306
 username:'root'
 password:'root'
-dataSourceType:MYSQL
+dataSourceEnum:MYSQL
 databasename:test_db
 url:jdbc:mysql://192.168.30.148:3306/test_db?useSSL=false
 

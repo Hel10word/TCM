@@ -4,7 +4,7 @@
 	port:3306
 	username:'root'
 	password:'MyNewPass4!'
-	dataSourceType:MYSQL
+	dataSourceEnum:MYSQL
 	databasename:test_db
 	tableName:lineitem
 	url:jdbc:mysql://192.168.120.68:3306/test_db?useSSL=false
@@ -14,7 +14,7 @@
 	port:10000
 	username:'rapids'
 	password:'rapids'
-	dataSourceType:HUDI
+	dataSourceEnum:HUDI
 	databasename:test_cdc_hudi
 	tableName:lineitem_cow
 	url:jdbc:hive2://192.168.120.67:10000/test_cdc_hudi

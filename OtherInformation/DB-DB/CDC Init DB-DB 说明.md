@@ -16,22 +16,22 @@
 
 https://www.postgresql.org/docs/13/datatype-numeric.html
 
-| PgSQL Data Type  | Range                                                        | TCM Type  | MySQL    |
-| ---------------- | ------------------------------------------------------------ | --------- | -------- |
-| smallint         | -32768 to +32767                                             | INT16     | smallint |
-| integer          | -2147483648 to +2147483647                                   | INT32     | int      |
-| bigint           | -9223372036854775808 to +9223372036854775807                 | INT64     | bigint   |
-| ==decimal==      | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point | 'Decimal' | decimal  |
-| ==numeric==      | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point | 'Decimal' | decimal  |
-| real             | 6 decimal digits precision                                   | FLOAT32   | float    |
-| double precision | 15 decimal digits precision                                  | FLOAT64   | double   |
-| smallserial      | 1 to 32767                                                   | INT16     | smallint |
-| serial           | 1 to 2147483647                                              | INT32     | int      |
-| bigserial        | 1 to 9223372036854775807                                     | INT64     | bigint   |
+| PgSQL Data Type  | Range                                                        | TCM Type | MySQL    |
+| ---------------- | ------------------------------------------------------------ | -------- | -------- |
+| smallint         | -32768 to +32767                                             | INT16    | SMALLINT |
+| integer          | -2147483648 to +2147483647                                   | INT32    | INT      |
+| bigint           | -9223372036854775808 to +9223372036854775807                 | INT64    | BIGINT   |
+| ==decimal==      | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point | DECIMAL  | DECIMAL  |
+| ==numeric==      | up to 131072 digits before the decimal point; up to 16383 digits after the decimal point | DECIMAL  | DECIMAL  |
+| real             | 6 decimal digits precision                                   | FLOAT32  | FLOAT    |
+| double precision | 15 decimal digits precision                                  | FLOAT64  | DOUBLE   |
+| smallserial      | 1 to 32767                                                   | INT16    | SMALLINT |
+| serial           | 1 to 2147483647                                              | INT32    | INT      |
+| bigserial        | 1 to 9223372036854775807                                     | INT64    | BIGINT   |
 
 [mysql-decimal ]:https://dev.mysql.com/doc/refman/5.7/en/precision-math-decimal-characteristics.html
 
--   ==decimal== 与 ==numeric== 类型 Mapping 到 MySQL DECIMAL，若数据整体长度超过65或小数点后面大于30位会存在精度丢失。
+-   ==decimal== 与 ==numeric== 类型 Mapping 到 MySQL DECIMAL，若数据整体长度超过 **65位** 或小数点后面大于 **30位** 会存在精度丢失。
 
 
 
@@ -41,7 +41,7 @@ https://www.postgresql.org/docs/13/datatype-money.html
 
 | PgSQL Data | Range                                          | TCM Type | MySQL         |
 | ---------- | ---------------------------------------------- | -------- | ------------- |
-| money      | -92233720368547758.08 to +92233720368547758.07 | MONEY    | DECIMAL(65,2) |
+| money      | -92233720368547758.08 to +92233720368547758.07 | DECIMAL  | DECIMAL(65,2) |
 
 `-92233720368547758.08` save in money data type is `-$92,233,720,368,547,758.08`，导出时通过类型转换解决。
 
@@ -55,10 +55,10 @@ https://www.postgresql.org/docs/13/datatype-character.html
 
 | PgSQL Data Type          | Description                | TCM Type | MySQL    |
 | ------------------------ | -------------------------- | -------- | -------- |
-| character varying(*`n`*) | variable-length with limit | String   | VARCHAR  |
-| varchar(*`n`*)           | variable-length with limit | String   | VARCHAR  |
-| character(*`n`*)         | fixed-length, blank padded | String   | VARCHAR  |
-| char(*`n`*)              | fixed-length, blank padded | String   | VARCHAR  |
+| character varying(*`n`*) | variable-length with limit | STRING   | VARCHAR  |
+| varchar(*`n`*)           | variable-length with limit | STRING   | VARCHAR  |
+| character(*`n`*)         | fixed-length, blank padded | STRING   | VARCHAR  |
+| char(*`n`*)              | fixed-length, blank padded | STRING   | VARCHAR  |
 | text                     | variable unlimited length  | TEXT     | LONGTEXT |
 
 -   需要注意 text 类型，在 pgsql 中是可以存放无限长度的,转到 MySQL 中会存在丢弃末尾长度。
@@ -87,12 +87,14 @@ https://www.postgresql.org/docs/13/datatype-datetime.html
 
 | PgSQL Data               | Range | TCM Type | MySQL |
 | ------------------------ | ----------------------- | -------- | ----- |
-| timestamp                | 4713 BC ~ 294276 AD     | 'Timestamp' | TIMESTAMP |
-| timestamp with time zone | 4713 BC ~ 294276 AD     | 'Timestamp' | TIMESTAMP |
+| timestamp                | 4713 BC ~ 294276 AD     | TIMESTAMP | TIMESTAMP |
+| timestamp with time zone | 4713 BC ~ 294276 AD     | TIMESTAMP | TIMESTAMP |
+| timestamp without time zone | 4713 BC ~ 294276 AD     | TIMESTAMP | TIMESTAMP |
 | date                     | 4713 BC ~ 5874897 AD    | DATE | DATE |
-| time                     | 00:00:00 ~ 24:00:00               | 'Time' |TIME|
-| time with time zone      | 00:00:00+1559 ~ 24:00:00-1559 | 'Time' | TIME |
-| ==interval==       | -178000000 years ~ 178000000 years | String | VARCHAR(255) |
+| time                     | 00:00:00 ~ 24:00:00               | TIME |TIME|
+| time with time zone      | 00:00:00+1559 ~ 24:00:00-1559 | TIME | TIME |
+| time without time zone   | 00:00:00+1559 ~ 24:00:00-1559 | TIME | TIME |
+| ==interval==       | -178000000 years ~ 178000000 years | STRING | VARCHAR(255) |
 
 [mysql-timestamp]:https://dev.mysql.com/doc/refman/5.7/en/timestamp-initialization.html
 
@@ -109,9 +111,9 @@ https://www.postgresql.org/docs/13/datatype-datetime.html
 
 https://www.postgresql.org/docs/13/datatype-boolean.html
 
-| PgSQL Data | True/False in PgSQL                                        | TCM Type | MySQL      |
-| ---------- | ---------------------------------------------------------- | -------- | ---------- |
-| boolean    | ('true','yes','on','1',1)=>t;('false','no','off','0',0)=>f | BOOLEAN  | TINYINT(1) |
+| PgSQL Data | True/False in PgSQL                                          | TCM Type | MySQL      |
+| ---------- | ------------------------------------------------------------ | -------- | ---------- |
+| boolean    | ('true','yes','on','1',1) => t; ('false','no','off','0',0)=>f | BOOLEAN  | TINYINT(1) |
 
 [MySQL-boolean]:https://dev.mysql.com/doc/refman/5.7/en/numeric-type-syntax.html
 
@@ -189,7 +191,7 @@ https://www.postgresql.org/docs/13/datatype-net-types.html
 
 
 
-### bit_string_types_pgsql
+### ==bit_string_types_pgsql==
 
 https://www.postgresql.org/docs/13/datatype-bit.html
 
@@ -199,7 +201,7 @@ https://www.postgresql.org/docs/13/datatype-bit.html
 | BIT VARYING[M] | BYTES    | VARBINARY |
 
 -   在PgSQL中查询官方手册，暂未发现 M 的定义范围。
--   由于Mapping 到MySQL中，为  VARBINARY[M] 0<=M<=21845，数据过长会丢失。
+-   由于Mapping 到 MySQL中，为  VARBINARY[M] 0<=M<=21845，**数据过长会丢失**。
 
 
 
@@ -214,7 +216,7 @@ https://www.postgresql.org/docs/13/datatype-textsearch.html
 | tsvector   | TEXT     | LONGTEXT |
 | tsquery    | TEXT     | LONGTEXT |
 
--   将其转换为 LONGTEXT 类型。
+-   由于 MySQL 中没有与之对应的 字段类型，因此这儿统一转换为长字符串。
 
 
 
@@ -228,7 +230,7 @@ https://www.postgresql.org/docs/13/datatype-uuid.html
 | ---------- | -------- | ------------ |
 | uuid       | STRING   | VARCHAR(255) |
 
--   默认转为 MySQL：VARCHAR(255)；
+-   默认转为 MySQL : VARCHAR(255)；
 
 
 
@@ -334,7 +336,7 @@ https://www.postgresql.org/docs/13/rangetypes.html
 | tstzrange  | Range of `timestamp with time zone`    | TEXT     | LONGTEXT |
 | daterange  | Range of `date`                        | TEXT     | LONGTEXT |
 
--   由于 MySQL 中没有与之对应的类型，因此转为 LONGTEXT 类型存储。
+-   由于 MySQL 中没有与之对应的 字段类型，因此这儿统一转换为长字符串。
 
 
 

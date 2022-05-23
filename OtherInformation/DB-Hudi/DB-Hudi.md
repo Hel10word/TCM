@@ -34,6 +34,8 @@ yarn application -kill <appId>
 
 
 
+Spark 的 MetaStore 需要用 Spark 自己的 Beeline 链接，Hive 的 MetaStore 也需要用自己的 Beeline 链接。
+
 连接 Hive  
 
 ```sql
@@ -42,7 +44,11 @@ beeline -u jdbc:hive2://192.168.120.67:10000/test_cdc_hudi -n '' -p '' -e ""
 
 
 
+CDC2 Spark thriftserver 地址：192.168.120.67:10000
 
+CDC1 Hive Matestore : 192.168.120.66:9083 
+
+>   netstat -antup|grep 9083
 
 CDC 相关的配置文件在 120.66:/etc/rapids/cdc
 
@@ -102,7 +108,7 @@ https://spark.apache.org/docs/3.2.0/sql-data-sources-csv.html
 |           |      |
 | --------- | ---- |
 | delimiter | ，   |
-| escape    | 、   |
+| escape    | \    |
 | quote     | ”    |
 
 1.  根据 CSV 解析到的 元数据
@@ -111,7 +117,7 @@ https://spark.apache.org/docs/3.2.0/sql-data-sources-csv.html
 
 -   `"\""` => `"`
 
--   `"\\` => `\`
+-   `"\\"` => `\`
 
 2.  根据 元数据 生成的 CSV 数据
 

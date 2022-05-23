@@ -40,7 +40,7 @@ CTM is a tool for initialization table between different datasources . Now suppo
 
     ```properties
     cloneDatabaseName=test_cdc_hudi
-    # mysql、postgresql、hudi
+    # mysql、postgresql、util
     cloneDataType=hudi
     cloneHost=192.168.120.67
     clonePort=10000
@@ -82,7 +82,7 @@ CTM is a tool for initialization table between different datasources . Now suppo
     # CSV save to HDFS Path 
     # default: N/A (Required)
     hdfs.source.data.path=hdfs:///HudiTest/
-    # hudi table data save to HDFS Path 
+    # util table data save to HDFS Path 
     # default: N/A (Required)
     hdfs.clone.data.path=hdfs://192.168.120.55:9000/HudiTest/demo_Hudi
     # Record key field. Value to be used as the recordKey component of HoodieKey.
@@ -153,12 +153,12 @@ CTM is a tool for initialization table between different datasources . Now suppo
 
 
 -   MySQL Mapping TCM design by [Mapping in Relation](https://debezium.io/documentation/reference/1.0/connectors/mysql.html#how-the-mysql-connector-maps-data-types_cdc) or view [MysqlMappingTool.java](src/main/java/com/boraydata/tcm\mapping/MysqlMappingTool.java)
--   PgSQL Mapping TCM design by [Mapping in Relation](https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#data-types) or view [PgsqlMappingTool.java](src/main/java/com/boraydata/tcm/mapping/PgsqlMappingTool.java)
+-   PgSQL Mapping TCM design by [Mapping in Relation](https://debezium.io/documentation/reference/1.0/connectors/postgresql.html#data-types) or view [PgsqlMappingTool.java](src/main/java/com/boraydata/cdc/tcm/mapping/PgsqlMappingTool.java)
 
--   TCM Data Type view [TableCloneManageType.java](src/main/java/com/boraydata/tcm/core/TableCloneManageType.java)
+-   TCM Data Type view [TableCloneManageType.java](src/main/java/com/boraydata/cdc/tcm/core/TableCloneManageType.java)
 
 
--   TCM Databases Type view [DataTypeMapping.java](src/main/java/com/boraydata/tcm/core/DataSourceType.java)
+-   TCM Databases Type view [DataTypeMapping.java](src/main/java/com/boraydata/cdc/tcm/core/DataSourceType.java)
 
     
 
@@ -170,5 +170,5 @@ view to [TCM-Performance](OtherInformation/Data Fabric CDC Init (DB-DB) 性能�
 
 ## Other
 
--   The specific execution method can refer to [TableCloneManage.java](src/main/java/com/boraydata/tcm/DoIt.java)
+-   The specific execution method can refer to [TableCloneManage.java](src/main/java/com/boraydata/cdc/tcm/DoIt.java)
 

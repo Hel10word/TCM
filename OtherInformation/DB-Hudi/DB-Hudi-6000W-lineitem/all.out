@@ -4,7 +4,7 @@
 	port:3306
 	username:'root'
 	password:'root'
-	dataSourceType:MYSQL
+	dataSourceEnum:MYSQL
 	databasename:test_db
 	tableName:lineitem_sf10_mysql
 	url:jdbc:mysql://192.168.30.148:3306/test_db?useSSL=false
@@ -14,7 +14,7 @@
 	port:10000
 	username:''
 	password:''
-	dataSourceType:HUDI
+	dataSourceEnum:HUDI
 	databasename:test_db
 	tableName:lineitem_sf10_mysql_cow
 	url:jdbc:hive2://192.168.30.39:10000/test_db

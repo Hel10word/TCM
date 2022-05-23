@@ -34,20 +34,20 @@
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>**/*.class</include>
-                <include>log4j2.xml</include>
+                <include>log4j.properties</include>
             </includes>
         </fileSet>
-<!--        <fileSet>-->
-<!--            <directory>${project.build.directory}/</directory>-->
-<!--            <outputDirectory>/</outputDirectory>-->
-<!--            <excludes>-->
-<!--                <exclude>README*</exclude>-->
-<!--                <exclude>LICENSE*</exclude>-->
-<!--                <exclude>NOTICE*</exclude>-->
-<!--                <exclude>*.sql</exclude>-->
-<!--                <exclude>*.properties</exclude>-->
-<!--            </excludes>-->
-<!--        </fileSet>-->
+        <fileSet>
+            <directory>${project.build.directory}/</directory>
+            <outputDirectory>/</outputDirectory>
+            <excludes>
+                <exclude>README*</exclude>
+                <exclude>LICENSE*</exclude>
+                <exclude>NOTICE*</exclude>
+                <exclude>*.sql</exclude>
+                <exclude>*.properties</exclude>
+            </excludes>
+        </fileSet>
         <fileSet>
             <directory>${basedir}/libs</directory>
             <outputDirectory>/lib</outputDirectory>
