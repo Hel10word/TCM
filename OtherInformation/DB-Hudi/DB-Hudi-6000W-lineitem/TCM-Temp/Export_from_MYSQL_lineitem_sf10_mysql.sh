@@ -1,1 +1,0 @@
-mysqlsh -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "util.exportTable('lineitem_sf10_mysql','./TCM-Temp/Export_from_MYSQL_lineitem_sf10_mysql.csv',{linesTerminatedBy:'\n',fieldsTerminatedBy:'|',fieldsOptionallyEnclosed:true,fieldsEnclosedBy:'\"',fieldsEscapedBy:'\\\'})" 2>&1

@@ -1,1 +1,0 @@
-mysql -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "load data local infile './TCM-Temp/MYSQL_to_MYSQL_numeric_types_m2m_clone.csv' into table numeric_types_m2m_clone fields terminated by ',';" 2>&1

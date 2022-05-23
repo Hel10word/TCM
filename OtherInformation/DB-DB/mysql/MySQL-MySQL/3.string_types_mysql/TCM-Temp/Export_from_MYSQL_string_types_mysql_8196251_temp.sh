@@ -1,3 +1,0 @@
-mysql -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "insert into string_types_mysql_8196251_temp select mychar,myvarchar,mybinary,myvarbinary,myblob,mytext,mymediumblob,mymediumtext,mylongblob,mylongtext,myenum,myset from string_types_mysql;" 2>&1
-mysqlsh -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "util.exportTable('string_types_mysql_8196251_temp','./TCM-Temp/MYSQL_to_MYSQL_string_types_mysql_m2m.csv',{linesTerminatedBy:'\n',fieldsTerminatedBy:','})" 2>&1
-mysql -h 192.168.30.148 -P 3306 -uroot -proot --database test_db -e "drop table string_types_mysql_8196251_temp" 2>&1
