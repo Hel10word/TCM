@@ -8,31 +8,31 @@ import com.boraydata.cdc.tcm.mapping.MappingTool;
 import com.boraydata.cdc.tcm.mapping.MappingToolFactory;
 
 /**
- * Use factory mode initialization {@link TableCloneManage}
+ * Use factory mode initialization {@link TableCloneManager}
  * @author bufan
- * @data 2021/8/25
+ * @date 2021/8/25
  */
-public class TableCloneManageFactory {
-    private TableCloneManageFactory() {throw new IllegalStateException("Utility class");}
-    public static TableCloneManage createTableCloneManage(TableCloneManageContext tableCloneManageContext){
-        TableCloneManage tableCloneManage;
-        DataSourceEnum sourceType = tableCloneManageContext.getSourceConfig().getDataSourceEnum();
-        DataSourceEnum cloneType = tableCloneManageContext.getCloneConfig().getDataSourceEnum();
+public class TableCloneManagerFactory {
+    private TableCloneManagerFactory() {throw new IllegalStateException("Utility class");}
+    public static TableCloneManager createTableCloneManage(TableCloneManagerContext tableCloneManagerContext){
+        TableCloneManager tableCloneManager;
+        DataSourceEnum sourceType = tableCloneManagerContext.getSourceConfig().getDataSourceEnum();
+        DataSourceEnum cloneType = tableCloneManagerContext.getCloneConfig().getDataSourceEnum();
         if(sourceType != null && cloneType != null) {
             MappingTool sourceMappingTool = MappingToolFactory.create(sourceType);
             MappingTool cloneMappingTool = MappingToolFactory.create(cloneType);
             SyncingTool sourceCommand = SyncingToolFactory.create(sourceType);
             SyncingTool cloneCommand = SyncingToolFactory.create(cloneType);
-            tableCloneManage = new TableCloneManage(
+            tableCloneManager = new TableCloneManager(
                     sourceMappingTool,
                     cloneMappingTool,
                     sourceCommand,
                     cloneCommand,
-                    tableCloneManageContext
+                    tableCloneManagerContext
             );
         }else {
-            throw new TCMException("should write complete Config in   *.tcm.core.TableCloneManageFactory.createTableCloneManage");
+            throw new TCMException("should write complete Config in   *.tcm.core.TableCloneManagerFactory.createTableCloneManager");
         }
-        return tableCloneManage;
+        return tableCloneManager;
     }
 }

@@ -4,8 +4,8 @@ import com.boraydata.cdc.tcm.TestDataProvider;
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
 import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
+import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
 import com.boraydata.cdc.tcm.utils.FileUtil;
-import com.boraydata.cdc.tcm.core.TableCloneManageContext;
 import com.boraydata.cdc.tcm.entity.Table;
 import org.junit.jupiter.api.Test;
 import org.postgresql.copy.CopyManager;
@@ -22,7 +22,7 @@ import java.util.Properties;
 
 /**
  * @author bufan
- * @data 2022/3/30
+ * @date 2022/3/30
  */
 public class PgsqlCopyManageTest {
 
@@ -92,14 +92,15 @@ public class PgsqlCopyManageTest {
 
     @Test
     public void getSQLShellTest(){
-        TableCloneManageContext tcmc = TestDataProvider.getTCMContext(TestDataProvider.PostgreSQLConfig, TestDataProvider.PostgreSQLConfig);
+        TableCloneManagerContext tcmc = TestDataProvider.getTCMContext(TestDataProvider.PostgreSQLConfig, TestDataProvider.PostgreSQLConfig);
         Table table = TestDataProvider.getTable(DataSourceEnum.MYSQL, "lineitem_test");
         tcmc.setSourceTable(table)
 //                .setTempTable(table)
                 .setCloneTable(table)
                 .setCsvFileName("test.csv");
 
-//        tool
+        System.out.println("Export:\n"+tool.getExportInfo(tcmc)+"\n");
+        System.out.println("Load:\n"+tool.getLoadInfo(tcmc));
 
     }
 }

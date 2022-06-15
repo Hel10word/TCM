@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.boraydata.cdc</groupId>
-    <artifactId>TableCloneManage</artifactId>
+    <artifactId>TableCloneManager</artifactId>
     <version>1.1</version>
     <description>Clone table struct and sync table data,Only good at offline table data.</description>
 
@@ -30,7 +30,7 @@
                     <archive>
 <!--                        设置 jar 包指定的主类-->
                         <manifest>
-                            <mainClass>com.boraydata.cdc.tcm.TcmLog</mainClass>
+                            <mainClass>${main-class}</mainClass>
                         </manifest>
                     </archive>
 <!--                    <descriptors>-->
@@ -90,12 +90,12 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>cdc-libs/</classpathPrefix>
-                            <mainClass>com.boraydata.cdc.tcm.TableCloneManageLauncher</mainClass>
+                            <mainClass>${main-class}</mainClass>
                         </manifest>
                     </archive>
                     <includes>
                         <include>**/*.class</include>
-                        <include>log4j.properties</include>
+                        <include>${log4j-configuration-file}</include>
                     </includes>
                     <excludes>
 <!--                        <exclude>config.properties</exclude>-->
@@ -108,13 +108,26 @@
     </build>
 
     <properties>
+        <main-class>com.boraydata.cdc.tcm.TableCloneManagerLauncher</main-class>
+<!--        <main-class>com.boraydata.cdc.tcm.Test</main-class>-->
+        <log4j-configuration-file>log4j2.xml</log4j-configuration-file>
+
         <hive-jdbc-standalone.version>1.0</hive-jdbc-standalone.version>
         <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
         <postgresql.version>42.3.1</postgresql.version>
+<!--    https://docs.microsoft.com/en-us/sql/connect/jdbc/connecting-with-ssl-encryption?view=sql-server-linux-ver15    -->
+<!--        <mssql-jdbc.version>11.1.1.jre8-preview</mssql-jdbc.version>-->
+        <mssql-jdbc.version>6.4.0.jre8</mssql-jdbc.version>
 
         <jackson.version>2.13.3</jackson.version>
 
-        <org.slf4j.slf4j.log4j12.version>1.7.30</org.slf4j.slf4j.log4j12.version>
+        <!--    slf4j interface    -->
+        <slf4j-api.version>1.7.36</slf4j-api.version>
+        <!--   log4j 2 implement     -->
+        <log4j-core.version>2.17.2</log4j-core.version>
+        <log4j-impl.version>2.17.2</log4j-impl.version>
+        <!--    slf4j to log4j2    -->
+        <log4j-slf4j-impl.version>2.17.2</log4j-slf4j-impl.version>
     </properties>
 
     <dependencies>
@@ -124,12 +137,12 @@
             <groupId>com.boraydata</groupId>
             <artifactId>hive-jdbc-standalone</artifactId>
             <version>${hive-jdbc-standalone.version}</version>
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.slf4j</groupId>-->
-<!--                    <artifactId>slf4j-log4j12</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--    MySQL    -->
         <dependency>
@@ -145,6 +158,12 @@
             <version>${postgresql.version}</version>
         </dependency>
 
+        <!--    SQL Server    -->
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>${mssql-jdbc.version}</version>
+        </dependency>
 
         <!--    JSON    -->
         <dependency>
@@ -154,12 +173,45 @@
         </dependency>
 
 
-        <!--   Log4j2     -->
+        <!--   slf4j interface    -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${org.slf4j.slf4j.log4j12.version}</version>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j-api.version}</version>
         </dependency>
+        <!-- Log4j2 implement -->
+        <!-- slf4j to log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j-slf4j-impl.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j-core.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j-impl.version}</version>
+        </dependency>
+
+
+
 
         <!--    Test    -->
         <dependency>

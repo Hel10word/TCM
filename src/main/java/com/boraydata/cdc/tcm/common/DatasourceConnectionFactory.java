@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * create database connection objects
  * @author bufan
- * @data 2021/8/25
+ * @date 2021/8/25
  */
 public class DatasourceConnectionFactory {
     static Properties dscPropers;
@@ -29,6 +29,11 @@ public class DatasourceConnectionFactory {
         dscPropers.setProperty("POSTGRESQL", "jdbc:postgresql://");
         dscPropers.setProperty("POSTGRESQL_Driver", "org.postgresql.Driver");
         dscPropers.setProperty("POSTGRESQL_TAIL", "/");
+
+        dscPropers.setProperty("SQLSERVER", "jdbc:sqlserver://");
+        dscPropers.setProperty("SQLSERVER_Driver", "com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        dscPropers.setProperty("SQLSERVER_TAIL", ";");
+
         dscPropers.setProperty("VOLTDB", "jdbc:voltdb://");
         dscPropers.setProperty("VOLTDB_Driver", "org.voltdb.jdbc.Driver");
         dscPropers.setProperty("VOLTDB_TAIL", "/");
@@ -77,12 +82,20 @@ public class DatasourceConnectionFactory {
 
         // get connection databaseName
         String databaseName = databaseConfig.getDatabaseName();
-        if (databaseName != null)
-            url.append(databaseName);
-        if(DataSourceEnum.MYSQL.toString().equals(dbType))
+        if (databaseName != null) {
+            if(DataSourceEnum.SQLSERVER.toString().equals(dbType)){
+                /**
+                 * @see <a href="https://docs.microsoft.com/en-us/sql/connect/jdbc/connecting-with-ssl-encryption?view=sql-server-linux-ver15"></a>
+                 */
+//                url.append("databaseName=").append(databaseName).append(";integratedSecurity=true;encrypt=true;trustServerCertificate=true");
+                url.append("databaseName=").append(databaseName).append(";");
+            }else {
+                url.append(databaseName);
+            }
+            if (DataSourceEnum.MYSQL.toString().equals(dbType))
 //            url.append("?useSSL=false&useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT");
-            url.append("?useSSL=false&serverTimezone=UTC&allowLoadLocalInfile=true");
-
+                url.append("?useSSL=false&serverTimezone=UTC&allowLoadLocalInfile=true");
+        }
         return url.toString();
     }
 

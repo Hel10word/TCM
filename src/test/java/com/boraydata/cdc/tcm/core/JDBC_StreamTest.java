@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 /**
  * @author bufan
- * @data 2021/10/14
+ * @date 2021/10/14
  */
 public class JDBC_StreamTest {
 

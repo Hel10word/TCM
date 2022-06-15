@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * @author bufan
  * @Description
- * @data 2022/5/18
+ * @date 2022/5/18
  */
 class ConfigurationLoaderTest {
 
@@ -20,7 +20,7 @@ class ConfigurationLoaderTest {
 
     @Test
     void writeJson() throws JsonProcessingException {
-        TableCloneManageConfig tcmConfig = TestDataProvider.getTCMConfig(TestDataProvider.MySQLConfig,TestDataProvider.HudiConfig);
+        TableCloneManagerConfig tcmConfig = TestDataProvider.getTCMConfig(TestDataProvider.MySQLConfig,TestDataProvider.HudiConfig);
         tcmConfig.setSourceTableName("temple_table").setCloneTableName("temple_table");
         tcmConfig = TestDataProvider.setHudiConfig(tcmConfig,"col_varchar");
         String jsonStr = JacksonUtil.toJson(tcmConfig);
@@ -30,8 +30,8 @@ class ConfigurationLoaderTest {
 
     @Test
     void loadConfigFileTest() throws IOException {
-        TableCloneManageConfig config = ConfigurationLoader.loadConfigFile(jsonConfigPath);
-//        TableCloneManageConfig config = ConfigurationLoader.loadConfigFile(propertiesConfigPath);
+        TableCloneManagerConfig config = ConfigurationLoader.loadConfigFile(jsonConfigPath);
+//        TableCloneManagerConfig config = ConfigurationLoader.loadConfigFile(propertiesConfigPath);
         System.out.println(config);
     }
 }

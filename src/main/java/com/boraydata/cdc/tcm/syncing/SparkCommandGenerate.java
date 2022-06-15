@@ -5,7 +5,7 @@
 //
 ///**
 // * @author bufan
-// * @data 2021/10/12
+// * @date 2021/10/12
 // *
 // * Add SerDe Properties
 // * https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#:~:text=TBLPROPERTIES%20(%27comment%27%20%3D%20new_comment)%3B-,Add%20SerDe%20Properties,-ALTER%20TABLE%20table_name

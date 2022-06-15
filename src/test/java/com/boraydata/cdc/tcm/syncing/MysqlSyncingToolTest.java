@@ -3,13 +3,13 @@ package com.boraydata.cdc.tcm.syncing;
 
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.TestDataProvider;
-import com.boraydata.cdc.tcm.core.TableCloneManageContext;
+import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
 import com.boraydata.cdc.tcm.entity.Table;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author bufan
- * @data 2021/11/8
+ * @date 2021/11/8
  */
 class MysqlSyncingToolTest {
     MysqlSyncingTool tool = new MysqlSyncingTool();
@@ -19,7 +19,7 @@ class MysqlSyncingToolTest {
 
     @Test
     public void generateExportSQLByShellTest(){
-        TableCloneManageContext tcmc = TestDataProvider.getTCMContext(TestDataProvider.MySQLConfig, TestDataProvider.MySQLConfig);
+        TableCloneManagerContext tcmc = TestDataProvider.getTCMContext(TestDataProvider.MySQLConfig, TestDataProvider.MySQLConfig);
         Table table = TestDataProvider.getTable(DataSourceEnum.MYSQL, "lineitem_test");
         tcmc.setSourceTable(table)
 //                .setTempTable(table)

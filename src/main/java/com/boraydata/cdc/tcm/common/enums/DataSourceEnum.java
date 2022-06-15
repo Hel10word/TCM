@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * because the name is used to get the content protocol in {@link com.boraydata.cdc.tcm.common.DatasourceConnectionFactory} #dscPropers
  * e.g.{ORACLE DB2 MYSQL POSTGRESQL VOLTDB GREENPLUM MEMSQL RDP HIVE}
  * @author bufan
- * @data 2021/8/24
+ * @date 2021/8/24
  */
 public enum DataSourceEnum {
 
@@ -22,13 +22,14 @@ public enum DataSourceEnum {
             MySQLContent.UDT_TYPE,
             MySQLContent.ORDINAL_POSITION,
             MySQLContent.IS_NULLABLE,
-            MySQLContent.CHAR_MAX_LENGTH,
-            MySQLContent.NUMERIC_PRECISION_M,
-            MySQLContent.NUMERIC_PRECISION_D,
+            MySQLContent.CHARACTER_MAXIMUM_LENGTH,
+            MySQLContent.NUMERIC_PRECISION,
+            MySQLContent.NUMERIC_SCALE,
             MySQLContent.DATETIME_PRECISION,
             MySQLContent.SQL_TABLE_INFO_BY_TABLE_NAME,
             MySQLContent.SQL_TABLE_INFO_BY_CATALOG,
-            MySQLContent.SQL_ALL_TABLE_INFO
+            MySQLContent.SQL_ALL_TABLE_INFO,
+            MySQLContent.SQL_GET_PRIMARY_KEYS
             ),
         POSTGRESQL(
             PostgreSQLContent.TABLE_CATALOG,
@@ -39,15 +40,35 @@ public enum DataSourceEnum {
             PostgreSQLContent.UDT_TYPE,
             PostgreSQLContent.ORDINAL_POSITION,
             PostgreSQLContent.IS_NULLABLE,
-            PostgreSQLContent.CHAR_MAX_LENGTH,
-            PostgreSQLContent.NUMERIC_PRECISION_M,
-            PostgreSQLContent.NUMERIC_PRECISION_D,
+            PostgreSQLContent.CHARACTER_MAXIMUM_LENGTH,
+            PostgreSQLContent.NUMERIC_PRECISION,
+            PostgreSQLContent.NUMERIC_SCALE,
             PostgreSQLContent.DATETIME_PRECISION,
             PostgreSQLContent.SQL_TABLE_INFO_BY_TABLE_NAME,
             PostgreSQLContent.SQL_TABLE_INFO_BY_CATALOG,
-            PostgreSQLContent.SQL_ALL_TABLE_INFO
+            PostgreSQLContent.SQL_ALL_TABLE_INFO,
+            PostgreSQLContent.SQL_GET_PRIMARY_KEYS
             ),
+        SQLSERVER(
+                SQLServerContent.TABLE_CATALOG,
+                SQLServerContent.TABLE_SCHEMA,
+                SQLServerContent.TABLE_NAME,
+                SQLServerContent.COLUMN_NAME,
+                SQLServerContent.DATA_TYPE,
+                SQLServerContent.UDT_TYPE,
+                SQLServerContent.ORDINAL_POSITION,
+                SQLServerContent.IS_NULLABLE,
+                SQLServerContent.CHARACTER_MAXIMUM_LENGTH,
+                SQLServerContent.NUMERIC_PRECISION,
+                SQLServerContent.NUMERIC_SCALE,
+                SQLServerContent.DATETIME_PRECISION,
+                SQLServerContent.SQL_TABLE_INFO_BY_TABLE_NAME,
+                SQLServerContent.SQL_TABLE_INFO_BY_CATALOG,
+                SQLServerContent.SQL_ALL_TABLE_INFO,
+                SQLServerContent.SQL_GET_PRIMARY_KEYS
+        ),
         HUDI(
+            null,
             null,
             null,
             null,
@@ -76,6 +97,8 @@ public enum DataSourceEnum {
             return DataSourceEnum.MYSQL;
         else if(value.equals(DataSourceEnum.POSTGRESQL.toString()) || value.equalsIgnoreCase("postgresql"))
             return DataSourceEnum.POSTGRESQL;
+        else if(value.equals(DataSourceEnum.POSTGRESQL.toString()) || value.equalsIgnoreCase("sqlserver"))
+            return DataSourceEnum.SQLSERVER;
         else if(value.equals(DataSourceEnum.HUDI.toString()) || value.equalsIgnoreCase("hudi"))
             return DataSourceEnum.HUDI;
         throw new TCMException("Failed to get DataSourceEnum, you must fill in the correct , are not '"+value+'\'');
@@ -98,14 +121,16 @@ public enum DataSourceEnum {
     public final String UdtType;
     public final String OrdinalPosition;
     public final String IsNullAble;
-    public final String CharMaxLength;
-    public final String NumericPrecisionM;
-    public final String NumericPrecisionD;
+    public final String CharacterMaximumLength;
+    public final String NumericPrecision;
+    public final String NumericScale;
     public final String DatetimePrecision;
 //    public final String ColumnComment;
     public final String SQL_TableInfoByTableName;
     public final String SQL_TableInfoByCatalog;
     public final String SQL_AllTableInfo;
+    public final String SQL_GetPrimaryKeys;
+
 
     DataSourceEnum(String TableCatalog,
                    String TableSchema,
@@ -115,14 +140,15 @@ public enum DataSourceEnum {
                    String UdtType,
                    String OrdinalPosition,
                    String IsNullAble,
-                   String CharMaxLength,
-                   String NumericPrecisionM,
-                   String NumericPrecisionD,
+                   String CharacterMaximumLength,
+                   String NumericPrecision,
+                   String NumericScale,
                    String DatetimePrecision,
 //                   String ColumnComment,
                    String SQL_TableInfoByTableName,
                    String SQL_TableInfoByCatalog,
-                   String SQL_AllTableInfo){
+                   String SQL_AllTableInfo,
+                   String SQL_GetPrimaryKeys){
         this.TableCatalog = TableCatalog;
         this.TableSchema = TableSchema;
         this.TableName = TableName;
@@ -131,14 +157,15 @@ public enum DataSourceEnum {
         this.UdtType = UdtType;
         this.OrdinalPosition = OrdinalPosition;
         this.IsNullAble = IsNullAble;
-        this.CharMaxLength = CharMaxLength;
-        this.NumericPrecisionM = NumericPrecisionM;
-        this.NumericPrecisionD = NumericPrecisionD;
+        this.CharacterMaximumLength = CharacterMaximumLength;
+        this.NumericPrecision = NumericPrecision;
+        this.NumericScale = NumericScale;
         this.DatetimePrecision = DatetimePrecision;
 //        this.ColumnComment = ColumnComment;
         this.SQL_TableInfoByTableName = SQL_TableInfoByTableName;
         this.SQL_TableInfoByCatalog = SQL_TableInfoByCatalog;
         this.SQL_AllTableInfo = SQL_AllTableInfo;
+        this.SQL_GetPrimaryKeys = SQL_GetPrimaryKeys;
     }
 
 
@@ -159,23 +186,23 @@ public enum DataSourceEnum {
         private static final String UDT_TYPE = "DATA_TYPE";
         private static final String ORDINAL_POSITION = "ORDINAL_POSITION";
         private static final String IS_NULLABLE = "IS_NULLABLE";
-        private static final String CHAR_MAX_LENGTH = "CHARACTER_MAXIMUM_LENGTH";
-        private static final String NUMERIC_PRECISION_M = "NUMERIC_PRECISION";
-        private static final String NUMERIC_PRECISION_D = "NUMERIC_SCALE";
+        private static final String CHARACTER_MAXIMUM_LENGTH = "CHARACTER_MAXIMUM_LENGTH";
+        private static final String NUMERIC_PRECISION = "NUMERIC_PRECISION";
+        private static final String NUMERIC_SCALE = "NUMERIC_SCALE";
         private static final String DATETIME_PRECISION = "DATETIME_PRECISION";
         private static final String COLUMN_COMMENT = "COLUMN_COMMENT";
         private static final String SELECT_TABLE_COLUMN =
-                "select "+TABLE_CATALOG+","+TABLE_SCHEMA+","+TABLE_NAME+","+COLUMN_NAME+","+DATA_TYPE+","+UDT_TYPE+","+ORDINAL_POSITION+","+IS_NULLABLE+","+CHAR_MAX_LENGTH+","+NUMERIC_PRECISION_M+","+NUMERIC_PRECISION_D+","+DATETIME_PRECISION;
+                "select "+TABLE_CATALOG+","+TABLE_SCHEMA+","+TABLE_NAME+","+COLUMN_NAME+","+DATA_TYPE+","+UDT_TYPE+","+ORDINAL_POSITION+","+IS_NULLABLE+","+ CHARACTER_MAXIMUM_LENGTH +","+ NUMERIC_PRECISION +","+ NUMERIC_SCALE +","+DATETIME_PRECISION;
 //                " select TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,ORDINAL_POSITION,IS_NULLABLE, NUMERIC_PRECISION, NUMERIC_SCALE,CHARACTER_SET_NAME, COLLATION_NAME ";
         private static final String SELECT_TABLE_FROM = " from information_schema.COLUMNS ";
         private static final String WHERE = " where ";
         private static final String AND = " and ";
         // because mysql only have doubly structures,all catalog is 'def'   e.g: def.testDB.testTable
-        private static final String WHERE_TABLE_CATALOG = " TABLE_SCHEMA in (?) ";
-        private static final String WHERE_TABLE_NAME = " TABLE_NAME in (?) ";
+        private static final String WHERE_TABLE_CATALOG = " "+TABLE_SCHEMA+" in (?) ";
+        private static final String WHERE_TABLE_NAME = " "+TABLE_NAME+" in (?) ";
         private static final String WHERE_ALL_TABLE =
-                " TABLE_SCHEMA not in ('INFORMATION_SCHEMA','SYS','PERFORMANCE_SCHEMA','MYSQL') ";
-        private static final String ORDER_BY = " ORDER BY TABLE_NAME,ORDINAL_POSITION ";
+                " "+TABLE_SCHEMA+" not in ('INFORMATION_SCHEMA','SYS','PERFORMANCE_SCHEMA','MYSQL') ";
+        private static final String ORDER_BY = " ORDER BY "+TABLE_NAME+","+ORDINAL_POSITION+" ";
 
      private static final String SQL_TABLE_INFO_BY_TABLE_NAME =
              SELECT_TABLE_COLUMN+
@@ -192,6 +219,17 @@ public enum DataSourceEnum {
                      SELECT_TABLE_FROM+
                      WHERE+WHERE_ALL_TABLE+
                      ORDER_BY+";";
+
+     private static final String SQL_GET_PRIMARY_KEYS =
+             "SELECT k.COLUMN_NAME as "+COLUMN_NAME+" ,k.ORDINAL_POSITION\n" +
+                     "FROM information_schema.table_constraints t\n" +
+                     "JOIN information_schema.key_column_usage k\n" +
+                     "USING(constraint_name,table_schema,table_name)\n" +
+                     "WHERE t.constraint_type='PRIMARY KEY'\n" +
+                     "  AND t.CONSTRAINT_CATALOG = ?\n" +
+                     "  AND t.table_schema = ?\n" +
+                     "  AND t.table_name = ?\n" +
+                     " order by k.ORDINAL_POSITION ;";
     }
 
     /**
@@ -208,22 +246,22 @@ public enum DataSourceEnum {
         private static final String UDT_TYPE = "udt_name";
         private static final String ORDINAL_POSITION = "ordinal_position";
         private static final String IS_NULLABLE = "is_nullable";
-        private static final String CHAR_MAX_LENGTH = "character_maximum_length";
-        private static final String NUMERIC_PRECISION_M = "numeric_precision";
-        private static final String NUMERIC_PRECISION_D = "numeric_scale";
+        private static final String CHARACTER_MAXIMUM_LENGTH = "character_maximum_length";
+        private static final String NUMERIC_PRECISION = "numeric_precision";
+        private static final String NUMERIC_SCALE = "numeric_scale";
         private static final String DATETIME_PRECISION = "datetime_precision";
 //        private static final String COLUMN_COMMENT = "COLUMN_COMMENT";
         private static final String SELECT_TABLE_COLUMN =
-                "select "+TABLE_CATALOG+","+TABLE_SCHEMA+","+TABLE_NAME+","+COLUMN_NAME+","+DATA_TYPE+","+UDT_TYPE+","+ORDINAL_POSITION+","+IS_NULLABLE+","+CHAR_MAX_LENGTH+","+NUMERIC_PRECISION_M+","+NUMERIC_PRECISION_D+","+DATETIME_PRECISION;
+                "select "+TABLE_CATALOG+","+TABLE_SCHEMA+","+TABLE_NAME+","+COLUMN_NAME+","+DATA_TYPE+","+UDT_TYPE+","+ORDINAL_POSITION+","+IS_NULLABLE+","+ CHARACTER_MAXIMUM_LENGTH +","+ NUMERIC_PRECISION +","+ NUMERIC_SCALE +","+DATETIME_PRECISION;
 //                " select table_catalog,table_schema,table_name,column_name,data_type,ordinal_position,is_nullable,numeric_precision,numeric_precision_radix,numeric_scale,character_set_name,collation_name ";
         private static final String SELECT_TABLE_FROM = " from information_schema.columns ";
         private static final String WHERE = " where ";
         private static final String AND = " and ";
-        private static final String WHERE_TABLE_CATALOG = " table_catalog in  (?) ";
-        private static final String WHERE_TABLE_NAME = " table_name in (?) ";
+        private static final String WHERE_TABLE_CATALOG = " "+TABLE_CATALOG+" in  (?) ";
+        private static final String WHERE_TABLE_NAME = " "+TABLE_NAME+" in (?) ";
         private static final String WHERE_ALL_TABLE =
-                " table_catalog not in  ('information_schema','pg_catalog','pg_toast_temp_1','pg_temp_1','pg_toast') ";
-        private static final String ORDER_BY = " ORDER BY table_name,ordinal_position ";
+                " "+TABLE_CATALOG+" not in  ('information_schema','pg_catalog','pg_toast_temp_1','pg_temp_1','pg_toast') ";
+        private static final String ORDER_BY = " ORDER BY "+TABLE_NAME+","+ORDINAL_POSITION+" ";
 
         private static final String SQL_TABLE_INFO_BY_TABLE_NAME =
                 SELECT_TABLE_COLUMN+
@@ -240,6 +278,76 @@ public enum DataSourceEnum {
                         SELECT_TABLE_FROM+
                         WHERE+WHERE_ALL_TABLE+
                         ORDER_BY+";";
+
+        private static final String SQL_GET_PRIMARY_KEYS =
+                "with pg_pk as (\n" +
+                "    select conrelid,conname,pg_get_constraintdef(oid) as constraintdef,unnest(conkey) as pk_order\n" +
+                "        FROM pg_constraint\n" +
+                "    where\n" +
+                "        conrelid = ?::regclass \n" +
+                ")\n" +
+                "select pg_pk.conrelid,pg_pk.conname,constraintdef,a.attname as "+COLUMN_NAME+",a.attnum \n" +
+                "    from pg_pk \n" +
+                "    left join pg_attribute a on a.attrelid = pg_pk.conrelid and a.attnum = pg_pk.pk_order";
+    }
+
+    /**
+     * @author: bufan
+     * @see <a href="https://docs.microsoft.com/en-us/sql/relational-databases/system-information-schema-views/columns-transact-sql?view=sql-server-linux-ver15"></a>
+     */
+    private static class SQLServerContent {
+        private static final String TABLE_CATALOG = "TABLE_CATALOG";
+        private static final String TABLE_SCHEMA = "TABLE_SCHEMA";
+        private static final String TABLE_NAME = "TABLE_NAME";
+        private static final String COLUMN_NAME = "COLUMN_NAME";
+        private static final String DATA_TYPE = "DATA_TYPE";
+        private static final String UDT_TYPE = "DATA_TYPE";
+        private static final String ORDINAL_POSITION = "ORDINAL_POSITION";
+        private static final String IS_NULLABLE = "IS_NULLABLE";
+        private static final String CHARACTER_MAXIMUM_LENGTH = "CHARACTER_MAXIMUM_LENGTH";
+        private static final String NUMERIC_PRECISION = "NUMERIC_PRECISION";
+        private static final String NUMERIC_SCALE = "NUMERIC_SCALE";
+        private static final String DATETIME_PRECISION = "DATETIME_PRECISION";
+        //        private static final String COLUMN_COMMENT = "COLUMN_COMMENT";
+        private static final String SELECT_TABLE_COLUMN =
+                "select "+TABLE_CATALOG+","+TABLE_SCHEMA+","+TABLE_NAME+","+COLUMN_NAME+","+DATA_TYPE+","+UDT_TYPE+","+ORDINAL_POSITION+","+IS_NULLABLE+","+CHARACTER_MAXIMUM_LENGTH+","+NUMERIC_PRECISION+","+NUMERIC_SCALE+","+DATETIME_PRECISION;
+        //                " select table_catalog,table_schema,table_name,column_name,data_type,ordinal_position,is_nullable,numeric_precision,numeric_precision_radix,numeric_scale,character_set_name,collation_name ";
+        private static final String SELECT_TABLE_FROM = " from INFORMATION_SCHEMA.COLUMNS ";
+        private static final String WHERE = " where ";
+        private static final String AND = " and ";
+        private static final String WHERE_TABLE_CATALOG = " "+TABLE_CATALOG+" in  (?) ";
+        private static final String WHERE_TABLE_NAME = " "+TABLE_NAME+" in (?) ";
+        private static final String WHERE_ALL_TABLE =
+                " "+TABLE_CATALOG+" not in  ('INFORMATION_SCHEMA','db_owner','db_accessadmin','db_securityadmin','db_ddladmin','db_backupoperator','db_datareader','db_datawriter','db_denydatareader','db_denydatawriter') ";
+        private static final String ORDER_BY = " ORDER BY "+TABLE_NAME+","+ORDINAL_POSITION+" ";
+
+        private static final String SQL_TABLE_INFO_BY_TABLE_NAME =
+                SELECT_TABLE_COLUMN+
+                        SELECT_TABLE_FROM+
+                        WHERE+WHERE_TABLE_NAME+
+                        ORDER_BY+";";
+        private static final String SQL_TABLE_INFO_BY_CATALOG =
+                SELECT_TABLE_COLUMN+
+                        SELECT_TABLE_FROM+
+                        WHERE+WHERE_TABLE_CATALOG+
+                        ORDER_BY+";";
+        private static final String SQL_ALL_TABLE_INFO =
+                SELECT_TABLE_COLUMN+
+                        SELECT_TABLE_FROM+
+                        WHERE+WHERE_ALL_TABLE+
+                        ORDER_BY+";";
+
+        private static final String SQL_GET_PRIMARY_KEYS =
+                "SELECT column_name as "+COLUMN_NAME+",KU.ORDINAL_POSITION\n" +
+                "FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC\n" +
+                "INNER JOIN\n" +
+                "    INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KU\n" +
+                "          ON TC.CONSTRAINT_TYPE = 'PRIMARY KEY' AND\n" +
+                "             TC.CONSTRAINT_NAME = KU.CONSTRAINT_NAME AND \n" +
+                "             KU.CONSTRAINT_CATALOG = ? AND \n" +
+                "             KU.CONSTRAINT_SCHEMA  = ? AND \n" +
+                "             KU.table_name = ?\n" +
+                "ORDER BY KU.ORDINAL_POSITION,KU.TABLE_NAME;";
     }
 
 }

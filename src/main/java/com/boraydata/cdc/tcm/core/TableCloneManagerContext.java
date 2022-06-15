@@ -1,19 +1,19 @@
 package com.boraydata.cdc.tcm.core;
 
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
-import com.boraydata.cdc.tcm.common.TableCloneManageConfig;
+import com.boraydata.cdc.tcm.common.TableCloneManagerConfig;
 import com.boraydata.cdc.tcm.entity.Table;
 
 /**
- * Record the context information of {@link TableCloneManage}
+ * Record the context information of {@link TableCloneManager}
  * @author bufan
- * @data 2021/8/25
+ * @date 2021/8/25
  */
-public class TableCloneManageContext {
+public class TableCloneManagerContext {
 
     private DatabaseConfig sourceConfig;
     private DatabaseConfig cloneConfig;
-    private TableCloneManageConfig tcmConfig;
+    private TableCloneManagerConfig tcmConfig;
 
     private Table sourceTable;
     private Table tempTable;
@@ -35,7 +35,7 @@ public class TableCloneManageContext {
     private String loadShellContent;
     private String loadDataInHudiScalaScriptContent;
 
-    private TableCloneManageContext(Builder builder){
+    private TableCloneManagerContext(Builder builder){
         this.sourceConfig = builder.sourceConfig;
         this.cloneConfig = builder.cloneConfig;
         this.tcmConfig = builder.tcmConfig;
@@ -51,7 +51,7 @@ public class TableCloneManageContext {
         return cloneConfig;
     }
 
-    public TableCloneManageConfig getTcmConfig() {
+    public TableCloneManagerConfig getTcmConfig() {
         return tcmConfig;
     }
 
@@ -59,7 +59,7 @@ public class TableCloneManageContext {
         return sourceTable;
     }
 
-    public TableCloneManageContext setSourceTable(Table sourceTable) {
+    public TableCloneManagerContext setSourceTable(Table sourceTable) {
         this.sourceTable = sourceTable;
         return this;
     }
@@ -68,7 +68,7 @@ public class TableCloneManageContext {
         return tempTable;
     }
 
-    public TableCloneManageContext setTempTable(Table tempTable) {
+    public TableCloneManagerContext setTempTable(Table tempTable) {
         this.tempTable = tempTable;
         return this;
     }
@@ -77,7 +77,7 @@ public class TableCloneManageContext {
         return cloneTable;
     }
 
-    public TableCloneManageContext setCloneTable(Table cloneTable) {
+    public TableCloneManagerContext setCloneTable(Table cloneTable) {
         this.cloneTable = cloneTable;
         return this;
     }
@@ -86,7 +86,7 @@ public class TableCloneManageContext {
         return tempTableCreateSQL;
     }
 
-    public TableCloneManageContext setTempTableCreateSQL(String tempTableCreateSQL) {
+    public TableCloneManagerContext setTempTableCreateSQL(String tempTableCreateSQL) {
         this.tempTableCreateSQL = tempTableCreateSQL;
         return this;
     }
@@ -95,7 +95,7 @@ public class TableCloneManageContext {
         return tempTableSelectSQL;
     }
 
-    public TableCloneManageContext setTempTableSelectSQL(String tempTableSelectSQL) {
+    public TableCloneManagerContext setTempTableSelectSQL(String tempTableSelectSQL) {
         this.tempTableSelectSQL = tempTableSelectSQL;
         return this;
     }
@@ -104,7 +104,7 @@ public class TableCloneManageContext {
         return sourceTableSQLFileName;
     }
 
-    public TableCloneManageContext setSourceTableSQLFileName(String sourceTableSQLFileName) {
+    public TableCloneManagerContext setSourceTableSQLFileName(String sourceTableSQLFileName) {
         this.sourceTableSQLFileName = sourceTableSQLFileName;
         return this;
     }
@@ -113,7 +113,7 @@ public class TableCloneManageContext {
         return cloneTableSQLFileName;
     }
 
-    public TableCloneManageContext setCloneTableSQLFileName(String cloneTableSQLFileName) {
+    public TableCloneManagerContext setCloneTableSQLFileName(String cloneTableSQLFileName) {
         this.cloneTableSQLFileName = cloneTableSQLFileName;
         return this;
     }
@@ -122,7 +122,7 @@ public class TableCloneManageContext {
         return csvFileName;
     }
 
-    public TableCloneManageContext setCsvFileName(String csvFileName) {
+    public TableCloneManagerContext setCsvFileName(String csvFileName) {
         this.csvFileName = csvFileName;
         return this;
     }
@@ -131,7 +131,7 @@ public class TableCloneManageContext {
         return exportShellName;
     }
 
-    public TableCloneManageContext setExportShellName(String exportShellName) {
+    public TableCloneManagerContext setExportShellName(String exportShellName) {
         this.exportShellName = exportShellName;
         return this;
     }
@@ -140,7 +140,7 @@ public class TableCloneManageContext {
         return loadShellName;
     }
 
-    public TableCloneManageContext setLoadShellName(String loadShellName) {
+    public TableCloneManagerContext setLoadShellName(String loadShellName) {
         this.loadShellName = loadShellName;
         return this;
     }
@@ -149,7 +149,7 @@ public class TableCloneManageContext {
         return loadDataInHudiScalaScriptName;
     }
 
-    public TableCloneManageContext setLoadDataInHudiScalaScriptName(String loadDataInHudiScalaScriptName) {
+    public TableCloneManagerContext setLoadDataInHudiScalaScriptName(String loadDataInHudiScalaScriptName) {
         this.loadDataInHudiScalaScriptName = loadDataInHudiScalaScriptName;
         return this;
     }
@@ -162,7 +162,7 @@ public class TableCloneManageContext {
         return sourceTableSQL;
     }
 
-    public TableCloneManageContext setSourceTableSQL(String sourceTableSQL) {
+    public TableCloneManagerContext setSourceTableSQL(String sourceTableSQL) {
         this.sourceTableSQL = sourceTableSQL;
         return this;
     }
@@ -171,7 +171,7 @@ public class TableCloneManageContext {
         return cloneTableSQL;
     }
 
-    public TableCloneManageContext setCloneTableSQL(String cloneTableSQL) {
+    public TableCloneManagerContext setCloneTableSQL(String cloneTableSQL) {
         this.cloneTableSQL = cloneTableSQL;
         return this;
     }
@@ -180,7 +180,7 @@ public class TableCloneManageContext {
         return exportShellContent;
     }
 
-    public TableCloneManageContext setExportShellContent(String exportShellContent) {
+    public TableCloneManagerContext setExportShellContent(String exportShellContent) {
         this.exportShellContent = exportShellContent;
         return this;
     }
@@ -189,7 +189,7 @@ public class TableCloneManageContext {
         return loadShellContent;
     }
 
-    public TableCloneManageContext setLoadShellContent(String loadShellContent) {
+    public TableCloneManagerContext setLoadShellContent(String loadShellContent) {
         this.loadShellContent = loadShellContent;
         return this;
     }
@@ -198,7 +198,7 @@ public class TableCloneManageContext {
         return loadDataInHudiScalaScriptContent;
     }
 
-    public TableCloneManageContext setLoadDataInHudiScalaScriptContent(String loadDataInHudiScalaScriptContent) {
+    public TableCloneManagerContext setLoadDataInHudiScalaScriptContent(String loadDataInHudiScalaScriptContent) {
         this.loadDataInHudiScalaScriptContent = loadDataInHudiScalaScriptContent;
         return this;
     }
@@ -206,7 +206,7 @@ public class TableCloneManageContext {
     public static class Builder{
         private DatabaseConfig sourceConfig;
         private DatabaseConfig cloneConfig;
-        private TableCloneManageConfig tcmConfig;
+        private TableCloneManagerConfig tcmConfig;
 
         public Builder() {
         }
@@ -221,15 +221,15 @@ public class TableCloneManageContext {
             return this;
         }
 
-        public Builder setTcmConfig(TableCloneManageConfig tcmConfig) {
+        public Builder setTcmConfig(TableCloneManagerConfig tcmConfig) {
             this.tcmConfig = tcmConfig;
             this.setSourceConfig(tcmConfig.getSourceConfig());
             this.setCloneConfig(tcmConfig.getCloneConfig());
             return this;
         }
 
-        public TableCloneManageContext create() {
-            return new TableCloneManageContext(this);
+        public TableCloneManagerContext create() {
+            return new TableCloneManagerContext(this);
         }
     }
 

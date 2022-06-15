@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 /**
  * @author bufan
- * @data 2021/9/1
+ * @date 2021/9/1
  */
 class StringUtilTest {
 

@@ -1,11 +1,11 @@
 package com.boraydata.cdc.tcm;
 
 import com.boraydata.cdc.tcm.common.ConfigurationLoader;
-import com.boraydata.cdc.tcm.common.TableCloneManageConfig;
-import com.boraydata.cdc.tcm.core.TableCloneManage;
-import com.boraydata.cdc.tcm.core.TableCloneManageFactory;
+import com.boraydata.cdc.tcm.common.TableCloneManagerConfig;
+import com.boraydata.cdc.tcm.core.TableCloneManager;
+import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
+import com.boraydata.cdc.tcm.core.TableCloneManagerFactory;
 import com.boraydata.cdc.tcm.exception.TCMException;
-import com.boraydata.cdc.tcm.core.TableCloneManageContext;
 import com.boraydata.cdc.tcm.entity.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +13,15 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Objects;
 
-/** TCM - Table Clone Manage and Table Data Sync
+/** TCM - Table Clone Manager and Table Data Sync
  * @author bufan
- * @data 2021/9/28
+ * @date 2021/9/28
  */
-public class TableCloneManageLauncher {
+public class TableCloneManagerLauncher {
 
     public static void main(String[] args)  {
 
-        Logger logger = LoggerFactory.getLogger(TableCloneManageLauncher.class);
+        Logger logger = LoggerFactory.getLogger(TableCloneManagerLauncher.class);
         Boolean deleteFlag;
         Boolean debugFlag;
         String sourceTableName;
@@ -29,7 +29,7 @@ public class TableCloneManageLauncher {
         String sourceDataType;
         String cloneDataType;
 
-        TableCloneManageConfig config;
+        TableCloneManagerConfig config;
         long start = 0;
         long end = 0;
         long all = 0;
@@ -58,13 +58,13 @@ public class TableCloneManageLauncher {
                         "\n================================== Clone Config Info ==================================\n" +
                     "{}\n",config.getSourceConfig().outInfo(),config.getCloneConfig().outInfo());
 
-//====================== 2. Create TableCloneManageContext, pass the read information to context
-        TableCloneManageContext tcmContext = new TableCloneManageContext.Builder()
+//====================== 2. Create TableCloneManagerContext, pass the read information to context
+        TableCloneManagerContext tcmContext = new TableCloneManagerContext.Builder()
                 .setTcmConfig(config)
                 .create();
 
 //====================== 3、 use Context create TCM
-        TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmContext);
+        TableCloneManager tcm = TableCloneManagerFactory.createTableCloneManage(tcmContext);
 
 
 

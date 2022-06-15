@@ -6,7 +6,7 @@ import java.io.File;
 
 /**
  * @author bufan
- * @data 2021/11/9
+ * @date 2021/11/9
  */
 public class FilePathTest {
     @Test

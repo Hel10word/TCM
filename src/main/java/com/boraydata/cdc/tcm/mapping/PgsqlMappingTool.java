@@ -7,10 +7,7 @@ import com.boraydata.cdc.tcm.exception.TCMException;
 import com.boraydata.cdc.tcm.utils.StringUtil;
 import com.boraydata.cdc.tcm.entity.Table;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * deal with the mapping relationship between PostgreSQL Type and TCM Type
@@ -20,11 +17,11 @@ import java.util.Objects;
  * All Data Type from official document:
  * @see <a href="https://www.postgresql.org/docs/13/datatype.html">PostgreSQL 13 Data Type</a>
  * @author bufan
- * @data 2021/9/1
+ * @date 2021/9/1
  */
 public class PgsqlMappingTool implements MappingTool {
 
-    private static final Map<String, TCMDataTypeEnum> mappingMap = new HashMap<>();
+    private static final Map<String, TCMDataTypeEnum> mappingMap = new LinkedHashMap<>();
     static {
         /**
          * @see <a href="https://www.postgresql.org/docs/13/datatype-numeric.html">datatype-numeric</a>
@@ -181,11 +178,6 @@ public class PgsqlMappingTool implements MappingTool {
     }
 
 
-    /**
-     * To look up mapping relation between {@link TCMDataTypeEnum} and OriginalDataType by the ‘mappingMap’
-     * @Param null : table={...,..,..,columns={...,...,...,DataType=integer,dataTypeMapping=null}}
-     * @Return: null : table={...,..,..,columns={...,...,...,DataType=integer,dataTypeMapping=INT32}}
-     */
     @Override
     public Table createSourceMappingTable(Table table) {
         if(table.getColumns() == null || table.getColumns().isEmpty())
@@ -200,9 +192,9 @@ public class PgsqlMappingTool implements MappingTool {
             }
             String colDataType = StringUtil.dataTypeFormat(column.getDataType());
             if("MONEY".equalsIgnoreCase(colDataType))
-                column.setNumericPrecision(65).setNumericScale(2);
-            if("BOOLEAN".equalsIgnoreCase(colDataType))
-                column.setCharacterMaximumPosition(1L);
+                column.setNumericPrecision(1000).setNumericScale(2);
+//            if("BOOLEAN".equalsIgnoreCase(colDataType))
+//                column.setCharacterMaximumPosition(1L);
             if("INTERVAL".equalsIgnoreCase(colDataType))
                 column.setCharacterMaximumPosition(255L);
             if("UUID".equalsIgnoreCase(colDataType))
@@ -219,11 +211,6 @@ public class PgsqlMappingTool implements MappingTool {
     }
 
 
-    /**
-     * return a clone table,and set DataType by {@link TCMDataTypeEnum}
-     * @Param null :    table={...,MYSQL,..,columns={...,...,col_int,DataType=mediumint,dataTypeMapping=INT32}}
-     * @Return: null :  table={...,POSTGRESQL,..,columns={null,null,col_int,DataType=INT,dataTypeMapping=INT32}}
-     */
     @Override
     public Table createCloneMappingTable(Table table) {
         Table cloneTable = table.clone();
@@ -272,30 +259,42 @@ public class PgsqlMappingTool implements MappingTool {
             stringBuilder.append("\"").append(column.getColumnName()).append("\" ").append(dataType);
 
 
-            if(
-                    TCMDataTypeEnum.STRING.equals(tcmDataTypeEnum)
-            ){
+            if(TCMDataTypeEnum.STRING.equals(tcmDataTypeEnum)){
                 Long characterMaximumPosition = column.getCharacterMaximumPosition();
-                if(characterMaximumPosition != null && characterMaximumPosition != 0)
-                    stringBuilder.append("(").append(characterMaximumPosition).append(")");
+                if(characterMaximumPosition != null && characterMaximumPosition != 0) {
+                    if (0 <= characterMaximumPosition && characterMaximumPosition <= 10485760)
+                        stringBuilder.append("(").append(characterMaximumPosition).append(")");
+                    else
+                        stringBuilder.append("(10485760)");
+                }
             } else if(
                     TCMDataTypeEnum.TIME.equals(tcmDataTypeEnum) ||
                     TCMDataTypeEnum.TIMESTAMP.equals(tcmDataTypeEnum)
             ){
                 Integer datetimePrecision = column.getDatetimePrecision();
-                if(datetimePrecision != null && datetimePrecision != 0)
-                    stringBuilder.append("(").append(datetimePrecision).append(")");
-            } else if(
-                    TCMDataTypeEnum.FLOAT32.equals(tcmDataTypeEnum) ||
-                    TCMDataTypeEnum.FLOAT64.equals(tcmDataTypeEnum) ||
-                    TCMDataTypeEnum.DECIMAL.equals(tcmDataTypeEnum)
-            ){
+                if(datetimePrecision != null && datetimePrecision != 0) {
+                    if(0 < datetimePrecision && datetimePrecision <= 6)
+                        stringBuilder.append("(").append(datetimePrecision).append(")");
+                    else
+                        stringBuilder.append("(6)");
+                    stringBuilder.append(" with time zone ");
+                }
+            } else if(TCMDataTypeEnum.DECIMAL.equals(tcmDataTypeEnum)){
                 Integer precision = column.getNumericPrecision();
                 Integer scale = column.getNumericScale();
                 if(precision != null && precision != 0){
-                    stringBuilder.append("(").append(precision);
-                    if(scale != null && scale != 0)
-                        stringBuilder.append(",").append(scale);
+                    if(1 <= precision && precision <= 1000)
+                        stringBuilder.append("(").append(precision);
+                    else {
+                        precision = 1000;
+                        stringBuilder.append("(1000");
+                    }
+                    if(scale != null && scale != 0){
+                        if( 0 <= scale && scale <= precision)
+                            stringBuilder.append(",").append(scale);
+                        else
+                            stringBuilder.append(",").append(precision);
+                    }
                     stringBuilder.append(")");
                 }
             }else {
@@ -305,6 +304,10 @@ public class PgsqlMappingTool implements MappingTool {
                 stringBuilder.append(" not NULL");
             stringBuilder.append("\n,");
         }
+        List<String> primaryKeys = table.getPrimaryKeys();
+        if(Objects.nonNull(primaryKeys) && Boolean.FALSE.equals(primaryKeys.isEmpty()))
+            stringBuilder.append("PRIMARY KEY(").append(String.join(",", primaryKeys)).append(")\n,");
+
         stringBuilder.deleteCharAt(stringBuilder.length()-1);
         stringBuilder.append(");");
         return stringBuilder.toString();

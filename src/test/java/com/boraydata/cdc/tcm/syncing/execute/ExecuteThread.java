@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 /**
  * @author bufan
- * @data 2022/3/15
+ * @date 2022/3/15
  */
 public class ExecuteThread {
     public static void main(String[] args) throws InterruptedException{

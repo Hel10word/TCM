@@ -5,7 +5,7 @@ import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.common.enums.TCMDataTypeEnum;
 import com.boraydata.cdc.tcm.entity.Column;
-import com.boraydata.cdc.tcm.common.TableCloneManageConfig;
+import com.boraydata.cdc.tcm.common.TableCloneManagerConfig;
 import com.boraydata.cdc.tcm.entity.Table;
 
 import java.util.List;
@@ -43,7 +43,7 @@ import java.util.List;
 
 /** Generate different Scala script according to the common file
  * @author bufan
- * @data 2021/12/1
+ * @date 2021/12/1
  *
  * https://hudi.apache.org/docs/writing_data
  */
@@ -83,7 +83,7 @@ public class ScalaScriptGenerateUtil {
             "\nimport org.apache.spark.sql.types._\n"
     );
 
-    public String initSriptFile(Table table, String hdfsSourceFilePath, DatabaseConfig dbConfig, TableCloneManageConfig tcmConfig){
+    public String initSriptFile(Table table, String hdfsSourceFilePath, DatabaseConfig dbConfig, TableCloneManagerConfig tcmConfig){
         String delimiter = tcmConfig.getDelimiter();
         String hoodieTableType = tcmConfig.getHoodieTableType();
         String primaryKey = tcmConfig.getPrimaryKey();

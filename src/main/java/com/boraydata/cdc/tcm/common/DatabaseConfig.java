@@ -11,7 +11,7 @@ import java.util.Objects;
 /**
  * define metadata connection info.
  * @author bufan
- * @data 2021/8/25
+ * @date 2021/8/25
  */
 @JsonPropertyOrder({
         "dataSourceEnum",
@@ -38,12 +38,52 @@ public class DatabaseConfig {
     private String jdbcUrl;
 
     public DatabaseConfig checkConfig(){
+        switch (dataSourceEnum){
+            case MYSQL:
+                if(StringUtil.isNullOrEmpty(this.catalog))
+                    this.catalog = "def";
+                if(StringUtil.isNullOrEmpty(this.schema))
+                    this.schema = this.databaseName;
+                if(StringUtil.isNullOrEmpty(this.port))
+                    this.port = "3306";
+                break;
+            case POSTGRESQL:
+                if(StringUtil.isNullOrEmpty(databaseName) && !StringUtil.isNullOrEmpty(catalog))
+                    this.databaseName = this.catalog;
+                String[] split_pgsql = this.databaseName.split("\\.");
+                if(split_pgsql.length == 2){
+                    this.catalog = split_pgsql[0];
+                    this.schema = split_pgsql[1];
+                    this.databaseName = split_pgsql[0];
+                }
+                if(StringUtil.isNullOrEmpty(this.catalog))
+                    this.catalog = this.databaseName;
+                if(StringUtil.isNullOrEmpty(this.schema))
+                    this.schema = "public";
+                if(StringUtil.isNullOrEmpty(this.port))
+                    this.port = "5432";
+                break;
+            case SQLSERVER:
+                if(StringUtil.isNullOrEmpty(databaseName) && !StringUtil.isNullOrEmpty(catalog))
+                    this.databaseName = this.catalog;
+                String[] split_sqlserver = this.databaseName.split("\\.");
+                if(split_sqlserver.length == 2){
+                    this.catalog = split_sqlserver[0];
+                    this.schema = split_sqlserver[1];
+                    this.databaseName = split_sqlserver[0];
+                }
+                if(StringUtil.isNullOrEmpty(this.catalog))
+                    this.catalog = this.databaseName;
+                if(StringUtil.isNullOrEmpty(this.schema))
+                    this.schema = "dbo";
+                if(StringUtil.isNullOrEmpty(this.port))
+                    this.port = "1433";
+                break;
+            default:
+        }
+
         if(StringUtil.isNullOrEmpty(databaseName))
             throw new TCMException("the database name is null"+this.outInfo());
-        if(DataSourceEnum.POSTGRESQL.equals(dataSourceEnum)){
-            this.catalog = this.databaseName;
-            this.schema = StringUtil.isNullOrEmpty(this.schema)?"public":this.schema;
-        }
         return this;
     }
 

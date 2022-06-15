@@ -46,6 +46,6 @@ public class StringUtil {
     public static TCMDataTypeEnum findRelation(Map<String, TCMDataTypeEnum> map, String string, TCMDataTypeEnum def){
         return map.keySet().stream().filter(
                 x -> x.equalsIgnoreCase(StringUtil.dataTypeFormat(string))
-        ).findFirst().map(x -> map.get(x)).orElse(def);
+        ).findFirst().map(map::get).orElse(def);
     }
 }

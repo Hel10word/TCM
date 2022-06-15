@@ -2,7 +2,7 @@ package com.boraydata.cdc.tcm.exception;
 
 /**
  * @author bufan
- * @data 2021/8/25
+ * @date 2021/8/25
  */
 public class TCMException extends RuntimeException {
 

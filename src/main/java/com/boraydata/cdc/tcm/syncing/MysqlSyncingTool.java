@@ -3,9 +3,8 @@ package com.boraydata.cdc.tcm.syncing;
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
-import com.boraydata.cdc.tcm.core.TableCloneManageContext;
+import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
 import com.boraydata.cdc.tcm.entity.Table;
-import com.boraydata.cdc.tcm.mapping.DataMappingSQLTool;
 import com.boraydata.cdc.tcm.utils.FileUtil;
 import com.mysql.cj.jdbc.ClientPreparedStatement;
 
@@ -38,26 +37,26 @@ import java.util.Objects;
  *    you need to add Escape in front of it to Escape.
  *
  * @author bufan
- * @data 2021/9/24
+ * @date 2021/9/24
  */
 
 public class MysqlSyncingTool implements SyncingTool {
 
     @Override
-    public String getExportInfo(TableCloneManageContext tcmContext) {
+    public String getExportInfo(TableCloneManagerContext tcmContext) {
 //        return generateExportSQLByShell(tcmContext);
         return generateExportSQLByMysqlShell(tcmContext);
     }
 
     @Override
-    public String getLoadInfo(TableCloneManageContext tcmContext) {
+    public String getLoadInfo(TableCloneManagerContext tcmContext) {
 //        return generateLoadSQLByMysqlShell(tcmContext);
 //        return generateLoadSQLByShell(tcmContext);
         return generateLoadSQLByJDBC(tcmContext);
     }
 
     @Override
-    public Boolean executeExport(TableCloneManageContext tcmContext) {
+    public Boolean executeExport(TableCloneManagerContext tcmContext) {
         String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getExportShellName(),tcmContext.getTcmConfig().getDebug());
         if(tcmContext.getTcmConfig().getDebug())
             System.out.println(outStr);
@@ -65,7 +64,7 @@ public class MysqlSyncingTool implements SyncingTool {
     }
 
     @Override
-    public Boolean executeLoad(TableCloneManageContext tcmContext) {
+    public Boolean executeLoad(TableCloneManagerContext tcmContext) {
 //        String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
 //        if(tcmContext.getTcmConfig().getDebug())
 //            System.out.println(outStr);
@@ -108,7 +107,7 @@ public class MysqlSyncingTool implements SyncingTool {
      * e.g. {@link #replaceExportStatementShell}
      * @author: bufan
      */
-    private String generateExportSQLByShell(TableCloneManageContext tcmContext){
+    private String generateExportSQLByShell(TableCloneManagerContext tcmContext){
         Table tempTable = tcmContext.getTempTable();
         Table sourceTable = tcmContext.getSourceTable();
         DatabaseConfig config = tcmContext.getSourceConfig();
@@ -168,7 +167,7 @@ public class MysqlSyncingTool implements SyncingTool {
      *      @see <a href="https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_local_infile"></a>
      * @author: bufan
      */
-    private String generateLoadSQLByShell(TableCloneManageContext tcmContext){
+    private String generateLoadSQLByShell(TableCloneManagerContext tcmContext){
         String csvPath = "./"+tcmContext.getCsvFileName();
         String tablename = tcmContext.getCloneTable().getTableName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
@@ -215,7 +214,7 @@ public class MysqlSyncingTool implements SyncingTool {
      * @return: mysqlsh -h192.168.30.244 -P3306 -uroot -proot --database test_db -e "util.exportTable('lineitem','/usr/local/lineitem.csv',{linesTerminatedBy:'\n',fieldsTerminatedBy:','})"
      * @author: bufan
      */
-    private String generateExportSQLByMysqlShell(TableCloneManageContext tcmContext){
+    private String generateExportSQLByMysqlShell(TableCloneManagerContext tcmContext){
 
         Table tempTable = tcmContext.getTempTable();
         Table sourceTable = tcmContext.getSourceTable();
@@ -270,7 +269,7 @@ public class MysqlSyncingTool implements SyncingTool {
      * @return: mysqlsh -h192.168.30.244 -P3306 -uroot -proot --database test_db -e "util.importTable('/usr/local/lineitem.csv', {table: 'lineitem',linesTerminatedBy:'\n',fieldsTerminatedBy:',',bytesPerChunk:'500M'})"
      * @author: bufan
      */
-    private String generateLoadSQLByMysqlShell(TableCloneManageContext tcmContext){
+    private String generateLoadSQLByMysqlShell(TableCloneManagerContext tcmContext){
         DatabaseConfig config = tcmContext.getCloneConfig();
         String csvPath = "./"+tcmContext.getCsvFileName();
         String tablename = tcmContext.getCloneTable().getTableName();
@@ -299,7 +298,7 @@ public class MysqlSyncingTool implements SyncingTool {
     /**
      * @see <a href="https://stackoverflow.com/questions/53156112/how-to-allow-load-data-local-infile-on-mysql-connector-java">MySQL 8 Load data infile</a>
      */
-    private String generateLoadSQLByJDBC(TableCloneManageContext tcmContext){
+    private String generateLoadSQLByJDBC(TableCloneManagerContext tcmContext){
         String filePath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
         String tableName = tcmContext.getCloneTable().getTableName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
@@ -308,7 +307,7 @@ public class MysqlSyncingTool implements SyncingTool {
         return "# MySQL Load Data By JDBC,SQL Statements : "+sql;
     }
 
-    private Boolean LoadDataToMySQLByJDBC5(TableCloneManageContext tcmContext){
+    private Boolean LoadDataToMySQLByJDBC5(TableCloneManagerContext tcmContext){
         String sql = tcmContext.getLoadShellContent();
         try(
                 Connection conn = DatasourceConnectionFactory.createDataSourceConnection(tcmContext.getCloneConfig());
@@ -327,7 +326,7 @@ public class MysqlSyncingTool implements SyncingTool {
      * @see <a href="https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-implementation-notes.html"></a>
      * @see <a href="https://stackoverflow.com/questions/3627537/is-a-load-data-without-a-file-i-e-in-memory-possible-for-mysql-and-java"></a>
      */
-    private Boolean LoadDataToMySQLByJDBC8(TableCloneManageContext tcmContext){
+    private Boolean LoadDataToMySQLByJDBC8(TableCloneManagerContext tcmContext){
         String sql = tcmContext.getLoadShellContent();
 
         String csvFilePath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();

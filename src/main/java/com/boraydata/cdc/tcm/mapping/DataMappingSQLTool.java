@@ -4,7 +4,6 @@ import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.common.enums.TCMDataTypeEnum;
 import com.boraydata.cdc.tcm.entity.Column;
 import com.boraydata.cdc.tcm.utils.StringUtil;
-import com.boraydata.cdc.tcm.core.TableCloneManageContext;
 import com.boraydata.cdc.tcm.entity.Table;
 
 import java.util.Properties;
@@ -28,7 +27,7 @@ import java.util.Properties;
  *
  *      √√√ : need to create Temp table or use mapping query statement.
  * @author bufan
- * @data 2021/11/5
+ * @date 2021/11/5
  */
 public class DataMappingSQLTool {
     private static final String TRUE = "_TRUE";

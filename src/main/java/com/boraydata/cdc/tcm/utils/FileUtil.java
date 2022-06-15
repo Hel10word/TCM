@@ -12,7 +12,7 @@ import java.nio.file.StandardOpenOption;
 
 /** Check the file or directory exists, and write or delete file.
  * @author bufan
- * @data 2021/9/28
+ * @date 2021/9/28
  */
 public class FileUtil {
 

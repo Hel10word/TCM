@@ -3,9 +3,8 @@ package com.boraydata.cdc.tcm.syncing;
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
-import com.boraydata.cdc.tcm.core.TableCloneManageContext;
+import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
 import com.boraydata.cdc.tcm.entity.Table;
-import com.boraydata.cdc.tcm.mapping.DataMappingSQLTool;
 import com.boraydata.cdc.tcm.utils.FileUtil;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
@@ -38,23 +37,23 @@ import java.util.Objects;
  *    you need to add Escape in front of it to Escape.
  *
  * @author bufan
- * @data 2021/9/26
+ * @date 2021/9/26
  */
 public class PgsqlSyncingTool implements SyncingTool {
 
     @Override
-    public String getExportInfo(TableCloneManageContext tcmContext) {
+    public String getExportInfo(TableCloneManagerContext tcmContext) {
         return generateExportSQLByShell(tcmContext);
 //        return generateExportSQLByJDBC(tcmContext);
     }
 
     @Override
-    public String getLoadInfo(TableCloneManageContext tcmContext) {
+    public String getLoadInfo(TableCloneManagerContext tcmContext) {
         return generateLoadSQLByJDBC(tcmContext);
     }
 
     @Override
-    public Boolean executeExport(TableCloneManageContext tcmContext) {
+    public Boolean executeExport(TableCloneManagerContext tcmContext) {
         String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getExportShellName(),tcmContext.getTcmConfig().getDebug());
         if(tcmContext.getTcmConfig().getDebug())
             System.out.println(outStr);
@@ -64,7 +63,7 @@ public class PgsqlSyncingTool implements SyncingTool {
     }
 
     @Override
-    public Boolean executeLoad(TableCloneManageContext tcmContext) {
+    public Boolean executeLoad(TableCloneManagerContext tcmContext) {
 //        String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
 //        if(tcmContext.getTcmConfig().getDebug())
 //            System.out.println(outStr);
@@ -98,7 +97,7 @@ public class PgsqlSyncingTool implements SyncingTool {
      * @author: bufan
      * @return: psql postgres://postgres:postgres@192.168.30.155:5432/test_db -c "\copy lineitem from '/usr/local/lineitem.csv' with DELIMITER ',';"
      */
-    private String generateExportSQLByShell(TableCloneManageContext tcmContext){
+    private String generateExportSQLByShell(TableCloneManagerContext tcmContext){
         Table tempTable = tcmContext.getTempTable();
         Table sourceTable = tcmContext.getSourceTable();
         boolean hudiFlag = DataSourceEnum.HUDI.equals(tcmContext.getCloneConfig().getDataSourceEnum());
@@ -109,7 +108,7 @@ public class PgsqlSyncingTool implements SyncingTool {
          * @see <a href="https://spark.apache.org/docs/latest/sql-ref-datatypes.html"></a>
          */
         String tableName = "";
-        if(Boolean.TRUE.equals(Objects.isNull(tempTable)))
+        if(Boolean.FALSE.equals(Objects.isNull(tempTable)))
             tableName = "("+tcmContext.getTempTableSelectSQL()+")";
         else
             tableName = sourceTable.getTableName();
@@ -134,7 +133,7 @@ public class PgsqlSyncingTool implements SyncingTool {
      * @author: bufan
      * @return: psql postgres://postgres:postgres@192.168.30.155:5432/test_db -c "\copy (select * from lineitem) to '/usr/local/lineitem.csv' with DELIMITER ',';"
      */
-    private String generateLoadSQLByShell(TableCloneManageContext tcmContext){
+    private String generateLoadSQLByShell(TableCloneManagerContext tcmContext){
         String csvPath = "./"+tcmContext.getCsvFileName();
         String tableName = tcmContext.getCloneTable().getTableName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
@@ -157,7 +156,7 @@ public class PgsqlSyncingTool implements SyncingTool {
      * PostgreSQL also can use JDBC to Export or Load table data,the performance better than shell.
      * @see <a href="https://jdbc.postgresql.org/documentation/publicapi/org/postgresql/copy/CopyManager.html"></a>
      */
-    private String generateExportSQLByJDBC(TableCloneManageContext tcmContext){
+    private String generateExportSQLByJDBC(TableCloneManagerContext tcmContext){
         Table tempTable = tcmContext.getTempTable();
         Table sourceTable = tcmContext.getSourceTable();
         String tableName = "";
@@ -172,7 +171,7 @@ public class PgsqlSyncingTool implements SyncingTool {
         return "# PgSQL Export Data By JDBC-CopyManager,SQL Statements : "+sql;
     }
 
-    private String generateLoadSQLByJDBC(TableCloneManageContext tcmContext){
+    private String generateLoadSQLByJDBC(TableCloneManagerContext tcmContext){
         String tableName = tcmContext.getCloneTable().getTableName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
         String sql = "COPY " + tableName + " FROM STDIN WITH DELIMITER '"+delimiter+"'";
@@ -180,7 +179,7 @@ public class PgsqlSyncingTool implements SyncingTool {
         return "# PgSQL Load Data By JDBC-CopyManager,SQL Statements : "+sql;
     }
 
-    private Boolean ExportDataFromPgSQLByJDBC(TableCloneManageContext tcmContext){
+    private Boolean ExportDataFromPgSQLByJDBC(TableCloneManagerContext tcmContext){
         String filePath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
         String sql = tcmContext.getExportShellContent();
         File file = FileUtil.createNewFile(filePath);
@@ -197,7 +196,7 @@ public class PgsqlSyncingTool implements SyncingTool {
         return false;
     }
 
-    private Boolean LoadDataToPgSQLByJDBC(TableCloneManageContext tcmContext){
+    private Boolean LoadDataToPgSQLByJDBC(TableCloneManagerContext tcmContext){
         String filePath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
         String sql = tcmContext.getLoadShellContent();
         File file = FileUtil.getFile(filePath);

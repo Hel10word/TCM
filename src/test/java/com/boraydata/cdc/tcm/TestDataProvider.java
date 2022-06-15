@@ -1,7 +1,7 @@
 package com.boraydata.cdc.tcm;
 
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
-import com.boraydata.cdc.tcm.common.TableCloneManageConfig;
+import com.boraydata.cdc.tcm.common.TableCloneManagerConfig;
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.common.enums.TCMDataTypeEnum;
 import com.boraydata.cdc.tcm.core.*;
@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * @author bufan
- * @data 2021/11/5
+ * @date 2021/11/5
  */
 public class TestDataProvider {
     public static final String CUSTOM_FILE_PATH = "./customTable.json";
@@ -44,8 +44,16 @@ public class TestDataProvider {
             .setDataSourceEnum(DataSourceEnum.POSTGRESQL)
             .setHost("192.168.30.38")
             .setPort("5432")
-            .setUsername("root")
-            .setPassword("root");
+            .setUsername("postgres")
+            .setPassword("postgres");
+
+    public static DatabaseConfig SQLServerConfig = new DatabaseConfig()
+            .setDatabaseName("test_db")
+            .setDataSourceEnum(DataSourceEnum.SQLSERVER)
+            .setHost("192.168.120.237")
+            .setPort("1433")
+            .setUsername("sa")
+            .setPassword("Rapids123*");
 
     //========================== Hudi ===============================
     public static DatabaseConfig HudiConfig = new DatabaseConfig()
@@ -59,15 +67,15 @@ public class TestDataProvider {
 
 
 
-    public static TableCloneManageConfig getTCMConfig(){
-        return setHudiConfig(new TableCloneManageConfig()
+    public static TableCloneManagerConfig getTCMConfig(){
+        return setHudiConfig(new TableCloneManagerConfig()
                 .setSourceConfig(MySQLConfig)
                 .setCloneConfig(PostgreSQLConfig)
                 .setSourceTableName("mysql_table")
                 .setCloneTableName("postgresql_table"),
                 "id");
     }
-    public static TableCloneManageConfig setHudiConfig(TableCloneManageConfig config,String primaryKey){
+    public static TableCloneManagerConfig setHudiConfig(TableCloneManagerConfig config, String primaryKey){
         return config
 //                .setCustomSchemaFilePath(CUSTOM_FILE_PATH)
                 .setHdfsSourceDataDir("hdfs:///cdc-init/")
@@ -76,19 +84,19 @@ public class TestDataProvider {
                 .setSparkCustomCommand(SPARK_CUSTOM_COMMAND);
     }
 
-    public static TableCloneManageConfig getTCMConfig(DatabaseConfig sourceConfig, DatabaseConfig cloneConfig){
-        return getTCMConfig().setSourceConfig(sourceConfig).setCloneConfig(cloneConfig);
+    public static TableCloneManagerConfig getTCMConfig(DatabaseConfig sourceConfig, DatabaseConfig cloneConfig){
+        return getTCMConfig().setSourceConfig(sourceConfig).setCloneConfig(cloneConfig).checkConfig();
     }
 
-    public static TableCloneManageContext getTCMContext(DatabaseConfig sourceConfig, DatabaseConfig cloneConfig){
-        TableCloneManageContext.Builder tcmcBuilder = new TableCloneManageContext.Builder();
+    public static TableCloneManagerContext getTCMContext(DatabaseConfig sourceConfig, DatabaseConfig cloneConfig){
+        TableCloneManagerContext.Builder tcmcBuilder = new TableCloneManagerContext.Builder();
         return tcmcBuilder
                 .setTcmConfig(getTCMConfig(sourceConfig,cloneConfig))
                 .create();
     }
 
-    public static TableCloneManage getTCM(DatabaseConfig sourceConfig, DatabaseConfig cloneConfig) {
-        return TableCloneManageFactory.createTableCloneManage(getTCMContext(sourceConfig,cloneConfig));
+    public static TableCloneManager getTCM(DatabaseConfig sourceConfig, DatabaseConfig cloneConfig) {
+        return TableCloneManagerFactory.createTableCloneManage(getTCMContext(sourceConfig,cloneConfig));
     }
 
 //    public static DatabaseConfig getMySQLConfig() {

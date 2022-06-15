@@ -10,10 +10,11 @@ import com.boraydata.cdc.tcm.utils.JacksonUtil;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.LinkedList;
 
 /**
  * @author bufan
- * @data 2022/4/7
+ * @date 2022/4/7
  */
 class CustomTableTest {
     String FILEPATH = TestDataProvider.CUSTOM_FILE_PATH;
@@ -21,6 +22,11 @@ class CustomTableTest {
     @Test
     void writeCustomFile() throws IOException {
         Table customTable = TestDataProvider.getCustomTable();
+//        customTable.setColumns(TestDataProvider.getColumns(null));
+        LinkedList<String> primaryKeys = new LinkedList<>();
+        primaryKeys.add("col_tinyint");
+        primaryKeys.add("col_smallint");
+        customTable.setPrimaryKeys(primaryKeys);
 
         String jsonStr = JacksonUtil.toJson(customTable);
 
@@ -34,15 +40,21 @@ class CustomTableTest {
         Table customTable = JacksonUtil.filePathToObject(FILEPATH,Table.class);
         customTable.setTableName("customTable");
 
-
-        MappingTool tool1 = MappingToolFactory.create(DataSourceEnum.MYSQL);
-        assert tool1 != null;
-        System.out.println(tool1.getCreateTableSQL(tool1.createCloneMappingTable(customTable)));
-        MappingTool tool2 = MappingToolFactory.create(DataSourceEnum.POSTGRESQL);
-        assert tool2 != null;
-        System.out.println(tool2.getCreateTableSQL(tool2.createCloneMappingTable(customTable)));
-
         System.out.println(customTable.outTableInfo());
+
+        MappingTool mysqlTool = MappingToolFactory.create(DataSourceEnum.MYSQL);
+        assert mysqlTool != null;
+        System.out.println("\n"+mysqlTool.getCreateTableSQL(mysqlTool.createCloneMappingTable(customTable.setTableName("mysql_Table"))));
+
+        MappingTool postgresqlTool = MappingToolFactory.create(DataSourceEnum.POSTGRESQL);
+        assert postgresqlTool != null;
+        System.out.println("\n"+postgresqlTool.getCreateTableSQL(postgresqlTool.createCloneMappingTable(customTable.setTableName("postgresql_Table"))));
+
+        MappingTool sqlserverTool = MappingToolFactory.create(DataSourceEnum.SQLSERVER);
+        assert sqlserverTool != null;
+        System.out.println("\n"+sqlserverTool.getCreateTableSQL(sqlserverTool.createCloneMappingTable(customTable.setTableName("sqlserver_Table"))));
+
+
     }
 
 }

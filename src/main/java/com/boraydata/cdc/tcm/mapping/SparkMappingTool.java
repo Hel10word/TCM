@@ -12,7 +12,7 @@
 // * https://spark.apache.org/docs/3.1.2/sql-ref-datatypes.html
 // *
 // * @author bufan
-// * @data 2021/10/12
+// * @date 2021/10/12
 // */
 //public class SparkMappingTool implements MappingTool {
 //
@@ -35,7 +35,7 @@
 //        List<Column> cloneCols = new LinkedList<>();
 //        for (Column col : sourceCols){
 //            Column c = col.clone();
-//            c.setDataType(col.getTableCLoneManageType().getOutDataType(DataSourceEnum.SPARK));
+//            c.setDataType(col.getTableCLoneManagerType().getOutDataType(DataSourceEnum.SPARK));
 //            cloneCols.add(c);
 //        }
 //        cloneTable.setCatalogname(null);

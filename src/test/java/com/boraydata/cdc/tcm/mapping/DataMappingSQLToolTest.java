@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author bufan
- * @data 2021/11/5
+ * @date 2021/11/5
  */
 class DataMappingSQLToolTest {
     DataMappingSQLTool tool = new DataMappingSQLTool();

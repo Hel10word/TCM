@@ -2,7 +2,6 @@ package com.boraydata.cdc.tcm.entity;
 
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.common.enums.TCMDataTypeEnum;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -10,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * record column metadata information entity
  * @author bufan
- * @data 2021/8/25
+ * @date 2021/8/25
  */
 
 @JsonPropertyOrder({
@@ -189,8 +188,8 @@ public class Column implements Cloneable {
     }
 
     public String outInfo(){
-        return String.format("ColumnName=%-20s DataType=%-20s OrdinalPosition=%-4s CharacterMaximumPosition=%-10s NumericPrecision=%-4s NumericScale=%-4s DatetimePrecision=%-4s tableCLoneManageType=%s \n",
-                            columnName,         dataType,      ordinalPosition,    characterMaximumPosition,        numericPrecision,     numericScale,    datetimePrecision,      TCMDataTypeEnum);
+        return String.format("ColumnName=%-20s DataType=%-20s OrdinalPosition=%-4s CharacterMaximumPosition=%-10s NumericPrecision=%-6s NumericScale=%-6s DatetimePrecision=%-6s IsNullable=%-6s tableCLoneManageType=%s \n",
+                            columnName,         dataType,      ordinalPosition,    characterMaximumPosition,        numericPrecision,     numericScale,    datetimePrecision,      isNullable,     TCMDataTypeEnum);
     }
 
     public Column clone(){

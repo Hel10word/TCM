@@ -3,10 +3,10 @@ package com.boraydata.cdc.tcm.syncing;
 /**
  * define some interfaces for generate load and export command
  * @author bufan
- * @data 2021/9/24
+ * @date 2021/9/24
  */
 
-import com.boraydata.cdc.tcm.core.TableCloneManageContext;
+import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
 
 /**
  * e.g.
@@ -23,12 +23,12 @@ import com.boraydata.cdc.tcm.core.TableCloneManageContext;
  */
 public interface SyncingTool{
     // generate export table data information
-    String getExportInfo(TableCloneManageContext tcmContext);
+    String getExportInfo(TableCloneManagerContext tcmContext);
     // generate load table data information
-    String getLoadInfo(TableCloneManageContext tcmContext);
+    String getLoadInfo(TableCloneManagerContext tcmContext);
 
     // execute export data operate
-    Boolean executeExport(TableCloneManageContext tcmContext);
+    Boolean executeExport(TableCloneManagerContext tcmContext);
     // execute load data operate
-    Boolean executeLoad(TableCloneManageContext tcmContext);
+    Boolean executeLoad(TableCloneManagerContext tcmContext);
 }

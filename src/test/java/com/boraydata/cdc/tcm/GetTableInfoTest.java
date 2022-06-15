@@ -2,7 +2,7 @@ package com.boraydata.cdc.tcm;
 
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
 import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
-import com.boraydata.cdc.tcm.core.TableCloneManage;
+import com.boraydata.cdc.tcm.core.TableCloneManager;
 import com.boraydata.cdc.tcm.mapping.MappingTool;
 import com.boraydata.cdc.tcm.mapping.MappingToolFactory;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ import java.sql.*;
 
 /** use JDBC Metadata show table info
  * @author bufan
- * @data 2021/10/20
+ * @date 2021/10/20
  */
 public class GetTableInfoTest {
 
@@ -28,19 +28,22 @@ public class GetTableInfoTest {
 
     DatabaseConfig pgsqlConfig = TestDataProvider.PostgreSQLConfig;
 
-//    String tableName = "lineitem_sf1";
-    String tableName = "customer";
+    DatabaseConfig sqlserverConfig = TestDataProvider.SQLServerConfig.setCatalog("test_db").setSchema("dbo");
+
+    String tableName = "test";
+//    String tableName = "lineitem_sf10";
+//    String tableName = "customer";
 //    String tableName = "testtable";
-    DatabaseConfig config = mysqlConfig;
-//    DatabaseConfig config = pgsqlConfig;
+//    String tableName = "exact_numerics_sqlserver";
+//    DatabaseConfig config = mysqlConfig;
+    DatabaseConfig config = pgsqlConfig;
+//    DatabaseConfig config = sqlserverConfig;
     @Test
     public void test(){
-
         showTableInfoBySQL(config,tableName);
-//
         showTableInfoByJdbcMetadata(config,tableName);
 
-        TableCloneManage tcm = TestDataProvider.getTCM(config, config);
+        TableCloneManager tcm = TestDataProvider.getTCM(config, config);
         MappingTool tool = MappingToolFactory.create(config.getDataSourceEnum());
         assert tool != null : "Unable support "+config.getDataSourceEnum();
         System.out.println(tool.createSourceMappingTable(tcm.getSourceTableByTableName(config,tableName)).outTableInfo());
@@ -167,4 +170,30 @@ public class GetTableInfoTest {
      */
 
 
+    @Test
+    void name() {
+        DatabaseConfig pg = TestDataProvider.PostgreSQLConfig;
+//        String pg_tablename = "lineitem_sf10";
+        String pg_tablename = "t1";
+        String sql = "select * from information_schema.COLUMNS where table_name in (?)";
+
+        try(Connection con = DatasourceConnectionFactory.createDataSourceConnection(pg);
+            PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1,pg_tablename);
+            ResultSet colAllRet = ps.executeQuery();
+            StringBuilder sb = new StringBuilder("Show Table Info By Sql Query :\n\n");
+            while (colAllRet.next()){
+                ResultSetMetaData rsmd = colAllRet.getMetaData();
+                int count = rsmd.getColumnCount();
+                for (int i = 1;i<=count;i++){
+                    String columnName = rsmd.getColumnName(i);
+                    sb.append(String.format("%s:%-20s",columnName,colAllRet.getString(columnName)));
+                }
+                sb.append("\n");
+            }
+            System.out.println(sb.toString());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

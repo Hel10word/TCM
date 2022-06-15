@@ -11,28 +11,28 @@ import java.util.Properties;
 
 /**
  * @author bufan
- * @data 2022/5/16
+ * @date 2022/5/16
  */
 public class ConfigurationLoader {
 
-    public static TableCloneManageConfig loadConfigFile(String path) throws IOException {
+    public static TableCloneManagerConfig loadConfigFile(String path) throws IOException {
         String fileExtension = FileUtil.getFileExtension(path);
         if(fileExtension.equals("properties")) {
             FileInputStream in = new FileInputStream(path);
             Properties properties = new Properties();
             properties.load(in);
-            TableCloneManageConfig tableCloneManageConfig = loadPropertiesConfig(properties);
+            TableCloneManagerConfig tableCloneManageConfig = loadPropertiesConfig(properties);
             in.close();
             return tableCloneManageConfig.checkConfig();
         }else if(fileExtension.equals("json")){
-            TableCloneManageConfig tableCloneManageConfig = JacksonUtil.filePathToObject(path,TableCloneManageConfig.class);
-            return tableCloneManageConfig.checkConfig();
+            TableCloneManagerConfig tableCloneManagerConfig = JacksonUtil.filePathToObject(path, TableCloneManagerConfig.class);
+            return tableCloneManagerConfig.checkConfig();
         }else
             throw new TCMException("unable support config file type,file path:"+path);
     }
 
-    private static TableCloneManageConfig loadPropertiesConfig(Properties props){
-        TableCloneManageConfig tcmConfig = new TableCloneManageConfig();
+    private static TableCloneManagerConfig loadPropertiesConfig(Properties props){
+        TableCloneManagerConfig tcmConfig = new TableCloneManagerConfig();
 
         //======================================================    Source DatabaseConfig   ==================================================
         DatabaseConfig sourceConfig = new DatabaseConfig()
@@ -99,6 +99,8 @@ public class ConfigurationLoader {
                 .setOutCloneTableSQL(Boolean.parseBoolean(props.getProperty("outCloneTableSQL","false").toLowerCase()))
                 // create clone table in clone database
                 .setCreateTableInClone(Boolean.parseBoolean(props.getProperty("createTableInClone","true").toLowerCase()))
+                // create clone table in clone database with primary key
+                .setCreateTableInClone(Boolean.parseBoolean(props.getProperty("createPrimaryKeyInClone","true").toLowerCase()))
                 // execute export csv shell script
                 .setExecuteExportScript(Boolean.parseBoolean(props.getProperty("executeExportScript","true").toLowerCase()))
                 // execute import csv shell script

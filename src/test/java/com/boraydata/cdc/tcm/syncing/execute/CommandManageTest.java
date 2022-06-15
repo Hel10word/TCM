@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author bufan
- * @data 2021/9/27
+ * @date 2021/9/27
  */
 class CommandManageTest {
 

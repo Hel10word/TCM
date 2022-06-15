@@ -10,9 +10,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.Objects;
 
 /**
- * Define the configuration information of TableCloneManage
+ * Define the configuration information of TableCloneManager
  * @author bufan
- * @data 2021/11/4
+ * @date 2021/11/4
  */
 @JsonPropertyOrder({
         "sourceConfig",
@@ -36,6 +36,7 @@ import java.util.Objects;
         "outSourceTableSQL",
         "outCloneTableSQL",
         "createTableInClone",
+        "createPrimaryKeyInClone",
         "executeExportScript",
         "executeLoadScript",
         "csvFileName",
@@ -44,7 +45,7 @@ import java.util.Objects;
         "delimiter",
         "debug",
 })
-public class TableCloneManageConfig {
+public class TableCloneManagerConfig {
     private DatabaseConfig sourceConfig;
     private DatabaseConfig cloneConfig;
     private String sourceTableName;
@@ -123,6 +124,11 @@ public class TableCloneManageConfig {
      */
     private Boolean createTableInClone = true;
     /**
+     * whether create table in Clone witch primary keys
+     * default: true (Optional)
+     */
+    private Boolean createPrimaryKeyInClone = true;
+    /**
      * whether execute export csv file script from source.
      * default: true (Optional)
      */
@@ -160,7 +166,7 @@ public class TableCloneManageConfig {
     private Boolean debug = false;
 
 
-    public TableCloneManageConfig checkConfig(){
+    public TableCloneManagerConfig checkConfig(){
         this.sourceConfig = this.sourceConfig.checkConfig();
         DataSourceEnum sourceEnum = this.sourceConfig.getDataSourceEnum();
         if(sourceEnum.equals(DataSourceEnum.HUDI))
@@ -209,7 +215,7 @@ public class TableCloneManageConfig {
         return sourceConfig;
     }
 
-    public TableCloneManageConfig setSourceConfig(DatabaseConfig sourceConfig) {
+    public TableCloneManagerConfig setSourceConfig(DatabaseConfig sourceConfig) {
         this.sourceConfig = sourceConfig;
         return this;
     }
@@ -218,7 +224,7 @@ public class TableCloneManageConfig {
         return cloneConfig;
     }
 
-    public TableCloneManageConfig setCloneConfig(DatabaseConfig cloneConfig) {
+    public TableCloneManagerConfig setCloneConfig(DatabaseConfig cloneConfig) {
         this.cloneConfig = cloneConfig;
         return this;
     }
@@ -227,7 +233,7 @@ public class TableCloneManageConfig {
         return sourceTableName;
     }
 
-    public TableCloneManageConfig setSourceTableName(String sourceTableName) {
+    public TableCloneManagerConfig setSourceTableName(String sourceTableName) {
         this.sourceTableName = sourceTableName;
         return this;
     }
@@ -236,7 +242,7 @@ public class TableCloneManageConfig {
         return cloneTableName;
     }
 
-    public TableCloneManageConfig setCloneTableName(String cloneTableName) {
+    public TableCloneManagerConfig setCloneTableName(String cloneTableName) {
         this.cloneTableName = cloneTableName;
         return this;
     }
@@ -245,7 +251,7 @@ public class TableCloneManageConfig {
         return customSchemaFilePath;
     }
 
-    public TableCloneManageConfig setCustomSchemaFilePath(String customSchemaFilePath) {
+    public TableCloneManagerConfig setCustomSchemaFilePath(String customSchemaFilePath) {
         this.customSchemaFilePath = customSchemaFilePath;
         return this;
     }
@@ -254,7 +260,7 @@ public class TableCloneManageConfig {
         return customTable;
     }
 
-    public TableCloneManageConfig setCustomTable(Table customTable) {
+    public TableCloneManagerConfig setCustomTable(Table customTable) {
         this.customTable = customTable;
         return this;
     }
@@ -263,7 +269,7 @@ public class TableCloneManageConfig {
         return hdfsSourceDataDir;
     }
 
-    public TableCloneManageConfig setHdfsSourceDataDir(String hdfsSourceDataDir) {
+    public TableCloneManagerConfig setHdfsSourceDataDir(String hdfsSourceDataDir) {
         this.hdfsSourceDataDir = hdfsSourceDataDir;
         return this;
     }
@@ -272,7 +278,7 @@ public class TableCloneManageConfig {
         return hdfsCloneDataPath;
     }
 
-    public TableCloneManageConfig setHdfsCloneDataPath(String hdfsCloneDataPath) {
+    public TableCloneManagerConfig setHdfsCloneDataPath(String hdfsCloneDataPath) {
         this.hdfsCloneDataPath = hdfsCloneDataPath;
         return this;
     }
@@ -281,7 +287,7 @@ public class TableCloneManageConfig {
         return primaryKey;
     }
 
-    public TableCloneManageConfig setPrimaryKey(String primaryKey) {
+    public TableCloneManagerConfig setPrimaryKey(String primaryKey) {
         this.primaryKey = primaryKey;
         return this;
     }
@@ -290,7 +296,7 @@ public class TableCloneManageConfig {
         return partitionKey;
     }
 
-    public TableCloneManageConfig setPartitionKey(String partitionKey) {
+    public TableCloneManagerConfig setPartitionKey(String partitionKey) {
         this.partitionKey = partitionKey;
         return this;
     }
@@ -299,7 +305,7 @@ public class TableCloneManageConfig {
         return hoodieTableType;
     }
 
-    public TableCloneManageConfig setHoodieTableType(String hoodieTableType) {
+    public TableCloneManagerConfig setHoodieTableType(String hoodieTableType) {
         this.hoodieTableType = hoodieTableType;
         return this;
     }
@@ -308,7 +314,7 @@ public class TableCloneManageConfig {
         return nonPartition;
     }
 
-    public TableCloneManageConfig setNonPartition(Boolean nonPartition) {
+    public TableCloneManagerConfig setNonPartition(Boolean nonPartition) {
         this.nonPartition = nonPartition;
         return this;
     }
@@ -317,7 +323,7 @@ public class TableCloneManageConfig {
         return multiPartitionKeys;
     }
 
-    public TableCloneManageConfig setMultiPartitionKeys(Boolean multiPartitionKeys) {
+    public TableCloneManagerConfig setMultiPartitionKeys(Boolean multiPartitionKeys) {
         this.multiPartitionKeys = multiPartitionKeys;
         return this;
     }
@@ -326,7 +332,7 @@ public class TableCloneManageConfig {
         return sparkCustomCommand;
     }
 
-    public TableCloneManageConfig setSparkCustomCommand(String sparkCustomCommand) {
+    public TableCloneManagerConfig setSparkCustomCommand(String sparkCustomCommand) {
         this.sparkCustomCommand = sparkCustomCommand;
         return this;
     }
@@ -335,7 +341,7 @@ public class TableCloneManageConfig {
         return outSourceTableSQL;
     }
 
-    public TableCloneManageConfig setOutSourceTableSQL(Boolean outSourceTableSQL) {
+    public TableCloneManagerConfig setOutSourceTableSQL(Boolean outSourceTableSQL) {
         this.outSourceTableSQL = outSourceTableSQL;
         return this;
     }
@@ -344,7 +350,7 @@ public class TableCloneManageConfig {
         return outCloneTableSQL;
     }
 
-    public TableCloneManageConfig setOutCloneTableSQL(Boolean outCloneTableSQL) {
+    public TableCloneManagerConfig setOutCloneTableSQL(Boolean outCloneTableSQL) {
         this.outCloneTableSQL = outCloneTableSQL;
         return this;
     }
@@ -353,8 +359,17 @@ public class TableCloneManageConfig {
         return createTableInClone;
     }
 
-    public TableCloneManageConfig setCreateTableInClone(Boolean createTableInClone) {
+    public TableCloneManagerConfig setCreateTableInClone(Boolean createTableInClone) {
         this.createTableInClone = createTableInClone;
+        return this;
+    }
+
+    public Boolean getCreatePrimaryKeyInClone() {
+        return createPrimaryKeyInClone;
+    }
+
+    public TableCloneManagerConfig setCreatePrimaryKeyInClone(Boolean createPrimaryKeyInClone) {
+        this.createPrimaryKeyInClone = createPrimaryKeyInClone;
         return this;
     }
 
@@ -362,7 +377,7 @@ public class TableCloneManageConfig {
         return executeExportScript;
     }
 
-    public TableCloneManageConfig setExecuteExportScript(Boolean executeExportScript) {
+    public TableCloneManagerConfig setExecuteExportScript(Boolean executeExportScript) {
         this.executeExportScript = executeExportScript;
         return this;
     }
@@ -371,7 +386,7 @@ public class TableCloneManageConfig {
         return executeLoadScript;
     }
 
-    public TableCloneManageConfig setExecuteLoadScript(Boolean executeLoadScript) {
+    public TableCloneManagerConfig setExecuteLoadScript(Boolean executeLoadScript) {
         this.executeLoadScript = executeLoadScript;
         return this;
     }
@@ -380,7 +395,7 @@ public class TableCloneManageConfig {
         return csvFileName;
     }
 
-    public TableCloneManageConfig setCsvFileName(String csvFileName) {
+    public TableCloneManagerConfig setCsvFileName(String csvFileName) {
         this.csvFileName = csvFileName;
         return this;
     }
@@ -389,7 +404,7 @@ public class TableCloneManageConfig {
         return tempDirectory;
     }
 
-    public TableCloneManageConfig setTempDirectory(String tempDirectory) {
+    public TableCloneManagerConfig setTempDirectory(String tempDirectory) {
         this.tempDirectory = tempDirectory;
         return this;
     }
@@ -398,7 +413,7 @@ public class TableCloneManageConfig {
         return deleteCache;
     }
 
-    public TableCloneManageConfig setDeleteCache(Boolean deleteCache) {
+    public TableCloneManagerConfig setDeleteCache(Boolean deleteCache) {
         this.deleteCache = deleteCache;
         return this;
     }
@@ -407,7 +422,7 @@ public class TableCloneManageConfig {
         return delimiter;
     }
 
-    public TableCloneManageConfig setDelimiter(String delimiter) {
+    public TableCloneManagerConfig setDelimiter(String delimiter) {
         this.delimiter = delimiter;
         return this;
     }
@@ -416,7 +431,7 @@ public class TableCloneManageConfig {
         return debug;
     }
 
-    public TableCloneManageConfig setDebug(Boolean debug) {
+    public TableCloneManagerConfig setDebug(Boolean debug) {
         this.debug = debug;
         return this;
     }

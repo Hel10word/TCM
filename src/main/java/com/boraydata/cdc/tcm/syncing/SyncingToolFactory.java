@@ -4,16 +4,22 @@ import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 
 /**
  * @author bufan
- * @data 2021/11/4
+ * @date 2021/11/4
  */
 public class SyncingToolFactory {
     public static SyncingTool create(DataSourceEnum dataSourceEnum){
-        if (DataSourceEnum.MYSQL.toString().equals(dataSourceEnum.name()))
-            return new MysqlSyncingTool();
-        else if (DataSourceEnum.POSTGRESQL.toString().equals(dataSourceEnum.name()))
-            return new PgsqlSyncingTool();
-        else if (DataSourceEnum.HUDI.toString().equals(dataSourceEnum.name()))
-            return new HudiSyncingTool();
-        return null;
+
+        switch (dataSourceEnum){
+            case MYSQL:
+                return new MysqlSyncingTool();
+            case POSTGRESQL:
+                return new PgsqlSyncingTool();
+            case SQLSERVER:
+                return new SqlServerSyncingTool();
+            case HUDI:
+                return new HudiSyncingTool();
+            default:
+                return null;
+        }
     }
 }

@@ -1,10 +1,10 @@
 package com.boraydata.cdc.tcm.syncing;
 
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
+import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
 import com.boraydata.cdc.tcm.exception.TCMException;
 import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
-import com.boraydata.cdc.tcm.common.TableCloneManageConfig;
-import com.boraydata.cdc.tcm.core.TableCloneManageContext;
+import com.boraydata.cdc.tcm.common.TableCloneManagerConfig;
 import com.boraydata.cdc.tcm.entity.Table;
 import com.boraydata.cdc.tcm.syncing.util.ScalaScriptGenerateUtil;
 import org.slf4j.Logger;
@@ -19,21 +19,21 @@ import java.sql.Statement;
  * 2. Generate the *.scala Script
  * 3. spark-shell -i *.scala
  * @author bufan
- * @data 2021/12/1
+ * @date 2021/12/1
  */
 public class HudiSyncingTool implements SyncingTool {
 
     private static final Logger logger = LoggerFactory.getLogger(HudiSyncingTool.class);
 
     @Override
-    public String getExportInfo(TableCloneManageContext tcmContext) {
-        tcmContext.setExportShellContent("TableCloneManage Un Suppose Export from Hudi");
+    public String getExportInfo(TableCloneManagerContext tcmContext) {
+        tcmContext.setExportShellContent("TableCloneManager Un Suppose Export from Hudi");
         return null;
     }
 
     @Override
-    public String getLoadInfo(TableCloneManageContext tcmContext) {
-        TableCloneManageConfig tcmConfig = tcmContext.getTcmConfig();
+    public String getLoadInfo(TableCloneManagerContext tcmContext) {
+        TableCloneManagerConfig tcmConfig = tcmContext.getTcmConfig();
         DatabaseConfig cloneConfig = tcmContext.getCloneConfig();
         ScalaScriptGenerateUtil hudiTool = new ScalaScriptGenerateUtil();
 
@@ -55,12 +55,12 @@ public class HudiSyncingTool implements SyncingTool {
     }
 
     @Override
-    public Boolean executeExport(TableCloneManageContext tcmContext) {
+    public Boolean executeExport(TableCloneManagerContext tcmContext) {
         return null;
     }
 
     @Override
-    public Boolean executeLoad(TableCloneManageContext tcmContext) {
+    public Boolean executeLoad(TableCloneManagerContext tcmContext) {
         deleteOriginTable(tcmContext);
         String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
         if(tcmContext.getTcmConfig().getDebug())
@@ -68,7 +68,7 @@ public class HudiSyncingTool implements SyncingTool {
         return true;
     }
 
-    public Boolean deleteOriginTable(TableCloneManageContext tcmContext){
+    public Boolean deleteOriginTable(TableCloneManagerContext tcmContext){
         String tableName = tcmContext.getTcmConfig().getCloneTableName();
         String hoodieTableType = tcmContext.getTcmConfig().getHoodieTableType();
         try(

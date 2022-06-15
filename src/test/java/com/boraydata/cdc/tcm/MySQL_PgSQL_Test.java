@@ -1,9 +1,9 @@
 package com.boraydata.cdc.tcm;
 
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
-import com.boraydata.cdc.tcm.core.TableCloneManage;
-import com.boraydata.cdc.tcm.core.TableCloneManageContext;
-import com.boraydata.cdc.tcm.core.TableCloneManageFactory;
+import com.boraydata.cdc.tcm.core.TableCloneManager;
+import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
+import com.boraydata.cdc.tcm.core.TableCloneManagerFactory;
 import com.boraydata.cdc.tcm.entity.Table;
 import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import java.sql.ResultSet;
 
 /** 测试 MySQL 与 PgSQL 间的表同步
  * @author bufan
- * @data 2021/9/22
+ * @date 2021/9/22
  */
 public class MySQL_PgSQL_Test {
     DatabaseConfig mysqlConfig = TestDataProvider.MySQLConfig;
@@ -55,12 +55,12 @@ public class MySQL_PgSQL_Test {
 
 
     public void foo(DatabaseConfig sourceConfig,DatabaseConfig cloneConfig,String tableName){
-        TableCloneManageContext.Builder tcmcBuilder = new TableCloneManageContext.Builder();
-        TableCloneManageContext tcmContext = tcmcBuilder
+        TableCloneManagerContext.Builder tcmcBuilder = new TableCloneManagerContext.Builder();
+        TableCloneManagerContext tcmContext = tcmcBuilder
                 .setSourceConfig(sourceConfig)
                 .setCloneConfig(cloneConfig)
                 .create();
-        TableCloneManage tcm = TableCloneManageFactory.createTableCloneManage(tcmContext);
+        TableCloneManager tcm = TableCloneManagerFactory.createTableCloneManage(tcmContext);
 
         Table sourceTable = tcm.createSourceMappingTable(tableName);
 

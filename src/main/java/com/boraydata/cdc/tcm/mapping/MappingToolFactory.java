@@ -1,20 +1,29 @@
 package com.boraydata.cdc.tcm.mapping;
 
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
+import com.boraydata.cdc.tcm.syncing.HudiSyncingTool;
+import com.boraydata.cdc.tcm.syncing.MysqlSyncingTool;
+import com.boraydata.cdc.tcm.syncing.PgsqlSyncingTool;
+import com.boraydata.cdc.tcm.syncing.SqlServerSyncingTool;
 
 /**
  * to create MappingTool by {@link DataSourceEnum}
  * @author bufan
- * @data 2021/8/31
+ * @date 2021/8/31
  */
 public class MappingToolFactory {
 
     public static MappingTool create(DataSourceEnum dataSourceEnum){
-        if(DataSourceEnum.MYSQL.toString().equals(dataSourceEnum.name()))
-            return new MysqlMappingTool();
-        else if(DataSourceEnum.POSTGRESQL.toString().equals(dataSourceEnum.name()))
-            return new PgsqlMappingTool();
-        return null;
+        switch (dataSourceEnum){
+            case MYSQL:
+                return new MysqlMappingTool();
+            case POSTGRESQL:
+                return new PgsqlMappingTool();
+            case SQLSERVER:
+                return new SqlServerMappingTool();
+            default:
+                return null;
+        }
     }
 
 }

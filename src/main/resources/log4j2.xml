@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Copyright 2018 Boray Data Co. Ltd.  All rights reserved. -->
+
+
+<!-- https://logging.apache.org/log4j/2.x/manual/configuration.html#XML -->
+<!--
+TRACE < DEBUG < INFO < WARN < ERROR < FATAL
+status：是用于指定log4j的级别;如果把status改为TRACE再执行测试代码，可以看到控制台中打印了一些log4j加载插件、组装logger等调试信息。
+monitorterval：是用于指定 log4j 自动重新检测读取配置内容的间隔时间，单位为秒（s），最小值为5秒。
+-->
+<Configuration status="warn" name="TableCloneManage Log4j2" monitorInterval="60">
+<!-- 定义一些变量 -->
+    <Properties>
+        <Property name="rootLoggingLevel">info</Property>
+        <Property name="filename">./logs/cdc-init-tcm.log</Property>
+<!--        <Property name="rollingFilePattern">./logs/cdc-web-server-%i.log</Property>-->
+        <!--
+            The pattern that log messages are written out in.
+            Ref: https://logging.apache.org/log4j/2.x/manual/layouts.html#PatternLayout
+            %p 输出优先级，即 DEBUG,INFO,WARN,ERROR,FATAL
+            %r 输出自应用启动到输出该log信息耗费的毫秒数
+            %c 输出所属的类目,通常就是所在类的全名
+            %t 输出产生该日志事件的线程名
+            %d 输出日志时间点的日期或时间，默认格式为ISO8601，也可以在其后指定格式
+            %l 输出日志事件的发生位置，包括类目名、发生的线程，以及在代码中的行数                      Testlog.main(TestLog.java:10)
+            %F 输出日志消息产生时所在的文件名称
+            %L 输出代码中的行号
+            %x 输出和当前线程相关联的NDC(嵌套诊断环境),像javaservlets多客户多线程的应用中
+        -->
+<!--        <Property name="consolePattern" >[%-5p] %d{ISO8601} [%t] %30c{4} %M() %L : %m%n</Property>-->
+        <Property name="consolePattern">%highlight{%-5level} %d{ISO8601} [%style{%t}{bright,blue}] %style{%20c{-3} %M() %L}{bright,yellow}: %m %style{%throwable}{red} %n</Property>
+    </Properties>
+
+    <Appenders>
+        <!--
+        Console节点用于定义输出控制台的Appender。
+
+        name：用于指定Appender的名称；
+        target：用于指定输出目标，一般是SYSTEM_OUT或SYSTEM_ERR，默认是SYSTEM_OUT；
+        PatternLayout：用于指定输出格式，不设置的话，默认为:%m%n
+            -->
+        <Console
+                name="TCMConsole"
+                target="SYSTEM_OUT">
+<!--            <PatternLayout pattern="${consolePattern}"/>-->
+            <PatternLayout pattern="${consolePattern}" disableAnsi="false" noConsoleNoAnsi="false"/>
+        </Console>
+
+        <!--
+        Rolling的意思是当满足一定条件后，就重命名原日志文件用于备份，并从新生成一个新的日志文件。
+        例如需求是每天生成一个日志文件，但是如果一天内的日志文件体积已经超过1G，就从新生成，两个条件满足一个即可。
+        RollingFile节点用于实现日志文件更动更新的 Appender，当满足条件（日志大小、指定时间等）重命名或打包原日志文件进行归档，生成新日志文件用于日志写入。
+
+
+        name：用于指定Appender的名称；
+        fileName：用于指定日志文件的全路径；
+        filePattern：用于指定分割文件的日志全路径（命名规则）。
+        ================================================
+        PatternLayout：用于指定输出格式，不设置的话，默认为:%m%n；
+        Policies ：设置日志文件切割参数；
+        SizeBasedTriggeringPolicy：Policies的子节点，用于设置基于日志文件大小触发的滚动策略，size属性用来指定每个分割的日志文件大小。
+        TimeBasedTriggeringPolicy：Policies的子节点，用于设置基于时间间隔触发的滚动策略，interval属性用于指定滚动时间间隔，默认是1小时，modulate属性是用于对interval进行偏移调节，默认为false。若为true，则第一次触发时是第一个小时触发，后续以interval间隔触发。
+        CronTriggeringPolicy：Policies的子节点，用于设置基于Cron表达式触发的滚动策略。
+        DefaultRolloverStrategy：设置默认策略设置。
+        -->
+<!--        <RollingFile-->
+<!--                name="RCdcWebLogFile"-->
+<!--                fileName="${filename}"-->
+<!--                filePattern="${rollingFilePattern}"-->
+<!--                append="true">-->
+<!--            <PatternLayout pattern="${filePattern}"/>-->
+<!--            <Policies>-->
+<!--                <SizeBasedTriggeringPolicy size="5MB"/>-->
+<!--            </Policies>-->
+<!--            <DefaultRolloverStrategy max="1"/>-->
+<!--        </RollingFile>-->
+        <!--
+         File节点用于将日志输出到指定文件，一般不用该节点，而使用RollingFile节点。
+
+        name：用于指定Appender的名称；
+        fileName：用于指定日志文件的全路径；
+        PatternLayout：用于指定输出格式，不设置的话，默认为:%m%n
+        -->
+<!--        <File-->
+<!--                name="CdcWebQuery"-->
+<!--                fileName="${queryFile}"-->
+<!--                append="true">>-->
+<!--            <PatternLayout pattern="${queryPattern}"/>-->
+<!--        </File>-->
+    </Appenders>
+
+    <!--
+    Root：用于指定项目的根日志，level属性表示日志输出级别，子节点AppenderRef用于指定输出到某个Appender，子节点的ref属性也就是前面的RollingFile中指定的name名称，子节点的level也是日志输出级别。
+    Logger ：用于指定日志的形式，指定不同包的日志级别，level属性表示日志输出级别，name属性用来指定该Logger所适用的类或者类的全路径。
+            子节点AppenderRef用于指定日志输出到哪个Appender，若没有指定，默认集成自Root。
+      -->
+    <Loggers>
+        <Root level="all">
+<!--            <Filters>-->
+<!--                <ThresholdFilter level="${rootLoggingLevel}" onMatch="ACCEPT" onMismatch="DENY"/>-->
+<!--            </Filters>-->
+            <AppenderRef ref="TCMConsole" level="info"/>
+<!--            <AppenderRef ref="CdcWebLogFile" level="info"/>-->
+        </Root>
+        <!--    org.apache.thrift、org.apache.hive    -->
+        <Logger name="org.apache" level="all">
+            <AppenderRef ref="TCMConsole" level="info"/>
+        </Logger>
+        <!--    hive    -->
+        <Logger name="com.boraydata.hive-jdbc-standalone" level="all">
+            <AppenderRef ref="TCMConsole" level="warn"/>
+        </Logger>
+    </Loggers>
+
+</Configuration>
