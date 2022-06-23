@@ -16,14 +16,14 @@ import java.sql.SQLException;
 class DatasourceConnectionFactoryTest {
 
     DatabaseConfig configMySQL = TestDataProvider.MySQLConfig;
-    DatabaseConfig configPgSQL = TestDataProvider.PostgreSQLConfig;
+    DatabaseConfig configPostgreSQL = TestDataProvider.PostgreSQLConfig;
     DatabaseConfig configSqlServer = TestDataProvider.SQLServerConfig.setSchema("dbo");
 
     DatabaseConfig configHudi = TestDataProvider.HudiConfig.setDatabaseName("test_cdc_hudi");
     @Test
     public void getJDBCUrlTest(){
         System.out.println(DatasourceConnectionFactory.getJDBCUrl(configMySQL));
-//        System.out.println(DatasourceConnectionFactory.getJDBCUrl(configPgSQL));
+//        System.out.println(DatasourceConnectionFactory.getJDBCUrl(configPostgreSQL));
 //        System.out.println(DatasourceConnectionFactory.getJDBCUrl(configHudi));
         System.out.println(DatasourceConnectionFactory.getJDBCUrl(configSqlServer));
 
@@ -53,13 +53,13 @@ class DatasourceConnectionFactoryTest {
 //                "LINES TERMINATED BY '\\n';";
 //        System.out.println(sql);
 //        List list = DatasourceConnectionFactory.executeQuerySQL(configMySQL, sql);
-//        List list = DatasourceConnectionFactory.executeQuerySQL(configPgSQL, sql);
+//        List list = DatasourceConnectionFactory.executeQuerySQL(configPostgreSQL, sql);
 //        List list = DatasourceConnectionFactory.executeQuerySQL(configHive, sql);
 //        list.forEach(System.out::println);
 
 //        String sql = "create table test(id int)";
         DatasourceConnectionFactory.showQueryBySQL(configMySQL, sql);
-//        DatasourceConnectionFactory.showQueryBySQL(configPgSQL, sql);
+//        DatasourceConnectionFactory.showQueryBySQL(configPostgreSQL, sql);
 //        DatasourceConnectionFactory.showQueryBySQL(configSqlServer, sql);
 //        DatasourceConnectionFactory.showQueryBySQL(configHudi, sql);
 
@@ -83,13 +83,13 @@ class DatasourceConnectionFactoryTest {
         }
     }
 
-    //=========================== PGSQL =====================================
+    //=========================== PostgreSQL =====================================
     @Test
     public void postgresqlConnTest() {
 
         try (
-                Connection conn = DatasourceConnectionFactory.createDataSourceConnection(configPgSQL);
-                PreparedStatement ps = conn.prepareStatement(configPgSQL.getDataSourceEnum().SQL_TableInfoByTableName);
+                Connection conn = DatasourceConnectionFactory.createDataSourceConnection(configPostgreSQL);
+                PreparedStatement ps = conn.prepareStatement(configPostgreSQL.getDataSourceEnum().SQL_TableInfoByTableName);
         ){
 //            ResultSet myResultSet = statement.executeQuery("SELECT table_name,column_name,data_type FROM information_schema.columns WHERE table_name = 'test';");
             ps.setString(1,"lineitem_sf1");
@@ -109,7 +109,7 @@ class DatasourceConnectionFactoryTest {
     @Test
     public void connectionTest() throws SQLException {
 //        Connection con = DatasourceConnectionFactory.createDataSourceConnection(configMySQL);
-//        Connection con = DatasourceConnectionFactory.createDataSourceConnection(configPgSQL);
+//        Connection con = DatasourceConnectionFactory.createDataSourceConnection(configPostgreSQL);
         Connection con = DatasourceConnectionFactory.createDataSourceConnection(configHudi);
         con.close();
     }

@@ -2,6 +2,7 @@ package com.boraydata.cdc.tcm.core;
 
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
 import com.boraydata.cdc.tcm.TestDataProvider;
+import com.boraydata.cdc.tcm.common.TableCloneManagerConfig;
 import com.boraydata.cdc.tcm.entity.Table;
 import com.boraydata.cdc.tcm.mapping.MappingToolFactory;
 import org.junit.jupiter.api.Test;
@@ -15,24 +16,23 @@ class TableCloneManagerTest {
     //========================== MySQL ===============================
     DatabaseConfig configMySQL = TestDataProvider.MySQLConfig;
 
-    //========================== PgSQL ===============================
-    DatabaseConfig configPGSQL = TestDataProvider.PostgreSQLConfig;
+    //========================== PostgreSQL ===============================
+    DatabaseConfig configPostgreSQL = TestDataProvider.PostgreSQLConfig;
 
     //========================== SQLSERVER ===============================
     DatabaseConfig configSQLServer = TestDataProvider.SQLServerConfig.setCatalog("test_db").setSchema("dbo");
 
+    //========================== SQLSERVER ===============================
+    DatabaseConfig configHudi = TestDataProvider.HudiConfig;
+
     // create the table clone manager
     TableCloneManagerContext.Builder tcmcBuilder = new TableCloneManagerContext.Builder();
     TableCloneManagerContext tcmc = tcmcBuilder
-            .setTcmConfig(TestDataProvider.getTCMConfig(configPGSQL,configMySQL))
+            .setTcmConfig(TestDataProvider.getTCMConfig(configPostgreSQL,configPostgreSQL))
             .create();
 
     String sourceName = "test";
-//    String sourceName = "lineitem_test";
-//    String sourceName = "lineitem_sf10";
-//    String sourceName = "binary_strings_sqlserver";
     String cloneName = sourceName+"_clone";
-//    String cloneName = "numeric_types_pgsql_clone";
 
     // 获取 在 CreateConfig 上创建表的语句
     @Test
@@ -70,5 +70,49 @@ class TableCloneManagerTest {
         boolean tableInDatasource = tcm.createTableInDatasource();
         if(tableInDatasource)
             System.out.println("Success!!");
+    }
+
+    @Test
+    void fullFunctionTest() {
+        String sourceTableName = "lineitem_sf10";
+        String cloneTableName = sourceTableName+"_clone";
+
+        TableCloneManagerConfig configTest = TestDataProvider.getTCMConfig(configMySQL, configSQLServer)
+                .setOutSourceTableSQL(Boolean.FALSE)
+                .setOutCloneTableSQL(Boolean.FALSE)
+                .setCreatePrimaryKeyInClone(Boolean.TRUE)
+                .setCreateTableInClone(Boolean.FALSE)
+                .setExecuteExportScript(Boolean.FALSE)
+                .setExecuteLoadScript(Boolean.FALSE)
+                .setDelimiter(",")
+                .setLineSeparate("\n")
+                .setQuote("\"")
+                .setEscape("\\")
+                .setSourceTableName(sourceTableName)
+                .setCloneTableName(cloneTableName);
+        TableCloneManagerContext tcmcTest = tcmcBuilder
+                .setTcmConfig(configTest)
+                .create();
+        TableCloneManager tcm = TableCloneManagerFactory.createTableCloneManage(tcmcTest);
+
+
+        Table sourceMappingTable = tcm.createSourceMappingTable(sourceTableName);
+        Table cloneTable = tcm.createCloneTable(sourceMappingTable,cloneTableName);
+        tcm.createTableInDatasource();
+        tcm.exportTableData();
+        tcm.loadTableData();
+        tcm.deleteCache();
+
+//        System.out.println(sourceMappingTable.outTableInfo());
+//        System.out.println(cloneTable.outTableInfo());
+
+
+        TableCloneManagerContext context = tcm.getTableCloneManagerContext();
+        System.out.println("SourceTableSQL:\n"+context.getSourceTableSQL()+"\n");
+        System.out.println("TempleTableSQL:\n"+context.getTempTableSelectSQL()+"\n");
+        System.out.println("CloneTableSQL:\n"+context.getCloneTableSQL()+"\n");
+        System.out.println("ExportShellContent:\n"+context.getExportShellContent()+"\n");
+        System.out.println("LoadShellContent:\n"+context.getLoadShellContent()+"\n");
+        System.out.println("LoadDataInHudiScalaScriptContent:\n"+context.getLoadDataInHudiScalaScriptContent()+"\n");
     }
 }

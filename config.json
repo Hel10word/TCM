@@ -34,5 +34,8 @@
   "deleteCache":true,
   "tempDirectory":"./TCM-Temp",
   "delimiter":"|",
+  "lineSeparate":"\n",
+  "quote":"\"",
+  "escape":"\\",
   "debug":false
 }

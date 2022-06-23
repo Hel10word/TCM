@@ -25,7 +25,7 @@ class CommandManageTest {
         StringBuilder sb = new StringBuilder(filePath);
         sb.append(tableName).append("_")
                 .append("MySQL").append("_to_")
-                .append("PgSQL");
+                .append("PostgreSQL");
         String csvFilePath = sb.append(".csv").toString();
         String loadShellFilePath = csvFilePath.replace(".csv","_load.sh");
         String exportShellFilePath = csvFilePath.replace(".csv","_export.sh");

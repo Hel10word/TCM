@@ -32,6 +32,7 @@ public class Table implements Cloneable {
     // Schema
     private String schemaName;
     private String tableName;
+    private String primaryKeyName;
     private List<String> primaryKeys = new LinkedList<>();
     private List<Column> columns = new LinkedList<>();
 
@@ -69,6 +70,15 @@ public class Table implements Cloneable {
 
     public Table setTableName(String tableName) {
         this.tableName = tableName;
+        return this;
+    }
+
+    public String getPrimaryKeyName() {
+        return primaryKeyName;
+    }
+
+    public Table setPrimaryKeyName(String primaryKeyName) {
+        this.primaryKeyName = primaryKeyName;
         return this;
     }
 
@@ -114,8 +124,8 @@ public class Table implements Cloneable {
     }
 
     public String outInfo(){
-        return String.format("DataSourceEnum:%-20s OriginalDataSourceEnum:%-20s CatalogName:%-20s SchemaName:%-20s TableName:%-20s ColumnCount:%-20s PrimaryKeys:%-20s",
-                                dataSourceEnum,     originalDataSourceEnum,     catalogName,      schemaName,       tableName,      columns.size(),     primaryKeys);
+        return String.format("DataSourceEnum:%-20s OriginalDataSourceEnum:%-20s CatalogName:%-20s SchemaName:%-20s TableName:%-20s ColumnCount:%-20s PrimaryKeyName:%-20s PrimaryKeys:%-20s",
+                                dataSourceEnum,     originalDataSourceEnum,     catalogName,      schemaName,       tableName,      columns.size(),   primaryKeyName,      primaryKeys);
     }
 
     @Override
@@ -130,6 +140,7 @@ public class Table implements Cloneable {
             List<Column> cloneList = new LinkedList<>();
             for(Column column : this.columns)
                 cloneList.add(column.clone());
+            table.setPrimaryKeyName(null);
             table.setPrimaryKeys(primaryKeys);
             table.setColumns(cloneList);
             table.setCatalogName(null);

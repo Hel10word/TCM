@@ -9,6 +9,7 @@ import com.boraydata.cdc.tcm.common.TableCloneManagerConfig;
 import com.boraydata.cdc.tcm.mapping.DataMappingSQLTool;
 import com.boraydata.cdc.tcm.mapping.MappingTool;
 import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
+import com.boraydata.cdc.tcm.syncing.DataSyncingCSVConfigTool;
 import com.boraydata.cdc.tcm.syncing.SyncingTool;
 import com.boraydata.cdc.tcm.utils.FileUtil;
 import com.boraydata.cdc.tcm.utils.StringUtil;
@@ -143,7 +144,8 @@ public class TableCloneManager {
                 column.setDataType(rs.getString(dsType.DataType));
                 column.setUdtType(rs.getString(dsType.UdtType));
                 column.setOrdinalPosition(rs.getInt(dsType.OrdinalPosition));
-                column.setNullable(rs.getBoolean(dsType.IsNullAble));
+                // SQL Server getString = YES but getBoolean = false
+                column.setNullable(StringUtil.isBoolean(rs.getString(dsType.IsNullAble)));
 
                 String characterMaximumLength = rs.getString(dsType.CharacterMaximumLength);
                 if(StringUtil.isNullOrEmpty(characterMaximumLength))
@@ -182,9 +184,12 @@ public class TableCloneManager {
                 getPrimaryKeysPs.setString(3, tableName);
             }
             rs = getPrimaryKeysPs.executeQuery();
+            String primaryKeyName = null;
             LinkedList<String> primaryKeys = new LinkedList<>();
-            while (rs.next())
+            while (rs.next()) {
                 primaryKeys.add(rs.getString(dsType.ColumnName));
+                primaryKeyName = rs.getString(dsType.PrimaryKeyName);
+            }
 
 
             Table table = new Table();
@@ -193,6 +198,7 @@ public class TableCloneManager {
             table.setSchemaName(tableSchema);
             table.setTableName(tableName);
             table.setColumns(columns);
+            table.setPrimaryKeyName(primaryKeyName);
             table.setPrimaryKeys(primaryKeys);
             return table;
         }catch (SQLException e) {
@@ -215,19 +221,17 @@ public class TableCloneManager {
             cloneTable = this.cloneMappingTool.createCloneMappingTable(table);
             cloneTable.setTableName(tableName);
             DatabaseConfig cloneConfig = this.tableCloneManagerContext.getCloneConfig();
-            if(Boolean.FALSE.equals(StringUtil.isNullOrEmpty(cloneConfig.getCatalog())))
+            if(StringUtil.nonEmpty(cloneConfig.getCatalog()))
                 cloneTable.setCatalogName(cloneConfig.getCatalog());
-            if(Boolean.FALSE.equals(StringUtil.isNullOrEmpty(cloneConfig.getSchema())))
+            if(StringUtil.nonEmpty(cloneConfig.getSchema()))
                 cloneTable.setSchemaName(cloneConfig.getSchema());
-            List<String> primaryKeys = new LinkedList<>();
+            List<String> primaryKeys = cloneTable.getPrimaryKeys();
 
-            if(Boolean.FALSE.equals(tableCloneManagerContext.getTcmConfig().getCreatePrimaryKeyInClone())) {
-                primaryKeys = cloneTable.getPrimaryKeys();
+            if(Boolean.FALSE.equals(tableCloneManagerContext.getTcmConfig().getCreatePrimaryKeyInClone()))
                 cloneTable.setPrimaryKeys(null);
-            }
             String createTableSQL = this.cloneMappingTool.getCreateTableSQL(cloneTable);
-            if(Boolean.FALSE.equals(primaryKeys.isEmpty()))
-                cloneTable.setPrimaryKeys(primaryKeys);
+
+            cloneTable.setPrimaryKeys(primaryKeys);
 
             this.tableCloneManagerContext.setCloneTableSQL(createTableSQL);
             if(Boolean.TRUE.equals(this.tableCloneManagerContext.getTcmConfig().getOutCloneTableSQL())){
@@ -292,8 +296,9 @@ public class TableCloneManager {
     public Boolean exportTableData(){
 //        if(DataSourceEnum.HUDI.equals(this.cloneConfig.getDataSourceEnum()))
 //            return true;
+        DataSyncingCSVConfigTool.CompleteContext(this.tableCloneManagerContext);
 
-        String sourceType = this.cloneConfig.getDataSourceEnum().toString();
+        String sourceType = this.tableCloneManagerContext.getSourceConfig().getDataSourceEnum().toString();
         Table tempTable = this.tableCloneManagerContext.getTempTable();
         Table sourceTable = this.tableCloneManagerContext.getSourceTable();
         Table table = Objects.isNull(tempTable)?sourceTable:tempTable;
@@ -303,7 +308,7 @@ public class TableCloneManager {
         String exportShellPath = this.tableCloneManagerContext.getTempDirectory()+exportShellName;
 
         if(StringUtil.isNullOrEmpty(this.tableCloneManagerContext.getCsvFileName()) || this.tableCloneManagerContext.getCsvFileName().replaceAll("\"","").replaceAll("'","").length() == 0) {
-            String csvFileName = "Export_from_" + sourceType + "_" + table.getTableName() + ".csv";
+            String csvFileName = "Export_from_" + sourceType + "_" + sourceTable.getTableName() + ".csv";
             this.tableCloneManagerContext.setCsvFileName(csvFileName);
         }
 
@@ -349,6 +354,10 @@ public class TableCloneManager {
             logger.warn("Not Execute Load Data Script!!!!!!");
             return true;
         }
+    }
+
+    public TableCloneManagerContext getTableCloneManagerContext() {
+        return tableCloneManagerContext;
     }
 
     // ========================================  Delete Cache File  ===========================

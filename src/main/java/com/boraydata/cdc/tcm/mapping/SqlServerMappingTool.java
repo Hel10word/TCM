@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * deal with the mapping relationship between Mysql Type and TCM Type
+ * deal with the mapping relationship between MySQL Type and TCM Type
  * @since Fabric CDC V1.0 mainly uses the debezium plugin for parsing binlog log,so refer to part of the design.
  * design by :
  * @see <a href="https://debezium.io/documentation/reference/1.0/connectors/sqlserver.html#sqlserver-data-types"></a>
@@ -139,12 +139,24 @@ public class SqlServerMappingTool implements MappingTool{
      *
      * @Param Table : table={null,SQLSERVER,test_table,columns={null,null,col_int,DataType=INT,dataTypeMapping=INT32}}
      * @Return: String
+     * @see <a href="https://database.guide/2-ways-to-create-a-table-if-it-doesnt-exist-in-sql-server/"></a>
+     * @see <a href="https://stackoverflow.com/questions/6520999/create-table-if-not-exists-equivalent-in-sql-server"></a>
      */
     @Override
     public String getCreateTableSQL(Table table) {
         if(table.getTableName() == null)
             throw new TCMException("Failed in create table SQL,Because ‘Table.TableName’ is null. You should set one ."+table.getDataSourceEnum().name());
-        StringBuilder stringBuilder = new StringBuilder("Create Table "+table.getTableName()+"(\n");
+
+        StringBuilder stringBuilder = new StringBuilder();
+        String schemaName = table.getSchemaName();
+        if(StringUtil.isNullOrEmpty(schemaName))
+            schemaName = "dbo";
+        String tableName = schemaName+"."+table.getTableName();
+        //        IF OBJECT_ID(N'dbo.t1',N'U') IS NULL
+        stringBuilder.append("IF OBJECT_ID(N'").append(tableName).append("',N'U') IS NULL \n");
+
+
+        stringBuilder.append("Create Table "+tableName+"(\n");
         List<Column> columns = table.getColumns();
         for(Column column : columns){
             TCMDataTypeEnum tcmDataTypeEnum = column.getTCMDataTypeEnum();
@@ -219,6 +231,7 @@ public class SqlServerMappingTool implements MappingTool{
                 }else {
                     // nothing to do
                     // SQL Server default is decimal(18,0)
+                    stringBuilder.append("(38,24)");
                 }
             }else {
                 // Nothing to do

@@ -38,7 +38,7 @@ public class TestDataProvider {
             .setUsername("root")
             .setPassword("root");
 
-    //========================== PgSQL ===============================
+    //========================== PostgreSQL ===============================
     public static DatabaseConfig PostgreSQLConfig = new DatabaseConfig()
             .setDatabaseName("test_db")
             .setDataSourceEnum(DataSourceEnum.POSTGRESQL)
@@ -88,6 +88,12 @@ public class TestDataProvider {
         return getTCMConfig().setSourceConfig(sourceConfig).setCloneConfig(cloneConfig).checkConfig();
     }
 
+    public static TableCloneManagerContext getTCMContext(TableCloneManagerConfig config){
+        TableCloneManagerContext.Builder tcmcBuilder = new TableCloneManagerContext.Builder();
+        return tcmcBuilder
+                .setTcmConfig(config)
+                .create();
+    }
     public static TableCloneManagerContext getTCMContext(DatabaseConfig sourceConfig, DatabaseConfig cloneConfig){
         TableCloneManagerContext.Builder tcmcBuilder = new TableCloneManagerContext.Builder();
         return tcmcBuilder

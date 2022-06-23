@@ -15,7 +15,7 @@ import com.boraydata.cdc.tcm.syncing.util.ScalaScriptGenerateUtil;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum TCMDataTypeEnum {
-//  tcm Type        Type name       default MySQL type              default PgSQL type          default SQL Server type     default HIVE type        default Scala DataFrame type
+//  tcm Type        Type name       default MySQL type              default PostgreSQL type          default SQL Server type     default HIVE type        default Scala DataFrame type
     INT8        ("INT8",        "TINYINT",          "SMALLINT",         "TINYINT",          "SMALLINT",      "IntegerType"),
     INT16       ("INT16",       "SMALLINT",         "SMALLINT",         "SMALLINT",         "SMALLINT",      "IntegerType"),
     INT32       ("INT32",       "INTEGER",          "INT",              "INT",              "INT",           "IntegerType"),
@@ -30,7 +30,6 @@ public enum TCMDataTypeEnum {
     TIME        ("TIME",        "TIME",             "TIME",             "TIME",             "TIMESTAMP",     "TimestampType"),
     TIMESTAMP   ("TIMESTAMP",   "TIMESTAMP",        "TIMESTAMP",        "DATETIMEOFFSET",   "TIMESTAMP",     "TimestampType"),
     TEXT        ("TEXT",        "LONGTEXT",         "TEXT",             "NTEXT",            "STRING",        "StringType"),
-
     ;
 
     /**

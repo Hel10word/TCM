@@ -32,4 +32,19 @@ class StringUtilTest {
 //    }
 
 
+    @Test
+    void escapeStrTest() {
+        System.out.println(StringUtil.escapeRegexQuoteEncode("\n"));
+        char ball = (char) 7;
+        String ball_str = String.valueOf(ball);
+        System.out.println(ball);
+        System.out.println(ball_str);
+        String oct = "\011";
+        String hex = "\u0011";
+        System.out.println(oct);
+        System.out.println(hex);
+
+    }
+
+
 }

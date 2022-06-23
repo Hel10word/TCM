@@ -6,9 +6,17 @@ import java.util.Map;
 import java.util.Random;
 
 public class StringUtil {
-    // judgment String is null or empty
+    // judgment String is null or empty, null ''  "" ,all return true
     public static boolean isNullOrEmpty(String string) {
         return string == null || string.isEmpty();
+    }
+    public static boolean nonEmpty(String string) {
+        return !isNullOrEmpty(string);
+    }
+    public static Boolean isBoolean(String string){
+        if("YES".equalsIgnoreCase(string) || "TRUE".equalsIgnoreCase(string))
+            return Boolean.TRUE;
+        return Boolean.FALSE;
     }
 
     // Format DataType
@@ -48,4 +56,39 @@ public class StringUtil {
                 x -> x.equalsIgnoreCase(StringUtil.dataTypeFormat(string))
         ).findFirst().map(map::get).orElse(def);
     }
+
+    // '/' => '////'
+    public static String escapeRegexEncode(String str){
+        if(isNullOrEmpty(str))
+            return "";
+        if("\n".equalsIgnoreCase(str))
+            return "\\n";
+        return str.replaceAll("\\\\","\\\\\\\\\\\\\\\\");
+    }
+
+
+    public static String escapeRegexSingleQuoteEncode(String str){
+        if(isNullOrEmpty(str))
+            return "";
+        if("\n".equalsIgnoreCase(str))
+            return "\\n";
+        return str.replaceAll("'","\\\\\\'");
+    }
+    public static String escapeRegexDoubleQuoteEncode(String str){
+        if(isNullOrEmpty(str))
+            return "";
+        if("\n".equalsIgnoreCase(str))
+            return "\\n";
+        return str.replaceAll("\"","\\\\\\\"");
+    }
+
+    // java: \\\\\\\"    out to file: \\\"    e.g. quote:"\\\""    in  regex \"
+    public static String escapeRegexQuoteEncode(String str){
+        if(isNullOrEmpty(str))
+            return "";
+        if("\n".equalsIgnoreCase(str))
+            return "\\n";
+        return escapeRegexDoubleQuoteEncode(escapeRegexSingleQuoteEncode(escapeRegexEncode(str)));
+    }
+
 }

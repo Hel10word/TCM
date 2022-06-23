@@ -89,7 +89,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>cdc-libs/</classpathPrefix>
+                            <classpathPrefix>${class-path}</classpathPrefix>
                             <mainClass>${main-class}</mainClass>
                         </manifest>
                     </archive>
@@ -108,11 +108,13 @@
     </build>
 
     <properties>
+        <class-path>cdc-libs/</class-path>
         <main-class>com.boraydata.cdc.tcm.TableCloneManagerLauncher</main-class>
 <!--        <main-class>com.boraydata.cdc.tcm.Test</main-class>-->
         <log4j-configuration-file>log4j2.xml</log4j-configuration-file>
 
         <hive-jdbc-standalone.version>1.0</hive-jdbc-standalone.version>
+<!--        <mysql-connector-java.version>5.1.46</mysql-connector-java.version>-->
         <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
         <postgresql.version>42.3.1</postgresql.version>
 <!--    https://docs.microsoft.com/en-us/sql/connect/jdbc/connecting-with-ssl-encryption?view=sql-server-linux-ver15    -->

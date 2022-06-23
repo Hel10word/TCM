@@ -20,19 +20,19 @@ public class JDBC_StreamTest {
     //========================== MySQL ===============================
     DatabaseConfig configMySQL = TestDataProvider.MySQLConfig;
 
-    //========================== PgSQL ===============================
-    DatabaseConfig configPGSQL = TestDataProvider.PostgreSQLConfig;
+    //========================== PostgreSQL ===============================
+    DatabaseConfig configPostgreSQL = TestDataProvider.PostgreSQLConfig;
 
-    private String sql = "select * from lineitem_sf1_pgsql limit 10000;";
+    private String sql = "select * from lineitem_sf1_postgreSQL limit 10000;";
 
     Connection mysqlCon = DatasourceConnectionFactory.createDataSourceConnection(TestDataProvider.MySQLConfig);
-    Connection pgsqlCon = DatasourceConnectionFactory.createDataSourceConnection(configPGSQL);
+    Connection postgreSQLCon = DatasourceConnectionFactory.createDataSourceConnection(configPostgreSQL);
 
     @Test
     public void foo(){
         long start = System.currentTimeMillis();
         try{
-            PreparedStatement stmt = pgsqlCon.prepareStatement(sql);
+            PreparedStatement stmt = postgreSQLCon.prepareStatement(sql);
             stmt.setFetchSize(1000);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()){
@@ -82,8 +82,8 @@ public class JDBC_StreamTest {
     @Test
     public void insert(Connection con, String[] args){
 
-//        INSERT INTO "lineitem_pgsql" VALUES (1701, 53004, 3005, 2, '2.00', '1914.00', '0.01', '0.04', 'R', 'F', '1992-06-24', '1992-07-12', '1992-06-29', 'COLLECT COD              ', 'SHIP      ', 'ween the pending, final accounts. ');
-        String insStr = "INSERT INTO lineitem_sf1_pgsql VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+//        INSERT INTO "lineitem_postgreSQL" VALUES (1701, 53004, 3005, 2, '2.00', '1914.00', '0.01', '0.04', 'R', 'F', '1992-06-24', '1992-07-12', '1992-06-29', 'COLLECT COD              ', 'SHIP      ', 'ween the pending, final accounts. ');
+        String insStr = "INSERT INTO lineitem_sf1_postgreSQL VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
         try{
             PreparedStatement stmt = con.prepareStatement(insStr);
             stmt.setFetchSize(1000);

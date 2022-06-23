@@ -43,6 +43,9 @@ import java.util.Objects;
         "deleteCache",
         "tempDirectory",
         "delimiter",
+        "lineSeparate",
+        "quote",
+        "escape",
         "debug",
 })
 public class TableCloneManagerConfig {
@@ -159,6 +162,21 @@ public class TableCloneManagerConfig {
      * default: | (Optional)
      */
     private String delimiter = "|";
+    /**
+     * Separator for each line of CSV file
+     * default: \n (Optional)
+     */
+    private String lineSeparate = "\n";
+    /**
+     * quoter each field of CSV file
+     * default: " (Optional)
+     */
+    private String quote = "\"";
+    /**
+     * escape delimiter of CSV file
+     * default: \ (Optional)
+     */
+    private String escape = "\\";
     /**
      * Whether to output detailed information during the running process
      * default: false (Optional)
@@ -424,6 +442,33 @@ public class TableCloneManagerConfig {
 
     public TableCloneManagerConfig setDelimiter(String delimiter) {
         this.delimiter = delimiter;
+        return this;
+    }
+
+    public String getLineSeparate() {
+        return lineSeparate;
+    }
+
+    public TableCloneManagerConfig setLineSeparate(String lineSeparate) {
+        this.lineSeparate = lineSeparate;
+        return this;
+    }
+
+    public String getQuote() {
+        return quote;
+    }
+
+    public TableCloneManagerConfig setQuote(String quote) {
+        this.quote = quote;
+        return this;
+    }
+
+    public String getEscape() {
+        return escape;
+    }
+
+    public TableCloneManagerConfig setEscape(String escape) {
+        this.escape = escape;
         return this;
     }
 

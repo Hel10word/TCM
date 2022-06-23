@@ -29,6 +29,7 @@ public enum DataSourceEnum {
             MySQLContent.SQL_TABLE_INFO_BY_TABLE_NAME,
             MySQLContent.SQL_TABLE_INFO_BY_CATALOG,
             MySQLContent.SQL_ALL_TABLE_INFO,
+            MySQLContent.PRIMARY_KEY_NAME,
             MySQLContent.SQL_GET_PRIMARY_KEYS
             ),
         POSTGRESQL(
@@ -47,6 +48,7 @@ public enum DataSourceEnum {
             PostgreSQLContent.SQL_TABLE_INFO_BY_TABLE_NAME,
             PostgreSQLContent.SQL_TABLE_INFO_BY_CATALOG,
             PostgreSQLContent.SQL_ALL_TABLE_INFO,
+            PostgreSQLContent.PRIMARY_KEY_NAME,
             PostgreSQLContent.SQL_GET_PRIMARY_KEYS
             ),
         SQLSERVER(
@@ -65,9 +67,11 @@ public enum DataSourceEnum {
                 SQLServerContent.SQL_TABLE_INFO_BY_TABLE_NAME,
                 SQLServerContent.SQL_TABLE_INFO_BY_CATALOG,
                 SQLServerContent.SQL_ALL_TABLE_INFO,
+                SQLServerContent.PRIMARY_KEY_NAME,
                 SQLServerContent.SQL_GET_PRIMARY_KEYS
         ),
         HUDI(
+            null,
             null,
             null,
             null,
@@ -129,6 +133,7 @@ public enum DataSourceEnum {
     public final String SQL_TableInfoByTableName;
     public final String SQL_TableInfoByCatalog;
     public final String SQL_AllTableInfo;
+    public final String PrimaryKeyName;
     public final String SQL_GetPrimaryKeys;
 
 
@@ -148,6 +153,8 @@ public enum DataSourceEnum {
                    String SQL_TableInfoByTableName,
                    String SQL_TableInfoByCatalog,
                    String SQL_AllTableInfo,
+                   //PRIMARY_KEY_NAME
+                   String PrimaryKeyName,
                    String SQL_GetPrimaryKeys){
         this.TableCatalog = TableCatalog;
         this.TableSchema = TableSchema;
@@ -165,6 +172,7 @@ public enum DataSourceEnum {
         this.SQL_TableInfoByTableName = SQL_TableInfoByTableName;
         this.SQL_TableInfoByCatalog = SQL_TableInfoByCatalog;
         this.SQL_AllTableInfo = SQL_AllTableInfo;
+        this.PrimaryKeyName = PrimaryKeyName;
         this.SQL_GetPrimaryKeys = SQL_GetPrimaryKeys;
     }
 
@@ -204,24 +212,25 @@ public enum DataSourceEnum {
                 " "+TABLE_SCHEMA+" not in ('INFORMATION_SCHEMA','SYS','PERFORMANCE_SCHEMA','MYSQL') ";
         private static final String ORDER_BY = " ORDER BY "+TABLE_NAME+","+ORDINAL_POSITION+" ";
 
-     private static final String SQL_TABLE_INFO_BY_TABLE_NAME =
+        private static final String SQL_TABLE_INFO_BY_TABLE_NAME =
              SELECT_TABLE_COLUMN+
                      SELECT_TABLE_FROM+
                      WHERE+WHERE_TABLE_NAME+
                      ORDER_BY+";";
-     private static final String SQL_TABLE_INFO_BY_CATALOG =
+        private static final String SQL_TABLE_INFO_BY_CATALOG =
              SELECT_TABLE_COLUMN+
                      SELECT_TABLE_FROM+
                      WHERE+WHERE_TABLE_CATALOG+
                      ORDER_BY+";";
-     private static final String SQL_ALL_TABLE_INFO =
+        private static final String SQL_ALL_TABLE_INFO =
              SELECT_TABLE_COLUMN+
                      SELECT_TABLE_FROM+
                      WHERE+WHERE_ALL_TABLE+
                      ORDER_BY+";";
 
-     private static final String SQL_GET_PRIMARY_KEYS =
-             "SELECT k.COLUMN_NAME as "+COLUMN_NAME+" ,k.ORDINAL_POSITION\n" +
+        private static final String PRIMARY_KEY_NAME = "CONSTRAINT_NAME";
+        private static final String SQL_GET_PRIMARY_KEYS =
+             "SELECT k.COLUMN_NAME as "+COLUMN_NAME+" ,t.CONSTRAINT_NAME as "+PRIMARY_KEY_NAME+",k.ORDINAL_POSITION\n" +
                      "FROM information_schema.table_constraints t\n" +
                      "JOIN information_schema.key_column_usage k\n" +
                      "USING(constraint_name,table_schema,table_name)\n" +
@@ -279,14 +288,15 @@ public enum DataSourceEnum {
                         WHERE+WHERE_ALL_TABLE+
                         ORDER_BY+";";
 
+        private static final String PRIMARY_KEY_NAME = "conname";
         private static final String SQL_GET_PRIMARY_KEYS =
                 "with pg_pk as (\n" +
-                "    select conrelid,conname,pg_get_constraintdef(oid) as constraintdef,unnest(conkey) as pk_order\n" +
+                "    select conrelid,conname,conkey,pg_get_constraintdef(oid) as constraintdef,unnest(conkey) as pk_order\n" +
                 "        FROM pg_constraint\n" +
                 "    where\n" +
                 "        conrelid = ?::regclass \n" +
                 ")\n" +
-                "select pg_pk.conrelid,pg_pk.conname,constraintdef,a.attname as "+COLUMN_NAME+",a.attnum \n" +
+                "select pg_pk.conrelid,pg_pk.conname as "+PRIMARY_KEY_NAME+",constraintdef,a.attname as "+COLUMN_NAME+",a.attnum \n" +
                 "    from pg_pk \n" +
                 "    left join pg_attribute a on a.attrelid = pg_pk.conrelid and a.attnum = pg_pk.pk_order";
     }
@@ -337,8 +347,9 @@ public enum DataSourceEnum {
                         WHERE+WHERE_ALL_TABLE+
                         ORDER_BY+";";
 
+        private static final String PRIMARY_KEY_NAME = "CONSTRAINT_NAME";
         private static final String SQL_GET_PRIMARY_KEYS =
-                "SELECT column_name as "+COLUMN_NAME+",KU.ORDINAL_POSITION\n" +
+                "SELECT column_name as "+COLUMN_NAME+",TC.CONSTRAINT_NAME as "+PRIMARY_KEY_NAME+",KU.ORDINAL_POSITION\n" +
                 "FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS TC\n" +
                 "INNER JOIN\n" +
                 "    INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS KU\n" +

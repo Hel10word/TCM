@@ -26,17 +26,18 @@ public class GetTableInfoTest {
 //            .setPassword("root")
 //            .create();
 
-    DatabaseConfig pgsqlConfig = TestDataProvider.PostgreSQLConfig;
+    DatabaseConfig postgreSQLConfig = TestDataProvider.PostgreSQLConfig;
 
     DatabaseConfig sqlserverConfig = TestDataProvider.SQLServerConfig.setCatalog("test_db").setSchema("dbo");
 
-    String tableName = "test";
+//    String tableName = "test_table";
+    String tableName = "test_table_clone";
 //    String tableName = "lineitem_sf10";
 //    String tableName = "customer";
 //    String tableName = "testtable";
 //    String tableName = "exact_numerics_sqlserver";
-//    DatabaseConfig config = mysqlConfig;
-    DatabaseConfig config = pgsqlConfig;
+    DatabaseConfig config = mysqlConfig;
+//    DatabaseConfig config = postgreSQLConfig;
 //    DatabaseConfig config = sqlserverConfig;
     @Test
     public void test(){

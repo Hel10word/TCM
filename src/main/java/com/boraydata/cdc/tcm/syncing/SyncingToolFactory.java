@@ -11,9 +11,9 @@ public class SyncingToolFactory {
 
         switch (dataSourceEnum){
             case MYSQL:
-                return new MysqlSyncingTool();
+                return new MySQLSyncingTool();
             case POSTGRESQL:
-                return new PgsqlSyncingTool();
+                return new PostgreSQLSyncingTool();
             case SQLSERVER:
                 return new SqlServerSyncingTool();
             case HUDI:

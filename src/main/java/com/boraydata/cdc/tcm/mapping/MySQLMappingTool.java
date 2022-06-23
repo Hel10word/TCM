@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * deal with the mapping relationship between Mysql Type and TCM Type
+ * deal with the mapping relationship between MySQL Type and TCM Type
  * @since Fabric CDC V1.0 mainly uses the debezium plugin for parsing binlog log,so refer to part of the design.
  * design by :
  * @see <a href="https://debezium.io/documentation/reference/1.0/connectors/mysql.html#how-the-mysql-connector-maps-data-types_cdc"></a>
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @author bufan
  * @date 2021/8/31
  */
-public class MysqlMappingTool implements MappingTool {
+public class MySQLMappingTool implements MappingTool {
 
     private static final Map<String, TCMDataTypeEnum> mappingMap = new LinkedHashMap<>();
     static {

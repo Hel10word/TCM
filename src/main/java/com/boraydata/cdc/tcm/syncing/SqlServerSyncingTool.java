@@ -3,7 +3,10 @@ package com.boraydata.cdc.tcm.syncing;
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
+import com.boraydata.cdc.tcm.entity.Column;
 import com.boraydata.cdc.tcm.entity.Table;
+import com.boraydata.cdc.tcm.syncing.util.SqlServerIndexTool;
+import com.boraydata.cdc.tcm.utils.StringUtil;
 
 import java.util.Objects;
 
@@ -11,21 +14,6 @@ import java.util.Objects;
 /**
  * Export and Load Table Data by SQL Server
  *
- * hudiFlag:
- *      Spark parsing CSV If you need to use Escape characters, you need to enclose the field,
- *      that is, you can use Escape only in combination with the Quote attribute.
- * @see <a href="https://spark.apache.org/docs/3.2.0/sql-data-sources-csv.html"></a>
- *  e.g.
- *      delimiter:,
- *      escape:\
- *      Source Table Data:{test,test-delimiter:,,test-escape:\,test-quote:"}
- *      default CSV File => test,test-delimiter:\,,test-escape:\\,test-quote:"
- *      But Spark need => "test","test-delimiter:,","test-escape:\\","test-quote:\""
- *
- *      val df = spark.read.option("delimiter", ",").option("escape", "\\").option("quote", "\"").csv(path)
- *      df.show()
- *   each column of Csv File will be wrapped with the content of Quote. If the data contains Escape or Quote
- *    you need to add Escape in front of it to Escape.
  * @author : bufan
  * @date : 2022/6/11
  */
@@ -33,7 +21,6 @@ public class SqlServerSyncingTool implements SyncingTool {
     @Override
     public String getExportInfo(TableCloneManagerContext tcmContext) {
         return generateExportSQLByBCP(tcmContext);
-//        return null;
     }
 
 
@@ -41,7 +28,6 @@ public class SqlServerSyncingTool implements SyncingTool {
     @Override
     public String getLoadInfo(TableCloneManagerContext tcmContext) {
         return generateLoadSQLByBCP(tcmContext);
-//        return null;
     }
 
 
@@ -51,17 +37,22 @@ public class SqlServerSyncingTool implements SyncingTool {
         if(tcmContext.getTcmConfig().getDebug())
             System.out.println(outStr);
         return true;
-//        return null;
     }
-    // todo 导入前禁用索引
-    // https://docs.microsoft.com/zh-cn/sql/relational-databases/indexes/clustered-and-nonclustered-indexes-described?view=sql-server-ver16
+
     @Override
     public Boolean executeLoad(TableCloneManagerContext tcmContext) {
+        Boolean haveIndex = SqlServerIndexTool.fillingPrimaryKeyName(tcmContext);
+
+        if(Boolean.TRUE.equals(haveIndex) && Boolean.FALSE.equals(SqlServerIndexTool.disableIndex(tcmContext)))
+            return false;
         String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
+
+        if(Boolean.TRUE.equals(haveIndex) && Boolean.FALSE.equals(SqlServerIndexTool.rebuildIndex(tcmContext)))
+            return false;
+
         if(tcmContext.getTcmConfig().getDebug())
             System.out.println(outStr);
         return true;
-//        return null;
     }
 
 
@@ -77,21 +68,24 @@ public class SqlServerSyncingTool implements SyncingTool {
      * have a question,bcp export csv unsupport escape or quotes
      * @see <a href="https://stackoverflow.com/questions/1976086/getting-bcp-exe-to-escape-terminators"></a>
      * @see <a href="https://stackoverflow.com/questions/2061113/sql-server-bcp-how-to-put-quotes-around-all-fields"></a>
+     * unable support Escape by official
+     * @see <a href="https://docs.microsoft.com/en-us/sql/relational-databases/import-export/specify-field-and-row-terminators-sql-server?view=sql-server-linux-ver15#characters-supported-as-terminators"></a>
      */
 
 
     /**
-     * bcp dbo.lineitem out /opt/export.csv -S 127.0.0.1,1433 -U sa -P 123 -d test_db -c -r '\n' -a 4096 -t '|'
-     * @return bcp ? -S localhost,port -U username -P password -d databasesName -c -r '\n' -a 4096 -t
+     * bcp dbo.lineitem out /opt/export.csv -S 127.0.0.1,1433 -U sa -P 123 -d test_db -c -a 4096
+     * @return bcp ? -S localhost,port -U username -P password -d databasesName -c -a 4096
+     * -t delimiter
+     * -r lineSeparate
      */
     private String getBCPConnectCommand(DatabaseConfig config) {
-        return String.format("bcp ? -S %s,%s -U %s -P %s -d %s -c -r '%s' -a 4096 -t ",
+        return String.format("bcp ? -S %s,%s -U %s -P %s -d %s -c -a 4096 ",
                 config.getHost(),
                 config.getPort(),
                 config.getUsername(),
                 config.getPassword(),
-                config.getDatabaseName(),
-                "\\n");
+                config.getDatabaseName());
     }
 
     /**
@@ -102,7 +96,7 @@ public class SqlServerSyncingTool implements SyncingTool {
 
         Table tempTable = tcmContext.getTempTable();
         Table sourceTable = tcmContext.getSourceTable();
-        boolean hudiFlag = DataSourceEnum.HUDI.equals(tcmContext.getCloneConfig().getDataSourceEnum());
+//        boolean hudiFlag = DataSourceEnum.HUDI.equals(tcmContext.getCloneConfig().getDataSourceEnum());
 
         /**
          *  because Hudi Data storage in Hive,Hive Data Type not support Boolean(0,1,"t","f"),
@@ -111,54 +105,104 @@ public class SqlServerSyncingTool implements SyncingTool {
          */
         String tableName = "";
         if(Boolean.FALSE.equals(Objects.isNull(tempTable)))
-            tableName = "\""+tcmContext.getTempTableSelectSQL()+"\"";
+            tableName = tcmContext.getTempTableSelectSQL();
         else
-            tableName = tcmContext.getSourceConfig().getSchema()+"."+sourceTable.getTableName();
+            tableName = "select * from "+tcmContext.getSourceConfig().getSchema()+"."+sourceTable.getTableName();
 
         String csvPath = "./"+tcmContext.getCsvFileName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
+        String lineSeparate = tcmContext.getTcmConfig().getLineSeparate();
+        String quote = tcmContext.getTcmConfig().getQuote();
+        String escape = tcmContext.getTcmConfig().getEscape();
         String bcpConnectCommand = getBCPConnectCommand(tcmContext.getSourceConfig());
-        String exportContent = replaceExportStatementShellByOut(bcpConnectCommand,tableName,csvPath,delimiter,hudiFlag);
+//        String exportContent = replaceExportStatementShellByOut(bcpConnectCommand,tableName,csvPath,delimiter,hudiFlag);
+        String exportContent = eplaceExportStatementShell(bcpConnectCommand,sourceTable,tableName,csvPath,delimiter,lineSeparate,quote,escape);
+
+        /**
+         * echo -e "aaa \r\n cccc" | sed -r 's/\r/bbbb/g'
+         * echo -e "aaa \r\n cccc" | sed -r ":x;N;s/\r\n/\\\r\\\n/g;bx"
+         * @see <a href="https://www.gnu.org/software/sed/manual/sed.html#sed-commands-list"></a>
+         * @see <a href="https://www.gnu.org/software/sed/manual/sed.html#Branching-and-flow-control"></a>
+         */
+        if(DataSourceEnum.POSTGRESQL.equals(tcmContext.getCloneConfig().getDataSourceEnum()))
+            exportContent = exportContent+"\n"+
+                    "sed -r -i \":x;N;s/\\r\\n/\\\\\\r\\\\\\n/g;bx\" "+csvPath;
+
         tcmContext.setExportShellContent(exportContent);
         return exportContent;
     }
 
 
     /**
-     * @param tableName dbo.lineitem
-     * @param com bcp ? -S localhost,port -U username -P password -d databasesName -c -r '\n' -a 4096 -t
-     * @return bcp dbo.lineitem out /opt/export.csv -S 127.0.0.1,1433 -U sa -P 123 -d test_db -c -r '\n' -a 4096 -t '|'
+     * @see <a href="https://docs.microsoft.com/zh-cn/sql/tools/bcp-utility?view=sql-server-linux-ver15#g-copying-data-from-a-query-to-a-data-file"></a>
      */
-    private String replaceExportStatementShellByOut(String com,String tableName,String filePath, String delimiter,boolean hudiFlag) {
-        if(hudiFlag)
-            return com.replace("?",tableName+" to " + "'"+filePath+"' with DELIMITER '"+delimiter+"' CSV QUOTE '\\\"' escape '\\\\' force quote *;");
-        else
-            return com.replace("?",tableName+" out '"+filePath+"'")+"'"+delimiter+"'";
-    }
-    /**
-     * @param tableName "select * from lineitem"
-     * @param com bcp ? -S localhost,port -U username -P password -d databasesName -c -r '\n' -a 4096 -t
-     * @return bcp "select * from dbo.lineitem" queryout /opt/export.csv -S 127.0.0.1,1433 -U sa -P 123 -d test_db -c -r '\n' -a 4096 -t '|'
-     */
-    private String replaceExportStatementShellByQueryout(String com,String tableName,String filePath, String delimiter,boolean hudiFlag) {
-        if(hudiFlag)
-            return com.replace("?",tableName+" to " + "'"+filePath+"' with DELIMITER '"+delimiter+"' CSV QUOTE '\\\"' escape '\\\\' force quote *;");
-        else
-            return com.replace("?",tableName+" queryout '"+filePath+"'")+"'"+delimiter+"'";
+    private String eplaceExportStatementShell(String con,Table table, String tableName, String filePath, String delimiter,String lineSeparate,String quote,String escape){
+//        tableName = StringUtil.escapeRegexQuoteEncode(tableName);
+        delimiter = StringUtil.escapeRegexSingleQuoteEncode(delimiter).replaceAll("\\\\","\\\\");
+        lineSeparate = StringUtil.escapeRegexSingleQuoteEncode(lineSeparate).replaceAll("\\\\","\\\\");
+        quote = StringUtil.escapeRegexQuoteEncode(quote).replaceAll("\\\\","\\\\\\\\");
+//        escape = StringUtil.escapeRegexQuoteEncode(escape).replaceAll("\\\\","\\\\\\\\");
+
+        /**
+         * with t1 as(
+         * 	select l_boolean,booleanMapping = iif(l_boolean = 1,'True','False') from test_table
+         * )
+         * select QUOTENAME(booleanMapping ,'"') from t1
+         * @see <a href="https://docs.microsoft.com/en-us/sql/t-sql/functions/logical-functions-iif-transact-sql?view=sql-server-linux-ver15"></a>
+         */
+        if (StringUtil.nonEmpty(quote)){
+            String templeTable = "table_"+StringUtil.getRandom();
+            StringBuilder tableQuery = new StringBuilder("with ").append(templeTable).append(" as(").append(tableName).append(") select ");
+            for (Column col : table.getColumns())
+                tableQuery.append("QUOTENAME(").append(col.getColumnName()).append(",'").append(quote).append("'),");
+            if(tableQuery.lastIndexOf(",") == tableQuery.length()-1)
+                tableQuery.deleteCharAt(tableQuery.length()-1);
+            tableName = tableQuery.append(" from ").append(templeTable).toString();
+        }
+        StringBuilder stringBuilder = new StringBuilder(con.replace("?","\""+tableName+"\" queryout '"+filePath+"'"));
+        if(StringUtil.nonEmpty(delimiter)) {
+//            stringBuilder.append(" -t '").append(delimiter).append("'");
+            if(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7.equals(delimiter))
+                stringBuilder.append("-t '0x07'");
+            else
+                stringBuilder.append(" -t '").append(delimiter).append("'");
+        }
+        if(StringUtil.nonEmpty(lineSeparate))
+            stringBuilder.append(" -r '").append(lineSeparate).append("'");
+
+        return stringBuilder.toString();
     }
 
     private String generateLoadSQLByBCP(TableCloneManagerContext tcmContext) {
         String csvPath = "./"+tcmContext.getCsvFileName();
         String tableName = tcmContext.getCloneConfig().getSchema()+"."+tcmContext.getCloneTable().getTableName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
+        String lineSeparate = tcmContext.getTcmConfig().getLineSeparate();
+        String quote = tcmContext.getTcmConfig().getQuote();
+        String escape = tcmContext.getTcmConfig().getEscape();
         String bcpConnectCommand = getBCPConnectCommand(tcmContext.getCloneConfig());
-        String loadContent = replaceLoadStatementShell(bcpConnectCommand, csvPath,tableName,delimiter);
+//        String loadContent = replaceLoadStatementShell(bcpConnectCommand, csvPath,tableName,delimiter);
+        String loadContent = replaceLoadStatementShell(bcpConnectCommand,tableName,csvPath,delimiter,lineSeparate,quote,escape);
         tcmContext.setLoadShellContent(loadContent);
         return loadContent;
     }
 
-    private String replaceLoadStatementShell(String com,String filePath,String tableName,String delimiter) {
-        return com.replace("?",tableName+" in '"+filePath+"'")+"'"+delimiter+"'";
+
+    private String replaceLoadStatementShell(String con,String tableName, String filePath, String delimiter,String lineSeparate,String quote,String escape) {
+        delimiter = StringUtil.escapeRegexSingleQuoteEncode(delimiter).replaceAll("\\\\","\\\\");
+        lineSeparate = StringUtil.escapeRegexSingleQuoteEncode(lineSeparate).replaceAll("\\\\","\\\\");
+
+        StringBuilder stringBuilder = new StringBuilder(con.replace("?","\""+tableName+"\" in '"+filePath+"'"));
+        if(StringUtil.nonEmpty(delimiter)) {
+            if(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7.equals(delimiter))
+                stringBuilder.append("-t '0x07'");
+            else
+                stringBuilder.append(" -t '").append(delimiter).append("'");
+        }
+        if(StringUtil.nonEmpty(lineSeparate))
+            stringBuilder.append(" -r '").append(lineSeparate).append("'");
+
+        return stringBuilder.toString();
     }
 
 }

@@ -39,6 +39,8 @@ public class DataMappingSQLTool {
         mappingPts.put(DataSourceEnum.MYSQL+FALSE,"'0'");
         mappingPts.put(DataSourceEnum.POSTGRESQL +TRUE,"'t'");
         mappingPts.put(DataSourceEnum.POSTGRESQL +FALSE,"'f'");
+        mappingPts.put(DataSourceEnum.SQLSERVER +TRUE,"'1'");
+        mappingPts.put(DataSourceEnum.SQLSERVER +FALSE,"'0'");
         mappingPts.put(DataSourceEnum.HUDI+TRUE,"'true'");
         mappingPts.put(DataSourceEnum.HUDI+FALSE,"'false'");
     }
@@ -118,26 +120,23 @@ public class DataMappingSQLTool {
     public static Table checkRelationship(Table table,DataSourceEnum sourceType,DataSourceEnum cloneType){
         Boolean mappingFlag = Boolean.FALSE;
         for (Column col: table.getColumns()){
+            if(mappingFlag)break;
             TCMDataTypeEnum colType = col.getTCMDataTypeEnum();
             if(sourceType.equals(DataSourceEnum.MYSQL)){
-                if(colType.equals(TCMDataTypeEnum.BOOLEAN)){
-                    if(cloneType.equals(DataSourceEnum.HUDI)){
-                        mappingFlag = Boolean.TRUE;
-                        break;
-                    }
+                if(colType.equals(TCMDataTypeEnum.BOOLEAN) && cloneType.equals(DataSourceEnum.HUDI)){
+                    mappingFlag = Boolean.TRUE;
                 }else if (colType.equals(TCMDataTypeEnum.BYTES)){
-                    if(cloneType.equals(DataSourceEnum.MYSQL) || cloneType.equals(DataSourceEnum.POSTGRESQL) || cloneType.equals(DataSourceEnum.HUDI)){
+                    if(cloneType.equals(DataSourceEnum.MYSQL) || cloneType.equals(DataSourceEnum.POSTGRESQL) || cloneType.equals(DataSourceEnum.HUDI))
                         mappingFlag = Boolean.TRUE;
-                        break;
-                    }
                 }
             }else if (sourceType.equals(DataSourceEnum.POSTGRESQL)){
                 if(colType.equals(TCMDataTypeEnum.BOOLEAN) || "MONEY".equalsIgnoreCase(StringUtil.dataTypeFormat(col.getDataType()))){
-                    if(cloneType.equals(DataSourceEnum.MYSQL) || cloneType.equals(DataSourceEnum.HUDI)){
+                    if(cloneType.equals(DataSourceEnum.MYSQL) || cloneType.equals(DataSourceEnum.SQLSERVER) || cloneType.equals(DataSourceEnum.HUDI) )
                         mappingFlag = Boolean.TRUE;
-                        break;
-                    }
                 }
+            }else if(sourceType.equals(DataSourceEnum.SQLSERVER)){
+                if(colType.equals(TCMDataTypeEnum.BOOLEAN) && cloneType.equals(DataSourceEnum.HUDI))
+                    mappingFlag = Boolean.TRUE;
             }
         }
         if(Boolean.TRUE.equals(mappingFlag)){

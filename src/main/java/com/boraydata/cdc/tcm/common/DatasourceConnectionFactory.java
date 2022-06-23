@@ -25,6 +25,7 @@ public class DatasourceConnectionFactory {
         // Use mysql-driver-8, can connect mysql-5 and mysql-8.
         dscPropers.setProperty("MYSQL", "jdbc:mysql://");
         dscPropers.setProperty("MYSQL_Driver", "com.mysql.cj.jdbc.Driver");
+//        dscPropers.setProperty("MYSQL_Driver", "com.mysql.jdbc.Driver");
         dscPropers.setProperty("MYSQL_TAIL", "/");
         dscPropers.setProperty("POSTGRESQL", "jdbc:postgresql://");
         dscPropers.setProperty("POSTGRESQL_Driver", "org.postgresql.Driver");

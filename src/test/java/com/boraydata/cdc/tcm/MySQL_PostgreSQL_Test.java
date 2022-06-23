@@ -12,28 +12,28 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-/** 测试 MySQL 与 PgSQL 间的表同步
+/** 测试 MySQL 与 PostgreSQL 间的表同步
  * @author bufan
  * @date 2021/9/22
  */
-public class MySQL_PgSQL_Test {
+public class MySQL_PostgreSQL_Test {
     DatabaseConfig mysqlConfig = TestDataProvider.MySQLConfig;
 
-    DatabaseConfig pgsqlConfig = TestDataProvider.PostgreSQLConfig;
+    DatabaseConfig postgreSQLConfig = TestDataProvider.PostgreSQLConfig;
 
     long start,end = 0;
 
     @Test
     public void test() {
-        System.out.println("Clone table mysql_pg_table in PgSQL from MySQL.lineitem");
+        System.out.println("Clone table mysql_pg_table in PostgreSQL from MySQL.lineitem");
         start = System.currentTimeMillis();
-        foo(mysqlConfig,pgsqlConfig,"string_types_mysql");
+        foo(mysqlConfig,postgreSQLConfig,"string_types_mysql");
         end = System.currentTimeMillis();
         System.out.println("Total time spent:" + (end - start)+"\n\n");
 
-//        System.out.println("Clone table pg_mysql_table in MySQL from PgSQL.lineitem");
+//        System.out.println("Clone table pg_mysql_table in MySQL from PostgreSQL.lineitem");
 //        start = System.currentTimeMillis();
-//        foo(pgsqlConfig,mysqlConfig,"pg_mysql_table");
+//        foo(postgreSQLConfig,mysqlConfig,"pg_mysql_table");
 //        end = System.currentTimeMillis();
 //        System.out.println("Total time spent:" + (end - start)+"\n\n");
 //
@@ -43,9 +43,9 @@ public class MySQL_PgSQL_Test {
 //        end = System.currentTimeMillis();
 //        System.out.println("Total time spent:" + (end - start)+"\n\n");
 //
-//        System.out.println("Clone table pg_pg_table in PgSQL from PgSQL.lineitem");
+//        System.out.println("Clone table pg_pg_table in PostgreSQL from PostgreSQL.lineitem");
 //        start = System.currentTimeMillis();
-//        foo(pgsqlConfig,pgsqlConfig,"pg_pg_table");
+//        foo(postgreSQLConfig,postgreSQLConfig,"pg_pg_table");
 //        end = System.currentTimeMillis();
 //        System.out.println("Total time spent:" + (end - start)+"\n\n");
     }
@@ -78,7 +78,7 @@ public class MySQL_PgSQL_Test {
 @Test
     public void testDB(){
         try (
-                Connection conn = DatasourceConnectionFactory.createDataSourceConnection(pgsqlConfig);
+                Connection conn = DatasourceConnectionFactory.createDataSourceConnection(postgreSQLConfig);
                 PreparedStatement ps = conn.prepareStatement("/copy (select * from lineitem_1 limit 5) to '/usr/local/lineitem_1_limit_5.csv' with csv;");
         ){
             ResultSet myResultSet = ps.executeQuery();

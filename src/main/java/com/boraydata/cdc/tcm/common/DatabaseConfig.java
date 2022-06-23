@@ -50,11 +50,11 @@ public class DatabaseConfig {
             case POSTGRESQL:
                 if(StringUtil.isNullOrEmpty(databaseName) && !StringUtil.isNullOrEmpty(catalog))
                     this.databaseName = this.catalog;
-                String[] split_pgsql = this.databaseName.split("\\.");
-                if(split_pgsql.length == 2){
-                    this.catalog = split_pgsql[0];
-                    this.schema = split_pgsql[1];
-                    this.databaseName = split_pgsql[0];
+                String[] split_postgreSQL = this.databaseName.split("\\.");
+                if(split_postgreSQL.length == 2){
+                    this.catalog = split_postgreSQL[0];
+                    this.schema = split_postgreSQL[1];
+                    this.databaseName = split_postgreSQL[0];
                 }
                 if(StringUtil.isNullOrEmpty(this.catalog))
                     this.catalog = this.databaseName;

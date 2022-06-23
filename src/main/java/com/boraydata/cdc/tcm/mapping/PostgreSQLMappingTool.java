@@ -19,7 +19,7 @@ import java.util.*;
  * @author bufan
  * @date 2021/9/1
  */
-public class PgsqlMappingTool implements MappingTool {
+public class PostgreSQLMappingTool implements MappingTool {
 
     private static final Map<String, TCMDataTypeEnum> mappingMap = new LinkedHashMap<>();
     static {
@@ -199,6 +199,8 @@ public class PgsqlMappingTool implements MappingTool {
                 column.setCharacterMaximumPosition(255L);
             if("UUID".equalsIgnoreCase(colDataType))
                 column.setCharacterMaximumPosition(255L);
+//            if(TCMDataTypeEnum.DECIMAL.equals(relation) && null == column.getNumericPrecision())
+//                column.setNumericPrecision(100).setNumericScale(100);
 
             column.setTCMDataTypeEnum(relation);
         }
@@ -226,7 +228,7 @@ public class PgsqlMappingTool implements MappingTool {
     /**
      *
      * generate the Create Table Statement by table
-     * Refer to the official documentation (PgSQL 13)
+     * Refer to the official documentation (PostgreSQL 13)
      * @see <a href="https://www.postgresql.org/docs/13/sql-createtable.html">create-table</a>
      * e.g.
      *   Create Table If Not Exists "schema name"."table name"(
@@ -235,7 +237,7 @@ public class PgsqlMappingTool implements MappingTool {
      *      ....
      *   );
      *
-     * @Param Table : table={null,PGSQL,test_table,columns={null,null,col_int,DataType=INT,dataTypeMapping=INT32}}
+     * @Param Table : table={null,POSTGRESQL,test_table,columns={null,null,col_int,DataType=INT,dataTypeMapping=INT32}}
      * @Return: String
      */
     @Override
