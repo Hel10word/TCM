@@ -8,14 +8,14 @@ import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
 import com.boraydata.cdc.tcm.entity.Table;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
 
 /**
  * @author : bufan
  * @date : 2022/6/22
  */
 class SqlServerIndexToolTest {
-    String tableName = "lineitem_test";
+    String tableName = "lineitem_sf10";
     String catalogName = "test_db";
     String schemaName = "dbo";
 
@@ -23,11 +23,11 @@ class SqlServerIndexToolTest {
             .setCatalog(catalogName)
             .setDatabaseName(catalogName)
             .setSchema(schemaName);
-        Table table = new Table()
-                .setDataSourceEnum(DataSourceEnum.SQLSERVER)
-                .setTableName(tableName)
-                .setCatalogName(catalogName)
-                .setSchemaName(schemaName);
+    Table table = new Table()
+            .setDataSourceEnum(DataSourceEnum.SQLSERVER)
+            .setTableName(tableName)
+            .setCatalogName(catalogName)
+            .setSchemaName(schemaName);
 
     TableCloneManagerConfig tcmConfig = TestDataProvider.getTCMConfig(dbConfig,dbConfig)
             .setCloneTableName(tableName);
@@ -37,19 +37,30 @@ class SqlServerIndexToolTest {
 
     @Test
     void fillingPrimaryKeyNameTest() {
-        SqlServerIndexTool.fillingPrimaryKeyName(tcmContext);
-        System.out.println(tcmContext.getCloneTable().getPrimaryKeyName());
+        SqlServerIndexTool.checkInformation(tcmContext);
+        DatabaseConfig dbConfig = tcmContext.getCloneConfig();
+        Table cloneTable = tcmContext.getCloneTable();
+        String primaryKeyName = SqlServerIndexTool.getPrimaryKeyName(dbConfig,cloneTable);
+        System.out.println(primaryKeyName);
+    }
+
+    @Test
+    void getAllNonClusteredIndexListTest() {
+        SqlServerIndexTool.checkInformation(tcmContext);
+        DatabaseConfig dbConfig = tcmContext.getCloneConfig();
+        String tableName = tcmContext.getCloneTable().getSchemaName()+"."+tcmContext.getCloneTable().getTableName();
+        List<String> allNonClusteredIndexList = SqlServerIndexTool.getAllNonClusteredIndexList(dbConfig,tableName);
+        System.out.println(allNonClusteredIndexList);
     }
 
     @Test
     void disableIndexTest() {
-        SqlServerIndexTool.fillingPrimaryKeyName(tcmContext);
         System.out.println(SqlServerIndexTool.disableIndex(tcmContext));
     }
 
     @Test
     void rebuildIndexTest() {
-        SqlServerIndexTool.fillingPrimaryKeyName(tcmContext);
         System.out.println(SqlServerIndexTool.rebuildIndex(tcmContext));
     }
+
 }

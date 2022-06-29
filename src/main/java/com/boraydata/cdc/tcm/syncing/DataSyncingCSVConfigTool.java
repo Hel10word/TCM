@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
  */
 public class DataSyncingCSVConfigTool {
     private static final Logger logger = LoggerFactory.getLogger(DataSyncingCSVConfigTool.class);
-//    private static final String SQL_SERVER_DELIMITER = "|#|";
-//    private static final String SQL_SERVER_DELIMITER = "\u200b";
+//    private static final String SQL_SERVER_DELIMITER = "\u0007";
+//    private static final String SQL_SERVER_DELIMITER = "\007";
     public static final String SQL_SERVER_DELIMITER_7 = String.valueOf((char) 7);
 //    private static final String SQL_SERVER_DELIMITER = "CHR(7)";
     /**
@@ -74,6 +74,7 @@ public class DataSyncingCSVConfigTool {
                 break;
             case HUDI:
                 context.getTcmConfig().setQuote("\"");
+                context.getTcmConfig().setEscape("\\");
                 break;
             default:
                 break;

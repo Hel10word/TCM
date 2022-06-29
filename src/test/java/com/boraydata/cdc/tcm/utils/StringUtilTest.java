@@ -46,5 +46,9 @@ class StringUtilTest {
 
     }
 
-
+    @Test
+    void name() {
+        System.out.println(String.valueOf((char) 7));
+        System.out.println("test");
+    }
 }

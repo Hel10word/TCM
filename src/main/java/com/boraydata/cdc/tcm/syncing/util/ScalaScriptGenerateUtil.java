@@ -7,6 +7,8 @@ import com.boraydata.cdc.tcm.common.enums.TCMDataTypeEnum;
 import com.boraydata.cdc.tcm.entity.Column;
 import com.boraydata.cdc.tcm.common.TableCloneManagerConfig;
 import com.boraydata.cdc.tcm.entity.Table;
+import com.boraydata.cdc.tcm.syncing.DataSyncingCSVConfigTool;
+import com.boraydata.cdc.tcm.utils.StringUtil;
 
 import java.util.List;
 
@@ -45,7 +47,7 @@ import java.util.List;
  * @author bufan
  * @date 2021/12/1
  *
- * https://hudi.apache.org/docs/writing_data
+ * https://hudi.apache.org/docs/0.9.0/writing_data
  */
 public class ScalaScriptGenerateUtil {
 
@@ -80,36 +82,71 @@ public class ScalaScriptGenerateUtil {
             "\nimport org.apache.hudi.config.HoodieWriteConfig._" +
 //            "\nimport org.apache.spark.sql.{DataFrame,SparkSession}" +
 //            "\nimport org.apache.spark.sql.types.{DataTypes,StructType}\n"
-            "\nimport org.apache.spark.sql.types._\n"
+            "\nimport org.apache.spark.sql.types._" +
+            "\ntry{\n"
     );
 
     public String initSriptFile(Table table, String hdfsSourceFilePath, DatabaseConfig dbConfig, TableCloneManagerConfig tcmConfig){
         String delimiter = tcmConfig.getDelimiter();
+        String lineSeparate = tcmConfig.getLineSeparate();
+        String quote = tcmConfig.getQuote();
+        String escape = tcmConfig.getEscape();
         String hoodieTableType = tcmConfig.getHoodieTableType();
         String primaryKey = tcmConfig.getPrimaryKey();
         String partitionKey = tcmConfig.getPartitionKey();
         String hdfsCloneDataPath = tcmConfig.getHdfsCloneDataPath();
+        String tableName = table.getTableName();
+        String databaseName = dbConfig.getDatabaseName();
 
         this
-                .setSchema(table).setDF(delimiter,hdfsSourceFilePath)
-                .setWrite(hoodieTableType,table.getTableName(),primaryKey,partitionKey, DatasourceConnectionFactory.getJDBCUrl(dbConfig),dbConfig.getDatabaseName(),dbConfig.getUsername(),dbConfig.getPassword(),hdfsCloneDataPath)
+                .setDatabase(databaseName)
+                .setDropOldTable(tableName,hoodieTableType)
+                .setSchema(table)
+                .setDF(delimiter,lineSeparate,quote,escape,hdfsSourceFilePath)
+                .setWrite(hoodieTableType,tableName,primaryKey,partitionKey, DatasourceConnectionFactory.getJDBCUrl(dbConfig),databaseName,dbConfig.getUsername(),dbConfig.getPassword(),hdfsCloneDataPath)
+                .setRefreshTable(tableName,hoodieTableType)
                 .setScalaEnd();
         return this.scalaScript.toString();
+    }
+
+    private ScalaScriptGenerateUtil setRefreshTable(String tableName,String hoodieTableType) {
+        if("MERGE_ON_READ".equals(hoodieTableType)) {
+            this.scalaScript.append("\nspark.sql(\"REFRESH TABLE ").append(tableName).append("_ro\");");
+            this.scalaScript.append("\nspark.sql(\"REFRESH TABLE ").append(tableName).append("_rt\");\n");
+        }else
+            this.scalaScript.append("\nspark.sql(\"REFRESH TABLE ").append(tableName).append("\");\n");
+        return this;
+    }
+
+    private ScalaScriptGenerateUtil setDropOldTable(String tableName,String hoodieTableType) {
+        if("MERGE_ON_READ".equals(hoodieTableType)) {
+            this.scalaScript.append("\nspark.sql(\"DROP TABLE IF EXISTS ").append(tableName).append("_ro\");");
+            this.scalaScript.append("\nspark.sql(\"DROP TABLE IF EXISTS ").append(tableName).append("_rt\");\n");
+        }else
+            this.scalaScript.append("\nspark.sql(\"DROP TABLE IF EXISTS ").append(tableName).append("\");\n");
+        return this;
+    }
+
+    private ScalaScriptGenerateUtil setDatabase(String databaseName) {
+        this.scalaScript.append("\nspark.sql(\"use ").append(databaseName).append("\");\n");
+
+        return this;
     }
 
     public String loadCommand(String hdfsSourceDataDir,String localCsvPath,String hdfsCloneDataPath,String scriptPath,String sparkStartCommand){
         StringBuilder loadShell = new StringBuilder();
         loadShell
-                .append("\nhdfs dfs -mkdir -p ").append(hdfsSourceDataDir)
+//                .append("\nhdfs dfs -mkdir -p ").append(hdfsSourceDataDir)
                 .append("\nhdfs dfs -mkdir -p ").append(hdfsCloneDataPath)
                 .append("\nhdfs dfs -rm -r ").append(hdfsCloneDataPath)
-                .append("\ntime hdfs dfs -put -f ").append(localCsvPath).append(" ").append(hdfsSourceDataDir).append(" 2>&1")
+//                .append("\ntime hdfs dfs -put -f ").append(localCsvPath).append(" ").append(hdfsSourceDataDir).append(" 2>&1")
                 // if the CSV File large and disk no space,save part of CSV for execute Spark-Shell
-                .append("\nhead -5 ").append(localCsvPath).append(" > ").append(localCsvPath).append("_sample_data")
+//                .append("\nhead -5 ").append(localCsvPath).append(" > ").append(localCsvPath).append("_sample_data")
 //                .append("\nrm -f ").append(localCsvPath)
                 .append("\n\n").append("time ").append(sparkStartCommand)
                 .append(" -i ").append(scriptPath)
-                .append("\nhdfs dfs -rm -r ").append(hdfsSourceDataDir).append(localCsvPath);
+                .append(" > ./").append(scriptPath).append(".out");
+//                .append("\nhdfs dfs -rm -r ").append(hdfsSourceDataDir).append(localCsvPath);
         return loadShell.toString();
     }
 
@@ -152,10 +189,24 @@ public class ScalaScriptGenerateUtil {
     //    .csv("/hudi-test/demo_spark.csv")
     //    .withColumn("_hoodie_ts",lit(null).cast(TimestampType))
     //    .withColumn("_hoodie_date",lit(null).cast(StringType));
-    private ScalaScriptGenerateUtil setDF(String delimiter, String hdfsCsvPath){
-        String options = ".option(\"delimiter\", \""+delimiter+"\").option(\"escape\", \"\\\\\").option(\"quote\", \"\\\"\")";
-        this.scalaScript.append("\nval df = spark.read.schema(schema)").append(options)
-                .append(".csv(\"").append(hdfsCsvPath).append("\")")
+    private ScalaScriptGenerateUtil setDF(String delimiter,String lineSeparate,String quote,String escape, String hdfsCsvPath){
+//        String options = ".option(\"delimiter\", \""+delimiter+"\").option(\"escape\", \"\\\\\").option(\"quote\", \"\\\"\")";
+//        this.scalaScript.append("\nval df = spark.read.schema(schema)").append(options)
+//                .append(".csv(\"").append(hdfsCsvPath).append("\")")
+        this.scalaScript.append("\nval df = spark.read.schema(schema)");
+        delimiter = StringUtil.escapeRegexDoubleQuoteEncode(delimiter);
+        quote = StringUtil.escapeRegexDoubleQuoteEncode(quote);
+        escape = StringUtil.escapeRegexDoubleQuoteEncode(escape).replaceAll("\\\\","\\\\\\\\");
+        if(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7.equals(delimiter))
+            this.scalaScript.append(".option(\"delimiter\",\"\\u0007\")");
+        else
+            this.scalaScript.append(".option(\"delimiter\",\"").append(delimiter).append("\")");
+
+        if(StringUtil.nonEmpty(quote))
+            this.scalaScript.append(".option(\"quote\",\"").append(quote).append("\")");
+        if(StringUtil.nonEmpty(escape))
+            this.scalaScript.append(".option(\"escape\",\"").append(escape).append("\")");
+        this.scalaScript.append(".csv(\"file://").append(hdfsCsvPath).append("\")")
                 /**
                  * @see <a href="https://stackoverflow.com/questions/32067467/create-new-dataframe-with-empty-null-field-values"></a>
                  * @see <a href="https://stackoverflow.com/questions/57945174/how-to-convert-timestamp-to-bigint-in-a-pyspark-dataframe"></a>
@@ -206,18 +257,19 @@ public class ScalaScriptGenerateUtil {
                 .append(String.format(".option(\"hoodie.datasource.hive_sync.mode\",\"%s\")","hms"))
                 .append(String.format(".mode(%s).save(\"%s\");","Append",hdfsCloneDataPath)).append("\n");
 
-        this.scalaScript.append("\nspark.sql(\"use ").append(database).append("\");");
-        if("MERGE_ON_READ".equals(hoodieTableType)) {
-            this.scalaScript.append("\nspark.sql(\"REFRESH TABLE ").append(tableName).append("_ro\");");
-            this.scalaScript.append("\nspark.sql(\"REFRESH TABLE ").append(tableName).append("_rt\");");
-        }else
-            this.scalaScript.append("\nspark.sql(\"REFRESH TABLE ").append(tableName).append("\");");
+
         return this;
     }
 
 
     private ScalaScriptGenerateUtil setScalaEnd(){
-        this.scalaScript.append("\nSystem.exit(0);");
+        this.scalaScript
+                .append("}\ncatch {" +
+                        "\ncase ex: Exception => println(ex.getMessage)" +
+                        "\n}")
+                .append("\nfinally {" +
+                        "\nSystem.exit(0);" +
+                        "\n}");
         return this;
     }
 

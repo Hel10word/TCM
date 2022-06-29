@@ -311,6 +311,8 @@ public class TableCloneManager {
             String csvFileName = "Export_from_" + sourceType + "_" + sourceTable.getTableName() + ".csv";
             this.tableCloneManagerContext.setCsvFileName(csvFileName);
         }
+        if(null == this.sourceSyncingTool)
+            return true;
 
         String exportContent = this.sourceSyncingTool.getExportInfo(this.tableCloneManagerContext);
 
@@ -335,6 +337,8 @@ public class TableCloneManager {
         String loadShellName = "Load_to_"+cloneType+"_"+table.getTableName()+".sh";
         this.tableCloneManagerContext.setLoadShellName(loadShellName);
         String loadShellPath = this.tableCloneManagerContext.getTempDirectory()+loadShellName;
+        if(null == this.cloneSyncingTool)
+            return true;
         String loadContent = this.cloneSyncingTool.getLoadInfo(this.tableCloneManagerContext);
 
 
@@ -369,6 +373,7 @@ public class TableCloneManager {
         String exportShellName = this.tableCloneManagerContext.getExportShellName();
         String loadShellName = this.tableCloneManagerContext.getLoadShellName();
         String scalaScriptName = this.tableCloneManagerContext.getLoadDataInHudiScalaScriptName();
+        String scalaOut = this.tableCloneManagerContext.getLoadDataInHudiScalaScriptName()+".out";
         String hadoopLog = "hadoop.log";
 
         if(StringUtil.isNullOrEmpty(dir) || !FileUtil.isDirectory(dir))
@@ -386,6 +391,7 @@ public class TableCloneManager {
             FileUtil.deleteFile(dir+csvFile);
         if(!StringUtil.isNullOrEmpty(scalaScriptName)) {
             FileUtil.deleteFile(dir + scalaScriptName);
+            FileUtil.deleteFile(dir + scalaOut);
             FileUtil.deleteFile(dir + csvFile+"_sample_data");
             FileUtil.deleteFile(dir+hadoopLog);
         }

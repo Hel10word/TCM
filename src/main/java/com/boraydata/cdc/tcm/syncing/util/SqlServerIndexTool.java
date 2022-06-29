@@ -14,8 +14,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-import static jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType.S;
 
 /**
  * @author : bufan
@@ -30,14 +32,55 @@ import static jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType.S;
  * ALTER INDEX PK__t2__3915638543A70640 ON t2 REBUILD;
  * -- show is_disable
  * SELECT IS_DISABLED FROM SYS.INDEXES WHERE NAME = 'PK__t2__3915638543A70640'
+ *
+ * -- get all NONCLUSTERED index
+ * SELECT name from sys.indexes WHERE object_id = OBJECT_ID(N'dbo.lineitem_sf10', N'U') AND type_desc = 'NONCLUSTERED'
+ *
+ * -- create NONCLUSTERED index
+ * CREATE NONCLUSTERED INDEX NONCLUSTERED_lineitem_sf10_l_orderkey ON dbo.lineitem_sf10 (l_orderkey)
+ *
+ * -- create UNIQUE index
+ * CREATE UNIQUE INDEX UNIQUE_lineitem_sf10_l_orderkey ON dbo.lineitem_sf10 (l_orderkey)
+ *
  */
 public class SqlServerIndexTool {
     private static final Logger logger = LoggerFactory.getLogger(SqlServerIndexTool.class);
 
-    private static final String PRIMARY_KEY_NAME = DataSourceEnum.SQLSERVER.PrimaryKeyName;
-    private static final String PRIMARY_KEY_DISABLE = "IS_DISABLED";
+//    private static final String PRIMARY_KEY_NAME = DataSourceEnum.SQLSERVER.PrimaryKeyName;
+    private static final String INDEX_NAME = "INDEX_NAME";
+    private static final String INDEX_DISABLE = "IS_DISABLED";
 
-    public static Boolean fillingPrimaryKeyName(TableCloneManagerContext tcmContext){
+
+    public static boolean disableIndex(TableCloneManagerContext tcmContext){
+        if(Boolean.FALSE.equals(checkInformation(tcmContext)))
+            return false;
+        DatabaseConfig dbConfig = tcmContext.getCloneConfig();
+        Table cloneTable = tcmContext.getCloneTable();
+        String tableName = cloneTable.getSchemaName()+"."+cloneTable.getTableName();
+
+        List<String> allNonClusteredIndexList = getAllNonClusteredIndexList(dbConfig,tableName);
+        Boolean flag = Boolean.TRUE;
+        for (String indexName : allNonClusteredIndexList)
+            flag = flag&&disableIndex(dbConfig,tableName,indexName);
+        logger.info("Disable SQL Server NonClustered Index:{}",flag);
+        return flag;
+    }
+    public static boolean rebuildIndex(TableCloneManagerContext tcmContext){
+        if(Boolean.FALSE.equals(checkInformation(tcmContext)))
+            return false;
+        DatabaseConfig dbConfig = tcmContext.getCloneConfig();
+        Table cloneTable = tcmContext.getCloneTable();
+        String tableName = cloneTable.getSchemaName()+"."+cloneTable.getTableName();
+
+        List<String> allNonClusteredIndexList = getAllNonClusteredIndexList(dbConfig,tableName);
+        Boolean flag = Boolean.TRUE;
+        for (String indexName : allNonClusteredIndexList)
+            flag = flag&&rebuildIndex(dbConfig,tableName,indexName);
+        logger.info("Rebuild SQL Server NonClustered Index:{}",flag);
+        return flag;
+    }
+
+    public static boolean checkInformation(TableCloneManagerContext tcmContext){
         DatabaseConfig dbConfig = tcmContext.getCloneConfig();
         if(!DataSourceEnum.SQLSERVER.equals(dbConfig.getDataSourceEnum())){
             String dbInfo = dbConfig.outInfo();
@@ -51,94 +94,126 @@ public class SqlServerIndexTool {
             logger.warn("table name incorrect,cloneTableName:{},tableInfo:{}",tcmContext.getTcmConfig().getCloneTableName(),table.outInfo());
         if (StringUtil.isNullOrEmpty(table.getSchemaName()))
             table.setSchemaName("dbo");
+        tcmContext.setCloneTable(table);
+        return Boolean.TRUE;
+    }
 
+
+
+    public static String getPrimaryKeyName(DatabaseConfig dbConfig,Table table){
+        String primaryKeyName = null;
         try (
                 Connection con = DatasourceConnectionFactory.createDataSourceConnection(dbConfig);
-                PreparedStatement getPrimaryNameSta =  con.prepareStatement(genGetPrimaryKey(table));
+                PreparedStatement getPrimaryNameSta =  con.prepareStatement(genGetPrimaryKey(table.getTableName(),table.getSchemaName()));
         ){
             ResultSet rs = getPrimaryNameSta.executeQuery();
             while (rs.next())
-                table.setPrimaryKeyName(rs.getString(PRIMARY_KEY_NAME));
+                primaryKeyName = rs.getString(INDEX_NAME);
         } catch (SQLException e) {
             throw new TCMException("failed to filling primary key name,dbConfig:"+dbConfig.outInfo()+",tableInfo:"+table.outInfo(),e);
         }
-        tcmContext.setCloneTable(table);
-        return StringUtil.nonEmpty(table.getPrimaryKeyName());
+        return primaryKeyName;
     }
 
-    public static Boolean disableIndex(TableCloneManagerContext tcmContext){
-        DatabaseConfig dbConfig = tcmContext.getCloneConfig();
-        Table table = tcmContext.getCloneTable();
-        Boolean flag = Boolean.FALSE;
-        if(StringUtil.isNullOrEmpty(table.getPrimaryKeyName()))
-            fillingPrimaryKeyName(tcmContext);
+    public static List<String> getAllNonClusteredIndexList (DatabaseConfig dbConfig,String tableName){
+        List<String> list = new LinkedList(Collections.emptyList());
         try (
                 Connection con = DatasourceConnectionFactory.createDataSourceConnection(dbConfig);
-                PreparedStatement disableIndexSta =  con.prepareStatement(genDisableIndex(table));
-                PreparedStatement primaryDisableSta =  con.prepareStatement(genPrimaryDisable(table));
+                PreparedStatement getPrimaryNameSta =  con.prepareStatement(genGetAllNonClusteredIndex(tableName));
+        ){
+            ResultSet rs = getPrimaryNameSta.executeQuery();
+            while (rs.next())
+                list.add(rs.getString(INDEX_NAME));
+        } catch (SQLException e) {
+            throw new TCMException("failed to filling primary key name,dbConfig:"+dbConfig.outInfo()+",tableName:"+tableName,e);
+        }
+        return list;
+    }
+
+    public static Boolean disableIndex(DatabaseConfig dbConfig,String tableName,String indexName){
+        Boolean flag = Boolean.FALSE;
+        String isDisable = null;
+        if(StringUtil.isNullOrEmpty(tableName) || StringUtil.isNullOrEmpty(indexName))
+            return false;
+        try (
+                Connection con = DatasourceConnectionFactory.createDataSourceConnection(dbConfig);
+                PreparedStatement disableIndexSta =  con.prepareStatement(genDisableIndex(tableName, indexName));
+                PreparedStatement primaryDisableSta =  con.prepareStatement(genIndexDisableSQL(indexName));
         ){
             disableIndexSta.execute();
             ResultSet rs = primaryDisableSta.executeQuery();
-            while (rs.next())
-                flag = "1".equals(rs.getString(PRIMARY_KEY_DISABLE))?Boolean.TRUE:Boolean.FALSE;
+            while (rs.next()) {
+                isDisable = rs.getString(INDEX_DISABLE);
+                flag = "1".equals(isDisable) ? Boolean.TRUE : Boolean.FALSE;
+            }
 
         } catch (SQLException e) {
-            throw new TCMException("failed to disable index,tableInfo:"+table.outInfo(),e);
+            throw new TCMException("failed to rebuild index,Table Name:"+tableName+" Index Name:"+indexName,e);
         }finally {
             if(Boolean.FALSE.equals(flag))
-                logger.warn("failed to disable index,tableInfo:{}",table.outInfo());
+                logger.warn("failed to rebuild index,Table Name:{} Index Name:{}",tableName,indexName);
             return flag;
         }
     }
-    public static Boolean rebuildIndex(TableCloneManagerContext tcmContext){
-        DatabaseConfig dbConfig = tcmContext.getCloneConfig();
-        Table table = tcmContext.getCloneTable();
+    public static Boolean rebuildIndex(DatabaseConfig dbConfig,String tableName,String indexName){
         Boolean flag = Boolean.TRUE;
-        if(StringUtil.isNullOrEmpty(table.getPrimaryKeyName()))
-            fillingPrimaryKeyName(tcmContext);
+        String isrebuild = null;
+        if(StringUtil.isNullOrEmpty(tableName) || StringUtil.isNullOrEmpty(indexName))
+            return false;
         try (
                 Connection con = DatasourceConnectionFactory.createDataSourceConnection(dbConfig);
-                PreparedStatement rebuildIndexSta =  con.prepareStatement(genRebuildIndex(table));
-                PreparedStatement primaryDisableSta =  con.prepareStatement(genPrimaryDisable(table));
+                PreparedStatement rebuildIndexSta =  con.prepareStatement(genRebuildIndexSQL(tableName,indexName));
+                PreparedStatement primaryDisableSta =  con.prepareStatement(genIndexDisableSQL(indexName));
         ){
             rebuildIndexSta.execute();
             ResultSet rs = primaryDisableSta.executeQuery();
-            while (rs.next())
-                flag = "1".equals(rs.getString(PRIMARY_KEY_DISABLE))?Boolean.TRUE:Boolean.FALSE;
+            while (rs.next()) {
+                isrebuild = rs.getString(INDEX_DISABLE);
+                flag = "1".equals(isrebuild) ? Boolean.TRUE : Boolean.FALSE;
+            }
         } catch (SQLException e) {
-            throw new TCMException("failed to rebuild index,tableInfo:"+table.outInfo(),e);
+            throw new TCMException("failed to rebuild index,Table Name:"+tableName+" Index Name:"+indexName,e);
         }finally {
             if(Boolean.FALSE.equals(!flag))
-                logger.warn("failed to rebuild index,tableInfo:{}",table.outInfo());
+                logger.warn("failed to rebuild index,Table Name:{} Index Name:{}",tableName,indexName);
             return !flag;
         }
     }
 
 
-    public static String genGetPrimaryKey(Table table){
+
+    public static String genGetPrimaryKey(String tableName,String schemaName){
         StringBuilder stringBuilder = new StringBuilder("SELECT TOP 1 ")
-                .append("CONSTRAINT_NAME as ").append(PRIMARY_KEY_NAME).append(" ")
+                .append("CONSTRAINT_NAME as ").append(INDEX_NAME).append(" ")
                 .append("FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_NAME = '")
-                .append(table.getTableName());
-        if(StringUtil.nonEmpty(table.getSchemaName()))
-            stringBuilder.append("' AND TABLE_SCHEMA = '").append(table.getSchemaName());
-        return stringBuilder.append("'").toString();
+                .append(tableName);
+        if(StringUtil.isNullOrEmpty(schemaName))
+            schemaName = "dbo";
+        stringBuilder.append("' AND TABLE_SCHEMA = '").append(schemaName).append("'");
+        return stringBuilder.toString();
     }
-    public static String genDisableIndex(Table table){
+    public static String genGetAllNonClusteredIndex(String tableName){
+        StringBuilder stringBuilder = new StringBuilder("SELECT name as ").append(INDEX_NAME).append(" FROM SYS.INDEXES ");
+        stringBuilder.append("WHERE object_id = OBJECT_ID(N'")
+                .append(tableName)
+                .append("', N'U') AND type_desc = 'NONCLUSTERED' ORDER BY index_id ASC");
+        return stringBuilder.toString();
+    }
+    public static String genDisableIndex(String tableName,String indexName){
         return "ALTER INDEX " +
-                table.getPrimaryKeyName() +
-                " ON " + table.getTableName() +
+                indexName +
+                " ON " + tableName +
                 " DISABLE";
     }
-    public static String genRebuildIndex(Table table){
+    public static String genRebuildIndexSQL(String tableName,String indexName){
         return "ALTER INDEX " +
-                table.getPrimaryKeyName() +
-                " ON " + table.getTableName() +
+                indexName +
+                " ON " + tableName +
                 " REBUILD";
     }
-    public static String genPrimaryDisable(Table table){
-        return "SELECT IS_DISABLED as "+PRIMARY_KEY_DISABLE+
+    public static String genIndexDisableSQL(String indexName){
+        return "SELECT IS_DISABLED as "+ INDEX_DISABLE +
                 " FROM SYS.INDEXES WHERE NAME = '"+
-                table.getPrimaryKeyName()+"'";
+                indexName+"'";
     }
 }

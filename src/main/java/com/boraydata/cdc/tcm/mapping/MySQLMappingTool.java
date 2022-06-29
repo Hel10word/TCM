@@ -170,7 +170,8 @@ public class MySQLMappingTool implements MappingTool {
                         stringBuilder.append(" DEFAULT CURRENT_TIMESTAMP(").append(column.getDatetimePrecision()).append(") ON UPDATE CURRENT_TIMESTAMP(").append(column.getDatetimePrecision()).append(")");
                     else
                         stringBuilder.append(" DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
-                }if (Boolean.FALSE.equals(column.getNullable()))
+                }
+                if (Boolean.FALSE.equals(column.getNullable()))
                     stringBuilder.append(" not NULL");
                 stringBuilder.append("\n,");
                 continue;

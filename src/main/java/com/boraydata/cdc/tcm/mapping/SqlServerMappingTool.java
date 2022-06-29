@@ -97,10 +97,10 @@ public class SqlServerMappingTool implements MappingTool{
             TCMDataTypeEnum relation = StringUtil.findRelation(mappingMap,column.getDataType(),null);
             if (Objects.isNull(relation))
                 throw new TCMException("not found DataType relation in "+column);
-            String colName = StringUtil.dataTypeFormat(column.getDataType());
-            if("smallmoney".equalsIgnoreCase(colName))
+            String dataType = StringUtil.dataTypeFormat(column.getDataType());
+            if("smallmoney".equalsIgnoreCase(dataType))
                 column.setNumericPrecision(6).setNumericScale(4);
-            if("money".equalsIgnoreCase(colName))
+            if("money".equalsIgnoreCase(dataType))
                 column.setNumericPrecision(15).setNumericScale(4);
             column.setTCMDataTypeEnum(relation);
         }

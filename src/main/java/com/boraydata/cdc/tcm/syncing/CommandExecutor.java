@@ -14,7 +14,7 @@ import java.io.InputStream;
 public class CommandExecutor {
     private static final Logger log = LoggerFactory.getLogger(CommandExecutor.class);
     public static String executeShell(String dir,String shellScriptName, boolean outFlag){
-        log.info("Execute Shell Path:{}{}",dir,shellScriptName);
+        log.info("Execute Shell Path Dir:'{}' ScriptName:'{}'",dir,shellScriptName);
         ProcessBuilder pb = new ProcessBuilder();
         pb.command("sh",shellScriptName);
         pb.directory(new File(dir));

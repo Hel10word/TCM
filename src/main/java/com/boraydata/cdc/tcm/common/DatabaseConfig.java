@@ -80,6 +80,7 @@ public class DatabaseConfig {
                     this.port = "1433";
                 break;
             default:
+                return this;
         }
 
         if(StringUtil.isNullOrEmpty(databaseName))

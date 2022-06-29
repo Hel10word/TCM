@@ -52,23 +52,23 @@ public enum DataSourceEnum {
             PostgreSQLContent.SQL_GET_PRIMARY_KEYS
             ),
         SQLSERVER(
-                SQLServerContent.TABLE_CATALOG,
-                SQLServerContent.TABLE_SCHEMA,
-                SQLServerContent.TABLE_NAME,
-                SQLServerContent.COLUMN_NAME,
-                SQLServerContent.DATA_TYPE,
-                SQLServerContent.UDT_TYPE,
-                SQLServerContent.ORDINAL_POSITION,
-                SQLServerContent.IS_NULLABLE,
-                SQLServerContent.CHARACTER_MAXIMUM_LENGTH,
-                SQLServerContent.NUMERIC_PRECISION,
-                SQLServerContent.NUMERIC_SCALE,
-                SQLServerContent.DATETIME_PRECISION,
-                SQLServerContent.SQL_TABLE_INFO_BY_TABLE_NAME,
-                SQLServerContent.SQL_TABLE_INFO_BY_CATALOG,
-                SQLServerContent.SQL_ALL_TABLE_INFO,
-                SQLServerContent.PRIMARY_KEY_NAME,
-                SQLServerContent.SQL_GET_PRIMARY_KEYS
+            SQLServerContent.TABLE_CATALOG,
+            SQLServerContent.TABLE_SCHEMA,
+            SQLServerContent.TABLE_NAME,
+            SQLServerContent.COLUMN_NAME,
+            SQLServerContent.DATA_TYPE,
+            SQLServerContent.UDT_TYPE,
+            SQLServerContent.ORDINAL_POSITION,
+            SQLServerContent.IS_NULLABLE,
+            SQLServerContent.CHARACTER_MAXIMUM_LENGTH,
+            SQLServerContent.NUMERIC_PRECISION,
+            SQLServerContent.NUMERIC_SCALE,
+            SQLServerContent.DATETIME_PRECISION,
+            SQLServerContent.SQL_TABLE_INFO_BY_TABLE_NAME,
+            SQLServerContent.SQL_TABLE_INFO_BY_CATALOG,
+            SQLServerContent.SQL_ALL_TABLE_INFO,
+            SQLServerContent.PRIMARY_KEY_NAME,
+            SQLServerContent.SQL_GET_PRIMARY_KEYS
         ),
         HUDI(
             null,
@@ -88,7 +88,45 @@ public enum DataSourceEnum {
             null,
             null,
             null
-            );
+            ),
+        KAFKA(
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ),
+        HADOOP(
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
 
     @JsonValue
     @Override
@@ -103,8 +141,12 @@ public enum DataSourceEnum {
             return DataSourceEnum.POSTGRESQL;
         else if(value.equals(DataSourceEnum.POSTGRESQL.toString()) || value.equalsIgnoreCase("sqlserver"))
             return DataSourceEnum.SQLSERVER;
-        else if(value.equals(DataSourceEnum.HUDI.toString()) || value.equalsIgnoreCase("hudi"))
+        else if(value.equals(DataSourceEnum.HUDI.toString()) || value.equalsIgnoreCase("hudi") || value.equalsIgnoreCase("hive"))
             return DataSourceEnum.HUDI;
+        else if(value.equals(DataSourceEnum.KAFKA.toString()) || value.equalsIgnoreCase("kafka"))
+            return DataSourceEnum.KAFKA;
+        else if(value.equals(DataSourceEnum.HADOOP.toString()) || value.equalsIgnoreCase("hadoop"))
+            return DataSourceEnum.HADOOP;
         throw new TCMException("Failed to get DataSourceEnum, you must fill in the correct , are not '"+value+'\'');
     }
 

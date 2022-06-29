@@ -39,7 +39,8 @@ public class HudiSyncingTool implements SyncingTool {
 
         Table cloneTable = tcmContext.getCloneTable();
         String hdfsSourceDataDir = tcmConfig.getHdfsSourceDataDir();
-        String hdfsSourceFileName = hdfsSourceDataDir + tcmContext.getCsvFileName();
+//        String hdfsSourceFileName = hdfsSourceDataDir + tcmContext.getCsvFileName();
+        String hdfsSourceFileName = tcmConfig.getTempDirectory() + tcmContext.getCsvFileName();
         String scriptContent = hudiTool.initSriptFile(cloneTable,hdfsSourceFileName,cloneConfig,tcmConfig);
 
         String scriptName = "Load_CSV_to_hudi_"+tcmConfig.getHoodieTableType()+".scala";
@@ -61,7 +62,7 @@ public class HudiSyncingTool implements SyncingTool {
 
     @Override
     public Boolean executeLoad(TableCloneManagerContext tcmContext) {
-        deleteOriginTable(tcmContext);
+//        deleteOriginTable(tcmContext);
         String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
         if(tcmContext.getTcmConfig().getDebug())
             logger.info(outStr);

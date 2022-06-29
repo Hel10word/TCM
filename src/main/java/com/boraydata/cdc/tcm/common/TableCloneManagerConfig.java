@@ -7,6 +7,8 @@ import com.boraydata.cdc.tcm.utils.JacksonUtil;
 import com.boraydata.cdc.tcm.utils.StringUtil;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -17,11 +19,14 @@ import java.util.Objects;
 @JsonPropertyOrder({
         "sourceConfig",
         "cloneConfig",
+        "redis",
         "sourceTableName",
         "cloneTableName",
+        "sourceTableNames",
+        "cloneTableNames",
 
-        "customSchemaFilePath",
-        "customTable",
+//        "customSchemaFilePath",
+        "customTables",
 
         "hdfsSourceDataDir",
         "hdfsCloneDataPath",
@@ -53,6 +58,10 @@ public class TableCloneManagerConfig {
     private DatabaseConfig cloneConfig;
     private String sourceTableName;
     private String cloneTableName;
+    private RedisConfig redis;
+
+    private LinkedList<String> sourceTableNames;
+    private LinkedList<String> cloneTableNames;
 
     /**
      * support have not regular metadata data type such as kafka and hadoop
@@ -63,6 +72,7 @@ public class TableCloneManagerConfig {
      * specifies the custom format {@link com.boraydata.cdc.tcm.entity.Table}
      */
     private Table customTable;
+    private LinkedList<Table> customTables;
 
     /**
      * CSV file save to HDFS Path.
@@ -189,6 +199,11 @@ public class TableCloneManagerConfig {
         DataSourceEnum sourceEnum = this.sourceConfig.getDataSourceEnum();
         if(sourceEnum.equals(DataSourceEnum.HUDI))
             throw new TCMException("SourceDataType unable to be"+sourceEnum);
+        if(DataSourceEnum.HADOOP.equals(sourceEnum) || DataSourceEnum.KAFKA.equals(sourceEnum)){
+            this.executeExportScript = Boolean.FALSE;
+            this.executeLoadScript = Boolean.FALSE;
+        }
+
 
         this.cloneConfig = cloneConfig.checkConfig();
         DataSourceEnum cloneEnum = this.cloneConfig.getDataSourceEnum();
@@ -210,10 +225,17 @@ public class TableCloneManagerConfig {
                 this.hdfsCloneDataPath = hdfsCloneDataPath + "/";
         }
 
-        if(StringUtil.isNullOrEmpty(sourceTableName))
-            throw new TCMException("the sourceTableName is null,sourceTableName:"+hoodieTableType);
-        if(StringUtil.isNullOrEmpty(cloneTableName))
-            this.cloneTableName = this.sourceTableName;
+        if(null != this.cloneTableNames && !this.cloneTableNames.isEmpty()){
+            if(this.sourceTableNames.size() != this.cloneTableNames.size())
+                throw new TCMException("the sourceTableNames size is :"+this.sourceTableNames.size() + " But cloneTableNames size is "+this.cloneTableNames.size());
+        }else {
+            if(StringUtil.isNullOrEmpty(sourceTableName))
+                throw new TCMException("the sourceTableName is null,sourceTableName:"+hoodieTableType);
+            if(StringUtil.isNullOrEmpty(cloneTableName))
+                this.cloneTableName = this.sourceTableName;
+        }
+
+
 
         // Custom Table
         if(Objects.isNull(customTable) && Boolean.FALSE.equals(StringUtil.isNullOrEmpty(customSchemaFilePath)))
@@ -247,6 +269,15 @@ public class TableCloneManagerConfig {
         return this;
     }
 
+    public RedisConfig getRedis() {
+        return redis;
+    }
+
+    public TableCloneManagerConfig setRedis(RedisConfig redis) {
+        this.redis = redis;
+        return this;
+    }
+
     public String getSourceTableName() {
         return sourceTableName;
     }
@@ -265,6 +296,24 @@ public class TableCloneManagerConfig {
         return this;
     }
 
+    public LinkedList<String> getSourceTableNames() {
+        return sourceTableNames;
+    }
+
+    public TableCloneManagerConfig setSourceTableNames(LinkedList<String> sourceTableNames) {
+        this.sourceTableNames = sourceTableNames;
+        return this;
+    }
+
+    public LinkedList<String> getCloneTableNames() {
+        return cloneTableNames;
+    }
+
+    public TableCloneManagerConfig setCloneTableNames(LinkedList<String> cloneTableNames) {
+        this.cloneTableNames = cloneTableNames;
+        return this;
+    }
+
     public String getCustomSchemaFilePath() {
         return customSchemaFilePath;
     }
@@ -280,6 +329,15 @@ public class TableCloneManagerConfig {
 
     public TableCloneManagerConfig setCustomTable(Table customTable) {
         this.customTable = customTable;
+        return this;
+    }
+
+    public LinkedList<Table> getCustomTables() {
+        return customTables;
+    }
+
+    public TableCloneManagerConfig setCustomTables(LinkedList<Table> customTables) {
+        this.customTables = customTables;
         return this;
     }
 

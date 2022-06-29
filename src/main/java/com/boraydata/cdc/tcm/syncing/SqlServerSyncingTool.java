@@ -8,6 +8,7 @@ import com.boraydata.cdc.tcm.entity.Table;
 import com.boraydata.cdc.tcm.syncing.util.SqlServerIndexTool;
 import com.boraydata.cdc.tcm.utils.StringUtil;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -41,13 +42,13 @@ public class SqlServerSyncingTool implements SyncingTool {
 
     @Override
     public Boolean executeLoad(TableCloneManagerContext tcmContext) {
-        Boolean haveIndex = SqlServerIndexTool.fillingPrimaryKeyName(tcmContext);
 
-        if(Boolean.TRUE.equals(haveIndex) && Boolean.FALSE.equals(SqlServerIndexTool.disableIndex(tcmContext)))
+        if(Boolean.FALSE.equals(SqlServerIndexTool.disableIndex(tcmContext)))
             return false;
+
         String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
 
-        if(Boolean.TRUE.equals(haveIndex) && Boolean.FALSE.equals(SqlServerIndexTool.rebuildIndex(tcmContext)))
+        if(Boolean.FALSE.equals(SqlServerIndexTool.rebuildIndex(tcmContext)))
             return false;
 
         if(tcmContext.getTcmConfig().getDebug())
@@ -140,7 +141,7 @@ public class SqlServerSyncingTool implements SyncingTool {
 //        tableName = StringUtil.escapeRegexQuoteEncode(tableName);
         delimiter = StringUtil.escapeRegexSingleQuoteEncode(delimiter).replaceAll("\\\\","\\\\");
         lineSeparate = StringUtil.escapeRegexSingleQuoteEncode(lineSeparate).replaceAll("\\\\","\\\\");
-        quote = StringUtil.escapeRegexQuoteEncode(quote).replaceAll("\\\\","\\\\\\\\");
+        quote = StringUtil.escapeRegexQuoteEncode(quote);
 //        escape = StringUtil.escapeRegexQuoteEncode(escape).replaceAll("\\\\","\\\\\\\\");
 
         /**
@@ -158,6 +159,7 @@ public class SqlServerSyncingTool implements SyncingTool {
             if(tableQuery.lastIndexOf(",") == tableQuery.length()-1)
                 tableQuery.deleteCharAt(tableQuery.length()-1);
             tableName = tableQuery.append(" from ").append(templeTable).toString();
+            tableName = tableName.replaceAll("\\\\","\\\\");
         }
         StringBuilder stringBuilder = new StringBuilder(con.replace("?","\""+tableName+"\" queryout '"+filePath+"'"));
         if(StringUtil.nonEmpty(delimiter)) {

@@ -125,7 +125,7 @@ public class Table implements Cloneable {
 
     public String outInfo(){
         return String.format("DataSourceEnum:%-20s OriginalDataSourceEnum:%-20s CatalogName:%-20s SchemaName:%-20s TableName:%-20s ColumnCount:%-20s PrimaryKeyName:%-20s PrimaryKeys:%-20s",
-                                dataSourceEnum,     originalDataSourceEnum,     catalogName,      schemaName,       tableName,      columns.size(),   primaryKeyName,      primaryKeys);
+                                dataSourceEnum,     originalDataSourceEnum,     catalogName,      schemaName,       tableName,      columns.size(),   primaryKeyName,     primaryKeys);
     }
 
     @Override

@@ -75,19 +75,21 @@ class TableCloneManagerTest {
     @Test
     void fullFunctionTest() {
         String sourceTableName = "lineitem_sf10";
-        String cloneTableName = sourceTableName+"_clone";
+//        String cloneTableName = sourceTableName+"_clone";
+        String cloneTableName = "lineitem_sf10_pk";
 
-        TableCloneManagerConfig configTest = TestDataProvider.getTCMConfig(configMySQL, configSQLServer)
+        TableCloneManagerConfig configTest = TestDataProvider.getTCMConfig(configPostgreSQL, configSQLServer)
                 .setOutSourceTableSQL(Boolean.FALSE)
                 .setOutCloneTableSQL(Boolean.FALSE)
                 .setCreatePrimaryKeyInClone(Boolean.TRUE)
                 .setCreateTableInClone(Boolean.FALSE)
                 .setExecuteExportScript(Boolean.FALSE)
-                .setExecuteLoadScript(Boolean.FALSE)
+                .setExecuteLoadScript(Boolean.TRUE)
                 .setDelimiter(",")
                 .setLineSeparate("\n")
                 .setQuote("\"")
                 .setEscape("\\")
+                .setTempDirectory("/data/cdc_data/fabric-cdc/init/db-hudi-test/")
                 .setSourceTableName(sourceTableName)
                 .setCloneTableName(cloneTableName);
         TableCloneManagerContext tcmcTest = tcmcBuilder

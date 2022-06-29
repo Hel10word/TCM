@@ -123,6 +123,8 @@
 
         <jackson.version>2.13.3</jackson.version>
 
+        <jedis.version>3.3.0</jedis.version>
+
         <!--    slf4j interface    -->
         <slf4j-api.version>1.7.36</slf4j-api.version>
         <!--   log4j 2 implement     -->
@@ -135,17 +137,17 @@
     <dependencies>
 
         <!--    hive-jdbc    -->
-        <dependency>
-            <groupId>com.boraydata</groupId>
-            <artifactId>hive-jdbc-standalone</artifactId>
-            <version>${hive-jdbc-standalone.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.boraydata</groupId>-->
+<!--            <artifactId>hive-jdbc-standalone</artifactId>-->
+<!--            <version>${hive-jdbc-standalone.version}</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.slf4j</groupId>-->
+<!--                    <artifactId>slf4j-api</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
         <!--    MySQL    -->
         <dependency>
             <groupId>mysql</groupId>
@@ -174,6 +176,13 @@
             <version>${jackson.version}</version>
         </dependency>
 
+        <!-- Redis -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
+        </dependency>
+
 
         <!--   slf4j interface    -->
         <dependency>
@@ -182,7 +191,7 @@
             <version>${slf4j-api.version}</version>
         </dependency>
         <!-- Log4j2 implement -->
-        <!-- slf4j to log4j2 -->
+        <!-- log4j2 to slf4j -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
