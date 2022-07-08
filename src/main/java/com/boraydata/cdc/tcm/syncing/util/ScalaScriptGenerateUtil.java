@@ -168,7 +168,7 @@ public class ScalaScriptGenerateUtil {
             return this;
         for ( Column column : columns){
             String columnName = column.getColumnName();
-            TCMDataTypeEnum tcmMappingType = column.getTCMDataTypeEnum();
+            TCMDataTypeEnum tcmMappingType = column.getTcmDataTypeEnum();
             String outDataType = tcmMappingType.getMappingDataType(DataSourceEnum.HUDI);
             this.scalaScript.append(".add(\"").append(columnName).append("\",").append(outDataType).append(")");
         }

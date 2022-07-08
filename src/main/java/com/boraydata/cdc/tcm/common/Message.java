@@ -1,6 +1,7 @@
 package com.boraydata.cdc.tcm.common;
 
 import com.boraydata.cdc.tcm.utils.StringUtil;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -12,10 +13,11 @@ import java.util.Objects;
  */
 @JsonPropertyOrder({
         "code",
+        "jobInfo",
         "message",
         "totalTime",
 })
-@JsonIgnoreProperties({})
+@JsonIgnoreProperties({"exceptionMsg","createSourceTableTime","createCloneTableTime","exportFromSourceTime","loadInCloneTime"})
 public class Message {
     private Integer code = 200;
     private String message;
@@ -40,19 +42,20 @@ public class Message {
     public String getMessage() {
         if(StringUtil.isNullOrEmpty(this.message)){
             StringBuilder sb = new StringBuilder();
-            if(StringUtil.nonEmpty(this.jobInfo))
-                sb.append("Job Info : ").append(this.jobInfo).append("\n");
+//            if(StringUtil.nonEmpty(this.jobInfo))
+//                sb.append("Job Info : ").append(this.jobInfo).append("\n");
             if(StringUtil.nonEmpty(this.exceptionMsg)){
                 sb.append("Exception Message : ").append(this.exceptionMsg).append("\n");
             }else {
-                if(Objects.nonNull(this.createSourceTableTime))
-                    sb.append("Create Source Table Spend Time : ").append(this.createSourceTableTime).append("\n");
-                if(Objects.nonNull(this.createCloneTableTime))
-                    sb.append("Create Clone Table Spend Time : ").append(this.createCloneTableTime).append("\n");
-                if(Objects.nonNull(this.exportFromSourceTime))
-                    sb.append("Export Data From Source Spend Time : ").append(this.exportFromSourceTime).append("\n");
-                if(Objects.nonNull(this.loadInCloneTime))
-                    sb.append("load Data In Clone Spend Time : ").append(this.loadInCloneTime).append("\n");
+                sb.append("SUCCESS!");
+//                if(Objects.nonNull(this.createSourceTableTime))
+//                    sb.append("Create Source Table Spend Time : ").append(this.createSourceTableTime).append("\n");
+//                if(Objects.nonNull(this.createCloneTableTime))
+//                    sb.append("Create Clone Table Spend Time : ").append(this.createCloneTableTime).append("\n");
+//                if(Objects.nonNull(this.exportFromSourceTime))
+//                    sb.append("Export Data From Source Spend Time : ").append(this.exportFromSourceTime).append("\n");
+//                if(Objects.nonNull(this.loadInCloneTime))
+//                    sb.append("load Data In Clone Spend Time : ").append(this.loadInCloneTime).append("\n");
             }
             this.message = sb.toString();
         }

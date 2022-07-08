@@ -135,7 +135,7 @@ public enum DataSourceEnum {
     }
 
     public static DataSourceEnum valueOfByString(String value){
-        if(value.equals(DataSourceEnum.MYSQL.toString()) || value.equalsIgnoreCase("mysql"))
+        if(value.equals(DataSourceEnum.MYSQL.toString()) || value.equalsIgnoreCase("mysql") || value.equalsIgnoreCase("rpdsql"))
             return DataSourceEnum.MYSQL;
         else if(value.equals(DataSourceEnum.POSTGRESQL.toString()) || value.equalsIgnoreCase("postgresql"))
             return DataSourceEnum.POSTGRESQL;

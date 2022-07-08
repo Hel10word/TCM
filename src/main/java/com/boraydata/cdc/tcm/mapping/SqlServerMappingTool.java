@@ -102,7 +102,7 @@ public class SqlServerMappingTool implements MappingTool{
                 column.setNumericPrecision(6).setNumericScale(4);
             if("money".equalsIgnoreCase(dataType))
                 column.setNumericPrecision(15).setNumericScale(4);
-            column.setTCMDataTypeEnum(relation);
+            column.setTcmDataTypeEnum(relation);
         }
         table.setColumns(columns);
         if(table.getDataSourceEnum() == null)
@@ -120,7 +120,7 @@ public class SqlServerMappingTool implements MappingTool{
         if(table.getDataSourceEnum() != null && DataSourceEnum.SQLSERVER.equals(table.getDataSourceEnum()))
             return cloneTable;
         for (Column col : cloneTable.getColumns())
-            col.setDataType(col.getTCMDataTypeEnum().getMappingDataType(DataSourceEnum.SQLSERVER));
+            col.setDataType(col.getTcmDataTypeEnum().getMappingDataType(DataSourceEnum.SQLSERVER));
         cloneTable.setDataSourceEnum(DataSourceEnum.SQLSERVER);
         return cloneTable;
     }
@@ -159,7 +159,7 @@ public class SqlServerMappingTool implements MappingTool{
         stringBuilder.append("Create Table "+tableName+"(\n");
         List<Column> columns = table.getColumns();
         for(Column column : columns){
-            TCMDataTypeEnum tcmDataTypeEnum = column.getTCMDataTypeEnum();
+            TCMDataTypeEnum tcmDataTypeEnum = column.getTcmDataTypeEnum();
             String dataType = column.getDataType();
             if(StringUtil.isNullOrEmpty(dataType) && Objects.isNull(tcmDataTypeEnum))
                 throw new TCMException("Create Table SQL is fail,Because unable use null type:"+column);

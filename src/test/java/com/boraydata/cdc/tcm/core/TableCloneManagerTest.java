@@ -117,4 +117,12 @@ class TableCloneManagerTest {
         System.out.println("LoadShellContent:\n"+context.getLoadShellContent()+"\n");
         System.out.println("LoadDataInHudiScalaScriptContent:\n"+context.getLoadDataInHudiScalaScriptContent()+"\n");
     }
+
+    @Test
+    void tableExistsTest() {
+        TableCloneManager tcm = TableCloneManagerFactory.createTableCloneManage(tcmc);
+//        System.out.println(tcm.tableExists(configMySQL,"t3"));
+//        System.out.println(tcm.tableExists(configPostgreSQL,"t3"));
+//        System.out.println(tcm.tableExists(configSQLServer,"t3"));
+    }
 }

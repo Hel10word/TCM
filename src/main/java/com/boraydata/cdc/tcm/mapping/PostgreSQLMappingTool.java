@@ -202,7 +202,7 @@ public class PostgreSQLMappingTool implements MappingTool {
 //            if(TCMDataTypeEnum.DECIMAL.equals(relation) && null == column.getNumericPrecision())
 //                column.setNumericPrecision(100).setNumericScale(100);
 
-            column.setTCMDataTypeEnum(relation);
+            column.setTcmDataTypeEnum(relation);
         }
         table.setColumns(columns);
         if(table.getDataSourceEnum() == null)
@@ -219,7 +219,7 @@ public class PostgreSQLMappingTool implements MappingTool {
         if(table.getDataSourceEnum() != null && DataSourceEnum.POSTGRESQL.equals(table.getDataSourceEnum()))
             return cloneTable;
         for (Column col : cloneTable.getColumns())
-            col.setDataType(col.getTCMDataTypeEnum().getMappingDataType(DataSourceEnum.POSTGRESQL));
+            col.setDataType(col.getTcmDataTypeEnum().getMappingDataType(DataSourceEnum.POSTGRESQL));
         cloneTable.setDataSourceEnum(DataSourceEnum.POSTGRESQL);
         return cloneTable;
     }
@@ -251,7 +251,7 @@ public class PostgreSQLMappingTool implements MappingTool {
             stringBuilder.append(table.getSchemaName()).append(".\"").append(table.getTableName()).append("\"(\n");
         List<Column> columns = table.getColumns();
         for(Column column : columns){
-            TCMDataTypeEnum tcmDataTypeEnum = column.getTCMDataTypeEnum();
+            TCMDataTypeEnum tcmDataTypeEnum = column.getTcmDataTypeEnum();
             String dataType = column.getDataType();
             if(StringUtil.isNullOrEmpty(dataType) && Objects.isNull(tcmDataTypeEnum))
                 throw new TCMException("Create Table SQL is fail,Because unable use null datatype:"+column);

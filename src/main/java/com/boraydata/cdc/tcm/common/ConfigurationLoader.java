@@ -23,10 +23,9 @@ public class ConfigurationLoader {
             properties.load(in);
             TableCloneManagerConfig tableCloneManageConfig = loadPropertiesConfig(properties);
             in.close();
-            return tableCloneManageConfig.checkConfig();
+            return tableCloneManageConfig;
         }else if(fileExtension.equals("json")){
-            TableCloneManagerConfig tableCloneManagerConfig = JacksonUtil.filePathToObject(path, TableCloneManagerConfig.class);
-            return tableCloneManagerConfig.checkConfig();
+            return JacksonUtil.filePathToObject(path, TableCloneManagerConfig.class);
         }else
             throw new TCMException("unable support config file type,file path:"+path);
     }

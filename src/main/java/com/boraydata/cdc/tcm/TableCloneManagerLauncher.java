@@ -30,6 +30,7 @@ public class TableCloneManagerLauncher {
 
         Boolean deleteFlag;
         Boolean debugFlag;
+        Boolean useCustomTables;
         String sourceTableName;
         String cloneTableName;
         String sourceDataType;
@@ -42,30 +43,47 @@ public class TableCloneManagerLauncher {
 
         if(args != null && args.length != 0)
             configFilePath = args[0];
-
         try {
             config = ConfigurationLoader.loadConfigFile(configFilePath);
+        } catch (IOException e) {
+            throw new TCMException("make sure the config file exist",e);
+        }
+        try {
+            config = config.checkConfig();
             deleteFlag = config.getDeleteCache();
             debugFlag = config.getDebug();
+            useCustomTables = config.getUseCustomTables();
             sourceTableName = config.getSourceTableName();
             cloneTableName = config.getCloneTableName();
             sourceDataType = config.getSourceConfig().getDataSourceEnum().toString();
             cloneDataType = config.getCloneConfig().getDataSourceEnum().toString();
-        } catch (IOException e) {
-            throw new TCMException("make sure the config file exist",e);
+        }catch (Exception e){
+            Message message = new Message().setCode(400).setMessage("Please make sure the configuration file is filled correctly \n"+e.getMessage());
+            RedisOperateUtil.sendMessage(config.getRedis(),JacksonUtil.toJson(message));
+            throw new TCMException("Please make sure the configuration file is filled correctly",e);
         }
         LinkedList<String> sourceTableNames = config.getSourceTableNames();
         LinkedList<String> cloneTableNames = config.getCloneTableNames();
         LinkedList<Table> customTables = config.getCustomTables();
         LinkedList<Message> messageList = new LinkedList<>();
         if(null != cloneTableNames) {
-            for (int i = 0; i < sourceTableNames.size(); i++) {
-                sourceTableName = sourceTableNames.get(i);
+            for (int i = 0; i < cloneTableNames.size(); i++) {
                 cloneTableName = cloneTableNames.get(i);
-                if(i <= customTables.size()) {
-                    Table customTable = customTables.get(i);
-                    if (StringUtil.nonEmpty(customTable.getTableName()) && customTable.getTableName().equals(sourceTableName))
-                        config.setCustomTable(customTable);
+                if(Boolean.TYPE.equals(useCustomTables)){
+                    if(customTables != null && !customTables.isEmpty() && i <= customTables.size()){
+                        sourceTableName = customTables.get(i).getTableName();
+                        config.setCustomTable(customTables.get(i));
+                    }else {
+                        messageList.add(new Message().setCode(400).setMessage("The number of 'useCustomTables' and 'cloneTableNames' are inconsistent, please re-fill configuration file."));
+                        continue;
+                    }
+                }else {
+                    if(i <= sourceTableNames.size()) {
+                        sourceTableName = sourceTableNames.get(i);
+                    }else {
+                        messageList.add(new Message().setCode(400).setMessage("The number of 'sourceTableName' and 'cloneTableNames' are inconsistent, please re-fill configuration file."));
+                        continue;
+                    }
                 }
                 config.setSourceTableName(sourceTableName);
                 config.setCloneTableName(cloneTableName);
@@ -73,6 +91,8 @@ public class TableCloneManagerLauncher {
                 messageList.add(message);
             }
         }else {
+            if(Boolean.FALSE.equals(useCustomTables))
+                config.setCustomTable(null);
             Message message = tableCloneManager(config, deleteFlag, debugFlag, sourceTableName, cloneTableName, sourceDataType, cloneDataType);
             messageList.add(message);
         }
@@ -84,7 +104,7 @@ public class TableCloneManagerLauncher {
 
     }
 
-    private static Message tableCloneManager(TableCloneManagerConfig config, Boolean deleteFlag, Boolean debugFlag, String sourceTableName, String cloneTableName, String sourceDataType, String cloneDataType) throws JsonProcessingException {
+    private static Message tableCloneManager(TableCloneManagerConfig config, Boolean deleteFlag, Boolean debugFlag, String sourceTableName, String cloneTableName, String sourceDataType, String cloneDataType){
         Message message = new Message();
         long start = 0;
         long end = 0;
@@ -103,19 +123,24 @@ public class TableCloneManagerLauncher {
 //====================== 3、 use Context create TCM
         TableCloneManager tcm = TableCloneManagerFactory.createTableCloneManage(tcmContext);
 
-        StringBuilder sb = new StringBuilder()
-                .append("Source Table : ").append(config.getSourceTableName()).append("\n")
-                .append("Source Data : ").append(JacksonUtil.toJson(config.getSourceConfig())).append("\n")
-                .append("Clone Table : ").append(config.getCloneTableName()).append("\n")
-                .append("Clone Data : ").append(JacksonUtil.toJson(config.getCloneConfig())).append("\n")
-                ;
-        message.setJobInfo(sb.toString());
+//        StringBuilder sb = new StringBuilder()
+//                .append("Source Table : ").append(config.getSourceTableName()).append("\n")
+//                .append("Source Data : ").append(JacksonUtil.toJson(config.getSourceConfig())).append("\n")
+//                .append("Clone Table : ").append(config.getCloneTableName()).append("\n")
+//                .append("Clone Data : ").append(JacksonUtil.toJson(config.getCloneConfig())).append("\n")
+//                ;
+//        message.setJobInfo(sb.toString());
 
 
         start = System.currentTimeMillis();
         logger.info("Ready to get Source Table metadata information,Table Name:'{}'  Datasource Type:{}",sourceTableName,sourceDataType);
 //====================== 4、 get Source Table Struct by tableName in sourceData
-        Table sourceTable = tcm.createSourceMappingTable(sourceTableName);
+        Table sourceTable;
+        try {
+            sourceTable = tcm.createSourceMappingTable(sourceTableName);
+        }catch (Exception e){
+            return message.setMessage("failed to createSourceMappingTable,sourceTableName:"+sourceTableName+"\n"+e.getMessage());
+        }
         end = System.currentTimeMillis();
         Long getSourceTable = end-start;
         all+=getSourceTable;
@@ -130,9 +155,19 @@ public class TableCloneManagerLauncher {
         start = System.currentTimeMillis();
         logger.info("Ready to create Clone Table,Table Name:'{}'  Datasource Type:{}",cloneTableName,cloneDataType);
 //====================== 5、 get Clone Table based on Source Table
-        Table cloneTable = tcm.createCloneTable(sourceTable,cloneTableName);
+        Table cloneTable;
+        try {
+            cloneTable= tcm.createCloneTable(sourceTable,cloneTableName);
+        }catch (Exception e){
+            return message.setMessage("failed to createCloneTable,cloneTableName:"+cloneTableName+"\n"+e.getMessage());
+        }
+
 //====================== 6、create Clone Table in clone database
-        tcm.createTableInDatasource();
+        try {
+            tcm.createTableInDatasource();
+        }catch (Exception e){
+            return message.setMessage("failed to createTableInDatasource,\n"+e.getMessage());
+        }
         end = System.currentTimeMillis();
         Long createCloneTable = end-start;
         all+=createCloneTable;
@@ -147,7 +182,11 @@ public class TableCloneManagerLauncher {
         logger.info("*********************************** EXPORT INFO ***********************************");
 
 //====================== 7、create export data script,and execute export shell.
-        tcm.exportTableData();
+        try {
+            tcm.exportTableData();
+        }catch (Exception e){
+            return message.setMessage("failed to exportTableData,\n"+e.getMessage());
+        }
         end = System.currentTimeMillis();
         Long exportFromSource = end-start;
         all+=exportFromSource;
@@ -166,7 +205,11 @@ public class TableCloneManagerLauncher {
         start = System.currentTimeMillis();
         logger.info("*********************************** LOAD INFO ***********************************");
 //====================== 8、create export data script,and execute export shell.
-        tcm.loadTableData();
+        try {
+            tcm.loadTableData();
+        }catch (Exception e){
+            return message.setMessage("failed to loadTableData,\n"+e.getMessage());
+        }
         end = System.currentTimeMillis();
         Long loadInClone = end-start;
         all+=loadInClone;
@@ -178,7 +221,11 @@ public class TableCloneManagerLauncher {
 //        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Mapping Table and Syncing TableData table time:{} <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",all);
 
         if(Boolean.TRUE.equals(deleteFlag)){
-            tcm.deleteCache();
+            try {
+                tcm.deleteCache();
+            }catch (Exception e){
+                return message.setMessage("failed to deleteCache,\n"+e.getMessage());
+            }
         }
 
         if(Boolean.TRUE.equals(debugFlag)){

@@ -3,8 +3,11 @@ package com.boraydata.cdc.tcm;
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
 import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
 import com.boraydata.cdc.tcm.core.TableCloneManager;
+import com.boraydata.cdc.tcm.entity.Table;
 import com.boraydata.cdc.tcm.mapping.MappingTool;
 import com.boraydata.cdc.tcm.mapping.MappingToolFactory;
+import com.boraydata.cdc.tcm.utils.JacksonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
@@ -30,8 +33,8 @@ public class GetTableInfoTest {
 
     DatabaseConfig sqlserverConfig = TestDataProvider.SQLServerConfig.setCatalog("test_db").setSchema("dbo");
 
-//    String tableName = "test_table";
-    String tableName = "test_table_clone";
+    String tableName = "test_table";
+//    String tableName = "test_table_clone";
 //    String tableName = "lineitem_sf10";
 //    String tableName = "customer";
 //    String tableName = "testtable";
@@ -40,14 +43,16 @@ public class GetTableInfoTest {
 //    DatabaseConfig config = postgreSQLConfig;
 //    DatabaseConfig config = sqlserverConfig;
     @Test
-    public void test(){
+    public void test() throws JsonProcessingException {
         showTableInfoBySQL(config,tableName);
         showTableInfoByJdbcMetadata(config,tableName);
 
         TableCloneManager tcm = TestDataProvider.getTCM(config, config);
         MappingTool tool = MappingToolFactory.create(config.getDataSourceEnum());
         assert tool != null : "Unable support "+config.getDataSourceEnum();
-        System.out.println(tool.createSourceMappingTable(tcm.getSourceTableByTableName(config,tableName)).outTableInfo());
+        Table sourceMappingTable = tool.createSourceMappingTable(tcm.getSourceTableByTableName(config, tableName));
+        System.out.println(sourceMappingTable.outTableInfo());
+        System.out.println(JacksonUtil.toJson(sourceMappingTable));
     }
 
 

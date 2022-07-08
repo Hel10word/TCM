@@ -2,8 +2,10 @@ package com.boraydata.cdc.tcm.entity;
 
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.common.enums.TCMDataTypeEnum;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 
 /**
@@ -26,7 +28,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "numericScale",
         "datetimePrecision",
         "isNullable",
-        "TCMDataTypeEnum",
+//        "TCMDataTypeEnum",
+        "mappingDataType",
 })
 @JsonIgnoreProperties({"dataSourceEnum","tableCatalog","tableSchema","tableName","udtType","ordinalPosition",})
 public class Column implements Cloneable {
@@ -49,9 +52,9 @@ public class Column implements Cloneable {
     private Integer numericScale;
     // time data type precision
     private Integer datetimePrecision;
-    private Boolean isNullable;
+    private Boolean nullable;
     // mapping tcm data type
-    private TCMDataTypeEnum TCMDataTypeEnum;
+    private TCMDataTypeEnum tcmDataTypeEnum;
 
     public DataSourceEnum getDataSourceEnum() {
         return dataSourceEnum;
@@ -62,14 +65,13 @@ public class Column implements Cloneable {
         return this;
     }
 
-    public TCMDataTypeEnum getTCMDataTypeEnum() {
-        return TCMDataTypeEnum;
+    @JsonGetter("mappingDataType")
+    public TCMDataTypeEnum getTcmDataTypeEnum() {
+        return tcmDataTypeEnum;
     }
-
-
-
-    public Column setTCMDataTypeEnum(TCMDataTypeEnum TCMDataTypeEnum) {
-        this.TCMDataTypeEnum = TCMDataTypeEnum;
+    @JsonSetter("mappingDataType")
+    public Column setTcmDataTypeEnum(TCMDataTypeEnum tcmDataTypeEnum) {
+        this.tcmDataTypeEnum = tcmDataTypeEnum;
         return this;
     }
 
@@ -137,11 +139,11 @@ public class Column implements Cloneable {
     }
 
     public Boolean getNullable() {
-        return isNullable;
+        return nullable;
     }
 
     public Column setNullable(Boolean nullAble) {
-        isNullable = nullAble;
+        nullable = nullAble;
         return this;
     }
 
@@ -188,8 +190,8 @@ public class Column implements Cloneable {
     }
 
     public String outInfo(){
-        return String.format("ColumnName=%-20s DataType=%-20s OrdinalPosition=%-4s CharacterMaximumPosition=%-10s NumericPrecision=%-6s NumericScale=%-6s DatetimePrecision=%-6s IsNullable=%-6s tableCLoneManageType=%s \n",
-                            columnName,         dataType,      ordinalPosition,    characterMaximumPosition,        numericPrecision,     numericScale,    datetimePrecision,      isNullable,     TCMDataTypeEnum);
+        return String.format("ColumnName=%-20s DataType=%-20s OrdinalPosition=%-4s CharacterMaximumPosition=%-10s NumericPrecision=%-6s NumericScale=%-6s DatetimePrecision=%-6s Nullable=%-6s TableCLoneManageType=%s \n",
+                            columnName,         dataType,      ordinalPosition,    characterMaximumPosition,        numericPrecision,     numericScale,    datetimePrecision, nullable, tcmDataTypeEnum);
     }
 
     public Column clone(){

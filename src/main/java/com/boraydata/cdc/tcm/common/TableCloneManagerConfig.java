@@ -38,6 +38,7 @@ import java.util.Objects;
 
         "sparkCustomCommand",
 
+        "useCustomTables",
         "outSourceTableSQL",
         "outCloneTableSQL",
         "createTableInClone",
@@ -121,6 +122,11 @@ public class TableCloneManagerConfig {
      */
     private String sparkCustomCommand;
 
+    /**
+     * Prefer to use Custom Tables information as source table
+     * default: false (Optional)
+     */
+    private Boolean useCustomTables = false;
     /**
      *  record the create table statement of the Source table, .sql file save in 'tempDirectory'
      *  default: false (Optional)
@@ -410,6 +416,15 @@ public class TableCloneManagerConfig {
 
     public TableCloneManagerConfig setSparkCustomCommand(String sparkCustomCommand) {
         this.sparkCustomCommand = sparkCustomCommand;
+        return this;
+    }
+
+    public Boolean getUseCustomTables() {
+        return useCustomTables;
+    }
+
+    public TableCloneManagerConfig setUseCustomTables(Boolean useCustomTables) {
+        this.useCustomTables = useCustomTables;
         return this;
     }
 

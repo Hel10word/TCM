@@ -124,86 +124,86 @@ public class TestDataProvider {
                 .setNumericPrecision(10)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(1)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.INT8));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.INT8));
         columns.add(new Column().setColumnName("col_smallint")
                 .setDataType(TCMDataTypeEnum.INT16.getMappingDataType(type))
                 .setNumericPrecision(10)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(2)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.INT16));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.INT16));
         columns.add(new Column().setColumnName("col_integer")
                 .setDataType(TCMDataTypeEnum.INT32.getMappingDataType(type))
                 .setNumericPrecision(10)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(3)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.INT32));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.INT32));
         columns.add(new Column().setColumnName("col_bigint")
                 .setDataType(TCMDataTypeEnum.INT64.getMappingDataType(type))
                 .setNumericPrecision(10)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(4)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.INT64));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.INT64));
         columns.add(new Column().setColumnName("col_float")
                 .setDataType(TCMDataTypeEnum.FLOAT32.getMappingDataType(type))
                 .setNumericPrecision(30)
                 .setNumericScale(12)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(5)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.FLOAT32));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.FLOAT32));
         columns.add(new Column().setColumnName("col_double")
                 .setDataType(TCMDataTypeEnum.FLOAT64.getMappingDataType(type))
                 .setNumericPrecision(65)
                 .setNumericScale(30)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(6)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.FLOAT64));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.FLOAT64));
         columns.add(new Column().setColumnName("col_boolean")
                 .setDataType(TCMDataTypeEnum.BOOLEAN.getMappingDataType(type))
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(7)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.BOOLEAN));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.BOOLEAN));
         columns.add(new Column().setColumnName("col_varchar")
                 .setDataType(TCMDataTypeEnum.STRING.getMappingDataType(type))
                 .setCharacterMaximumPosition(255L)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(8)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.STRING));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.STRING));
         columns.add(new Column().setColumnName("col_bytes")
                 .setDataType(TCMDataTypeEnum.BYTES.getMappingDataType(type))
                 .setCharacterMaximumPosition(255L)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(9)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.BYTES));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.BYTES));
         columns.add(new Column().setColumnName("col_decimal")
                 .setDataType(TCMDataTypeEnum.DECIMAL.getMappingDataType(type))
                 .setNumericPrecision(65)
                 .setNumericScale(30)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(10)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.DECIMAL));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.DECIMAL));
         columns.add(new Column().setColumnName("col_date")
                 .setDataType(TCMDataTypeEnum.DATE.getMappingDataType(type))
                 .setDatetimePrecision(0)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(11)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.DATE));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.DATE));
         columns.add(new Column().setColumnName("col_time")
                 .setDataType(TCMDataTypeEnum.TIME.getMappingDataType(type))
                 .setDatetimePrecision(3)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(12)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.TIME));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.TIME));
         columns.add(new Column().setColumnName("col_time_stamp")
                 .setDataType(TCMDataTypeEnum.TIMESTAMP.getMappingDataType(type))
                 .setDatetimePrecision(6)
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(13)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.TIMESTAMP));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.TIMESTAMP));
         columns.add(new Column().setColumnName("col_long_string")
                 .setDataType(TCMDataTypeEnum.TEXT.getMappingDataType(type))
                 .setNullable(Boolean.TRUE)
                 .setOrdinalPosition(14)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.TEXT));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.TEXT));
         return columns;
     }
 
@@ -212,16 +212,16 @@ public class TestDataProvider {
         columns.add(new Column().setColumnName("col_varchar")
                 .setCharacterMaximumPosition(255L)
                 .setNullable(Boolean.FALSE)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.STRING));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.STRING));
         columns.add(new Column().setColumnName("col_decimal")
                 .setNumericPrecision(65)
                 .setNumericScale(30)
                 .setNullable(Boolean.TRUE)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.DECIMAL));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.DECIMAL));
         columns.add(new Column().setColumnName("col_time_stamp")
                 .setDatetimePrecision(6)
                 .setNullable(Boolean.TRUE)
-                .setTCMDataTypeEnum(TCMDataTypeEnum.TIMESTAMP));
+                .setTcmDataTypeEnum(TCMDataTypeEnum.TIMESTAMP));
         return columns;
     }
 

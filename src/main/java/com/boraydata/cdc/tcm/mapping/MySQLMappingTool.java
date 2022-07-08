@@ -9,7 +9,6 @@ import com.boraydata.cdc.tcm.entity.Table;
 import com.boraydata.cdc.tcm.utils.StringUtil;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * deal with the mapping relationship between MySQL Type and TCM Type
@@ -109,7 +108,7 @@ public class MySQLMappingTool implements MappingTool {
 //                relation = TCMDataTypeEnum.BOOLEAN;
             if("FLOAT".equalsIgnoreCase(colDataType) && column.getNumericScale() != null)
                 relation = TCMDataTypeEnum.FLOAT64;
-            column.setTCMDataTypeEnum(relation);
+            column.setTcmDataTypeEnum(relation);
         }
         table.setColumns(columns);
         if(table.getDataSourceEnum() == null)
@@ -127,7 +126,7 @@ public class MySQLMappingTool implements MappingTool {
         if(table.getDataSourceEnum() != null && DataSourceEnum.MYSQL.equals(table.getDataSourceEnum()))
             return cloneTable;
         for (Column col : cloneTable.getColumns())
-            col.setDataType(col.getTCMDataTypeEnum().getMappingDataType(DataSourceEnum.MYSQL));
+            col.setDataType(col.getTcmDataTypeEnum().getMappingDataType(DataSourceEnum.MYSQL));
         cloneTable.setDataSourceEnum(DataSourceEnum.MYSQL);
         return cloneTable;
     }
@@ -156,7 +155,7 @@ public class MySQLMappingTool implements MappingTool {
         StringBuilder stringBuilder = new StringBuilder("Create Table If Not Exists `"+table.getTableName()+"`(\n");
         List<Column> columns = table.getColumns();
         for(Column column : columns){
-            TCMDataTypeEnum tcmDataTypeEnum = column.getTCMDataTypeEnum();
+            TCMDataTypeEnum tcmDataTypeEnum = column.getTcmDataTypeEnum();
             String dataType = column.getDataType();
             if(StringUtil.isNullOrEmpty(dataType) && Objects.isNull(tcmDataTypeEnum))
                 throw new TCMException("Create Table SQL is fail,Because unable use null type:"+column);

@@ -14,22 +14,22 @@ class ColumnTest {
     public void cloneTest(){
         Column column = new Column();
         column.setDataSourceEnum(DataSourceEnum.MYSQL);
-        column.setTCMDataTypeEnum(TCMDataTypeEnum.STRING);
+        column.setTcmDataTypeEnum(TCMDataTypeEnum.STRING);
         column.setTableName("testOne");
 
         Column clone = column.clone();
 
         System.out.println("DataSourceEnum    column:"+column.getDataSourceEnum()+"    clone:"+clone.getDataSourceEnum()+"  "+(column.getDataSourceEnum()==clone.getDataSourceEnum()));
-        System.out.println("TCMDataTypeEnum    column:"+column.getTCMDataTypeEnum()+"    clone:"+clone.getTCMDataTypeEnum()+"  "+(column.getTCMDataTypeEnum()==clone.getTCMDataTypeEnum()));
+        System.out.println("TCMDataTypeEnum    column:"+column.getTcmDataTypeEnum()+"    clone:"+clone.getTcmDataTypeEnum()+"  "+(column.getTcmDataTypeEnum()==clone.getTcmDataTypeEnum()));
         System.out.println("TableName    column:"+column.getTableName()+"    clone:"+clone.getTableName()+"  "+(column.getTableName() == clone.getTableName()));
 
         System.out.println("\n\n=========\n\n");
 //        column.setDataSourceEnum(DataSourceEnum.SPARK);
-        column.setTCMDataTypeEnum(TCMDataTypeEnum.BOOLEAN);
+        column.setTcmDataTypeEnum(TCMDataTypeEnum.BOOLEAN);
         column.setTableName("testTwo");
 
         System.out.println("DataSourceEnum    column:"+column.getDataSourceEnum()+"    clone:"+clone.getDataSourceEnum()+"  "+(column.getDataSourceEnum()==clone.getDataSourceEnum()));
-        System.out.println("TCMDataTypeEnum    column:"+column.getTCMDataTypeEnum()+"    clone:"+clone.getTCMDataTypeEnum()+"  "+(column.getTCMDataTypeEnum()==clone.getTCMDataTypeEnum()));
+        System.out.println("TCMDataTypeEnum    column:"+column.getTcmDataTypeEnum()+"    clone:"+clone.getTcmDataTypeEnum()+"  "+(column.getTcmDataTypeEnum()==clone.getTcmDataTypeEnum()));
         System.out.println("TableName    column:"+column.getTableName()+"    clone:"+clone.getTableName()+"  "+(column.getTableName()==clone.getTableName()));
     }
 

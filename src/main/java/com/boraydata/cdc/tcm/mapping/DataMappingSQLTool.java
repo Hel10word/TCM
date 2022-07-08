@@ -54,7 +54,7 @@ public class DataMappingSQLTool {
         DataSourceEnum tableType = table.getOriginalDataSourceEnum();
         sbSQL.append("select ");
         for (Column column : table.getColumns()){
-            TCMDataTypeEnum colType = column.getTCMDataTypeEnum();
+            TCMDataTypeEnum colType = column.getTcmDataTypeEnum();
             String colName = column.getColumnName();
             if(tableType.equals(target)){
                 sbSQL.append(colName);
@@ -121,7 +121,7 @@ public class DataMappingSQLTool {
         Boolean mappingFlag = Boolean.FALSE;
         for (Column col: table.getColumns()){
             if(mappingFlag)break;
-            TCMDataTypeEnum colType = col.getTCMDataTypeEnum();
+            TCMDataTypeEnum colType = col.getTcmDataTypeEnum();
             if(sourceType.equals(DataSourceEnum.MYSQL)){
                 if(colType.equals(TCMDataTypeEnum.BOOLEAN) && cloneType.equals(DataSourceEnum.HUDI)){
                     mappingFlag = Boolean.TRUE;

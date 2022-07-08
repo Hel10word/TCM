@@ -1,5 +1,15 @@
 {
   "sourceConfig":{
+    "dataSourceEnum":"POSTGRESQL",
+    "host":"192.168.30.38",
+    "port":"5432",
+    "username":"postgres",
+    "password":"postgres",
+    "databaseName":"test_db",
+    "catalog":"test_db",
+    "schema":"public"
+  },
+  "cloneConfig_mysql":{
     "dataSourceEnum":"MYSQL",
     "host":"192.168.30.38",
     "port":"3306",
@@ -7,7 +17,27 @@
     "password":"root",
     "databaseName":"test_db"
   },
+  "cloneConfig_pg":{
+    "dataSourceEnum":"POSTGRESQL",
+    "host":"192.168.30.38",
+    "port":"5432",
+    "username":"postgres",
+    "password":"postgres",
+    "databaseName":"test_db",
+    "catalog":"test_db",
+    "schema":"public"
+  },
   "cloneConfig":{
+    "dataSourceEnum":"SQLSERVER",
+    "host":"192.168.120.237",
+    "port":"1433",
+    "username":"sa",
+    "password":"Rapids123*",
+    "databaseName":"test_db",
+    "catalog":"test_db",
+    "schema":"dbo"
+  },
+  "cloneConfig_hudi":{
     "dataSourceEnum":"HUDI",
     "host":"192.168.120.67",
     "port":"10000",
@@ -15,8 +45,16 @@
     "password":"rapids",
     "databaseName":"test_cdc_hudi"
   },
-  "sourceTableName":"temple_table",
-  "cloneTableName":"temple_table",
+  "redis":{
+    "host":"192.168.120.66",
+    "messageKey":"TestRedisKey",
+    "port":"16379"
+  },
+  "sourceTableNames":["lineitem_sf10"],
+  "cloneTableNames":["lineitem_sf10"],
+  "customTables":[{}],
+
+
   "hdfsSourceDataDir":"hdfs:///cdc-init/",
   "hdfsCloneDataPath":"hdfs:///cdc-init/temple_table",
   "primaryKey":"col_varchar",
@@ -25,6 +63,7 @@
   "nonPartition":false,
   "multiPartitionKeys":false,
   "sparkCustomCommand":"spark-shell \\\n            --jars /opt/CDC/spark/jars/hudi-spark-bundle_2.11-0.8.0.jar \\\n            --driver-class-path $HADOOP_CONF_DIR \\\n            --packages org.apache.spark:spark-avro_2.11:2.4.4 \\\n            --master local[2] \\\n            --deploy-mode client \\\n            --driver-memory 2G \\\n            --executor-memory 2G \\\n            --num-executors 2",
+
   "outSourceTableSQL":false,
   "outCloneTableSQL":false,
   "createTableInClone":true,

@@ -246,7 +246,7 @@ public class TableCloneManager {
     }
 
 
-    // ========================================  Create TempTable && CloneTable in Databases ===========================
+    // ========================================  Create TempTable && CloneTable in Databases  ===========================
     public boolean createTableInDatasource(){
         return createTableInDatasource(this.tableCloneManagerContext);
     }
@@ -268,13 +268,39 @@ public class TableCloneManager {
 
         if(DataSourceEnum.HUDI.equals(cloneType))
             return true;
-        if(cloneTable != null)
-            return createTableInDatasource(cloneConfig,cloneTableSQL);
-        else
+        if(cloneTable != null) {
+            String cloneTableTableName = cloneTable.getTableName();
+            if(
+                    ( DataSourceEnum.MYSQL.equals(cloneType) || DataSourceEnum.POSTGRESQL.equals(cloneType) || DataSourceEnum.SQLSERVER.equals(cloneType)) &&
+                    tableExists(cloneConfig,cloneTableTableName)
+            ) {
+                boolean tableInDatasource = createTableInDatasource(cloneConfig, "drop table " + cloneConfig.getSchema() + "." + cloneTableTableName);
+                logger.warn("table already exists in clone, tableName:{} ,will delete table {}",cloneTableTableName,tableInDatasource);
+            }
+            return createTableInDatasource(cloneConfig, cloneTableSQL);
+        }else
             throw new TCMException("Unable find CloneTable in TCM.");
     }
 
-    // ========================================  Execute SQL By JDBC===========================
+    // ========================================  Execute SQL By JDBC  ===========================
+    private  boolean tableExists(DatabaseConfig dbConfig,String tableName){
+        String count_num = "count_num";
+        String sql = "SELECT count(1) as "+count_num+" FROM information_schema.TABLES where TABLE_CATALOG = '"+dbConfig.getCatalog()+"' and TABLE_SCHEMA = '"+dbConfig.getSchema()+"' and TABLE_NAME = '"+tableName+"'";
+        String countNum = "0";
+        try (Connection conn = DatasourceConnectionFactory.createDataSourceConnection(dbConfig);
+             Statement statement = conn.createStatement()){
+            // SELECT count(1) as count_num FROM information_schema.TABLES where TABLE_CATALOG = 'def' and TABLE_SCHEMA = 'test_db' and TABLE_NAME = 't5'
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()){
+                countNum = rs.getString(count_num);
+            }
+
+        }catch (TCMException|SQLException e){
+            throw new TCMException("Failed to create clone table,maybe datasource connection unable use!!! \n"+dbConfig.outInfo()+"\n"+sql,e);
+        }finally {
+            return !"0".equals(countNum);
+        }
+    }
     private boolean createTableInDatasource(DatabaseConfig dbConfig,String sql){
         try (Connection conn = DatasourceConnectionFactory.createDataSourceConnection(dbConfig);
              Statement statement = conn.createStatement()){
@@ -291,7 +317,9 @@ public class TableCloneManager {
 
 
 
-    // ========================================  Export CSV ===========================
+
+
+    // ========================================  Export CSV  ===========================
 
     public Boolean exportTableData(){
 //        if(DataSourceEnum.HUDI.equals(this.cloneConfig.getDataSourceEnum()))
@@ -328,7 +356,7 @@ public class TableCloneManager {
 
     }
 
-    // ========================================  Load CSV ===========================
+    // ========================================  Load CSV  ===========================
 
     public Boolean loadTableData(){
         String cloneType = this.tableCloneManagerContext.getCloneConfig().getDataSourceEnum().toString();
