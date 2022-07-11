@@ -70,6 +70,25 @@ public enum DataSourceEnum {
             SQLServerContent.PRIMARY_KEY_NAME,
             SQLServerContent.SQL_GET_PRIMARY_KEYS
         ),
+        RPDSQL(
+            RpdSQLContent.TABLE_CATALOG,
+            RpdSQLContent.TABLE_SCHEMA,
+            RpdSQLContent.TABLE_NAME,
+            RpdSQLContent.COLUMN_NAME,
+            RpdSQLContent.DATA_TYPE,
+            RpdSQLContent.UDT_TYPE,
+            RpdSQLContent.ORDINAL_POSITION,
+            RpdSQLContent.IS_NULLABLE,
+            RpdSQLContent.CHARACTER_MAXIMUM_LENGTH,
+            RpdSQLContent.NUMERIC_PRECISION,
+            RpdSQLContent.NUMERIC_SCALE,
+            RpdSQLContent.DATETIME_PRECISION,
+            RpdSQLContent.SQL_TABLE_INFO_BY_TABLE_NAME,
+            RpdSQLContent.SQL_TABLE_INFO_BY_CATALOG,
+            RpdSQLContent.SQL_ALL_TABLE_INFO,
+            RpdSQLContent.PRIMARY_KEY_NAME,
+            RpdSQLContent.SQL_GET_PRIMARY_KEYS
+            ),
         HUDI(
             null,
             null,
@@ -135,8 +154,10 @@ public enum DataSourceEnum {
     }
 
     public static DataSourceEnum valueOfByString(String value){
-        if(value.equals(DataSourceEnum.MYSQL.toString()) || value.equalsIgnoreCase("mysql") || value.equalsIgnoreCase("rpdsql"))
+        if(value.equals(DataSourceEnum.MYSQL.toString()) || value.equalsIgnoreCase("mysql"))
             return DataSourceEnum.MYSQL;
+        else if(value.equals(DataSourceEnum.RPDSQL.toString()) || value.equalsIgnoreCase("rpdsql"))
+            return DataSourceEnum.RPDSQL;
         else if(value.equals(DataSourceEnum.POSTGRESQL.toString()) || value.equalsIgnoreCase("postgresql"))
             return DataSourceEnum.POSTGRESQL;
         else if(value.equals(DataSourceEnum.POSTGRESQL.toString()) || value.equalsIgnoreCase("sqlserver"))
@@ -401,6 +422,70 @@ public enum DataSourceEnum {
                 "             KU.CONSTRAINT_SCHEMA  = ? AND \n" +
                 "             KU.table_name = ?\n" +
                 "ORDER BY KU.ORDINAL_POSITION,KU.TABLE_NAME;";
+    }
+
+    /**
+     * @author: bufan
+     * @date: 2022/7/9
+     * @see <a href="https://docs.singlestore.com/db/v7.8/en/reference/information-schema-reference/information-schema/introduction.html"></a>
+     * @see <a href="https://docs.singlestore.com/managed-service/en/reference/sql-reference/show-commands/show-commands.html"></a>
+     * @see <a href="https://docs.singlestore.com/db/v7.8/en/reference/information-schema-reference/cluster-component-tables.html"></a>
+     */
+    private static class RpdSQLContent  {
+        private static final String TABLE_CATALOG = "TABLE_CATALOG";
+        private static final String TABLE_SCHEMA = "TABLE_SCHEMA";
+        private static final String TABLE_NAME = "TABLE_NAME";
+        private static final String COLUMN_NAME = "COLUMN_NAME";
+        private static final String DATA_TYPE = "COLUMN_TYPE";
+        private static final String UDT_TYPE = "DATA_TYPE";
+        private static final String ORDINAL_POSITION = "ORDINAL_POSITION";
+        private static final String IS_NULLABLE = "IS_NULLABLE";
+        private static final String CHARACTER_MAXIMUM_LENGTH = "CHARACTER_MAXIMUM_LENGTH";
+        private static final String NUMERIC_PRECISION = "NUMERIC_PRECISION";
+        private static final String NUMERIC_SCALE = "NUMERIC_SCALE";
+        private static final String DATETIME_PRECISION = "DATETIME_PRECISION";
+        private static final String COLUMN_COMMENT = "COLUMN_COMMENT";
+        private static final String SELECT_TABLE_ALL_COLUMN = "select *,null as "+DATETIME_PRECISION;
+        private static final String SELECT_TABLE_COLUMN =
+                "select "+TABLE_CATALOG+","+TABLE_SCHEMA+","+TABLE_NAME+","+COLUMN_NAME+","+DATA_TYPE+","+UDT_TYPE+","+ORDINAL_POSITION+","+IS_NULLABLE+","+ CHARACTER_MAXIMUM_LENGTH +","+ NUMERIC_PRECISION +","+ NUMERIC_SCALE +","+DATETIME_PRECISION;
+        //                " select TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,COLUMN_TYPE,ORDINAL_POSITION,IS_NULLABLE, NUMERIC_PRECISION, NUMERIC_SCALE,CHARACTER_SET_NAME, COLLATION_NAME ";
+        private static final String SELECT_TABLE_FROM = " from information_schema.COLUMNS ";
+        private static final String WHERE = " where ";
+        private static final String AND = " and ";
+        // because mysql only have doubly structures,all catalog is 'def'   e.g: def.testDB.testTable
+        private static final String WHERE_TABLE_CATALOG = " "+TABLE_SCHEMA+" in (?) ";
+        private static final String WHERE_TABLE_NAME = " "+TABLE_NAME+" in (?) ";
+        private static final String WHERE_ALL_TABLE =
+                " "+TABLE_SCHEMA+" not in ('INFORMATION_SCHEMA') ";
+        private static final String ORDER_BY = " ORDER BY "+TABLE_NAME+","+ORDINAL_POSITION+" ";
+
+        private static final String SQL_TABLE_INFO_BY_TABLE_NAME =
+                SELECT_TABLE_ALL_COLUMN+
+                        SELECT_TABLE_FROM+
+                        WHERE+WHERE_TABLE_NAME+
+                        ORDER_BY+";";
+        private static final String SQL_TABLE_INFO_BY_CATALOG =
+                SELECT_TABLE_ALL_COLUMN+
+                        SELECT_TABLE_FROM+
+                        WHERE+WHERE_TABLE_CATALOG+
+                        ORDER_BY+";";
+        private static final String SQL_ALL_TABLE_INFO =
+                SELECT_TABLE_ALL_COLUMN+
+                        SELECT_TABLE_FROM+
+                        WHERE+WHERE_ALL_TABLE+
+                        ORDER_BY+";";
+
+        private static final String PRIMARY_KEY_NAME = "CONSTRAINT_NAME";
+        private static final String SQL_GET_PRIMARY_KEYS =
+                "SELECT k.COLUMN_NAME as "+COLUMN_NAME+" ,t.CONSTRAINT_NAME as "+PRIMARY_KEY_NAME+",k.ORDINAL_POSITION\n" +
+                        "FROM information_schema.table_constraints t\n" +
+                        "JOIN information_schema.key_column_usage k\n" +
+                        "USING(constraint_name,table_schema,table_name)\n" +
+                        "WHERE t.CONSTRAINT_NAME='PRIMARY'\n" +
+                        "  AND t.CONSTRAINT_CATALOG = ?\n" +
+                        "  AND t.table_schema = ?\n" +
+                        "  AND t.table_name = ?\n" +
+                        " order by k.ORDINAL_POSITION ;";
     }
 
 }

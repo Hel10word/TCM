@@ -18,12 +18,13 @@ public class ConfigurationLoader {
     public static TableCloneManagerConfig loadConfigFile(String path) throws IOException {
         String fileExtension = FileUtil.getFileExtension(path);
         if(fileExtension.equals("properties")) {
-            FileInputStream in = new FileInputStream(path);
-            Properties properties = new Properties();
-            properties.load(in);
-            TableCloneManagerConfig tableCloneManageConfig = loadPropertiesConfig(properties);
-            in.close();
-            return tableCloneManageConfig;
+//            FileInputStream in = new FileInputStream(path);
+//            Properties properties = new Properties();
+//            properties.load(in);
+//            TableCloneManagerConfig tableCloneManageConfig = loadPropertiesConfig(properties);
+//            in.close();
+//            return tableCloneManageConfig;
+            throw new TCMException("unable support '.properties' config file type,file path:"+path);
         }else if(fileExtension.equals("json")){
             return JacksonUtil.filePathToObject(path, TableCloneManagerConfig.class);
         }else

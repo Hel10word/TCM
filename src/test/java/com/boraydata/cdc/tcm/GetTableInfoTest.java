@@ -33,15 +33,16 @@ public class GetTableInfoTest {
 
     DatabaseConfig sqlserverConfig = TestDataProvider.SQLServerConfig.setCatalog("test_db").setSchema("dbo");
 
-    String tableName = "test_table";
-//    String tableName = "test_table_clone";
-//    String tableName = "lineitem_sf10";
-//    String tableName = "customer";
-//    String tableName = "testtable";
+    DatabaseConfig rpdsqlConfig = TestDataProvider.RPDSQLConfig;
+
+//    String tableName = "test_table";
+//    String tableName = "cdc_init";
+    String tableName = "lineitem_test";
 //    String tableName = "exact_numerics_sqlserver";
-    DatabaseConfig config = mysqlConfig;
+//    DatabaseConfig config = mysqlConfig;
 //    DatabaseConfig config = postgreSQLConfig;
 //    DatabaseConfig config = sqlserverConfig;
+    DatabaseConfig config = rpdsqlConfig;
     @Test
     public void test() throws JsonProcessingException {
         showTableInfoBySQL(config,tableName);

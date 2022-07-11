@@ -63,6 +63,7 @@ public enum TCMDataTypeEnum {
             return null;
         switch (dst){
             case MYSQL:
+            case RPDSQL:
                 return mysql;
             case POSTGRESQL:
                 return postgresql;

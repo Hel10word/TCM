@@ -205,10 +205,6 @@ public class PostgreSQLMappingTool implements MappingTool {
             column.setTcmDataTypeEnum(relation);
         }
         table.setColumns(columns);
-        if(table.getDataSourceEnum() == null)
-            table.setDataSourceEnum(DataSourceEnum.POSTGRESQL);
-        if(table.getOriginalDataSourceEnum() == null)
-            table.setOriginalDataSourceEnum(DataSourceEnum.POSTGRESQL);
         return table;
     }
 
@@ -220,7 +216,6 @@ public class PostgreSQLMappingTool implements MappingTool {
             return cloneTable;
         for (Column col : cloneTable.getColumns())
             col.setDataType(col.getTcmDataTypeEnum().getMappingDataType(DataSourceEnum.POSTGRESQL));
-        cloneTable.setDataSourceEnum(DataSourceEnum.POSTGRESQL);
         return cloneTable;
     }
 

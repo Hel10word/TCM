@@ -38,8 +38,12 @@ public class DatabaseConfig {
     private String jdbcUrl;
 
     public DatabaseConfig checkConfig(){
+
         switch (dataSourceEnum){
+            case RPDSQL:
             case MYSQL:
+                if(StringUtil.isNullOrEmpty(databaseName) && !StringUtil.isNullOrEmpty(schema))
+                    this.databaseName = this.schema;
                 if(StringUtil.isNullOrEmpty(this.catalog))
                     this.catalog = "def";
                 if(StringUtil.isNullOrEmpty(this.schema))
@@ -50,12 +54,12 @@ public class DatabaseConfig {
             case POSTGRESQL:
                 if(StringUtil.isNullOrEmpty(databaseName) && !StringUtil.isNullOrEmpty(catalog))
                     this.databaseName = this.catalog;
-                String[] split_postgreSQL = this.databaseName.split("\\.");
-                if(split_postgreSQL.length == 2){
-                    this.catalog = split_postgreSQL[0];
-                    this.schema = split_postgreSQL[1];
-                    this.databaseName = split_postgreSQL[0];
-                }
+//                String[] split_postgreSQL = this.databaseName.split("\\.");
+//                if(split_postgreSQL.length == 2){
+//                    this.catalog = split_postgreSQL[0];
+//                    this.schema = split_postgreSQL[1];
+//                    this.databaseName = split_postgreSQL[0];
+//                }
                 if(StringUtil.isNullOrEmpty(this.catalog))
                     this.catalog = this.databaseName;
                 if(StringUtil.isNullOrEmpty(this.schema))
@@ -66,12 +70,12 @@ public class DatabaseConfig {
             case SQLSERVER:
                 if(StringUtil.isNullOrEmpty(databaseName) && !StringUtil.isNullOrEmpty(catalog))
                     this.databaseName = this.catalog;
-                String[] split_sqlserver = this.databaseName.split("\\.");
-                if(split_sqlserver.length == 2){
-                    this.catalog = split_sqlserver[0];
-                    this.schema = split_sqlserver[1];
-                    this.databaseName = split_sqlserver[0];
-                }
+//                String[] split_sqlserver = this.databaseName.split("\\.");
+//                if(split_sqlserver.length == 2){
+//                    this.catalog = split_sqlserver[0];
+//                    this.schema = split_sqlserver[1];
+//                    this.databaseName = split_sqlserver[0];
+//                }
                 if(StringUtil.isNullOrEmpty(this.catalog))
                     this.catalog = this.databaseName;
                 if(StringUtil.isNullOrEmpty(this.schema))
@@ -83,8 +87,8 @@ public class DatabaseConfig {
                 return this;
         }
 
-        if(StringUtil.isNullOrEmpty(databaseName))
-            throw new TCMException("the database name is null"+this.outInfo());
+//        if(StringUtil.isNullOrEmpty(databaseName) || StringUtil.isNullOrEmpty(catalog))
+//            throw new TCMException("failed to init Database config,cause the 'databaseName'  Or ('catalog'、'schema') is null"+this.outInfo());
         return this;
     }
 

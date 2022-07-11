@@ -270,7 +270,7 @@ public class MySQLSyncingTool implements SyncingTool {
         for (Column col : tcmContext.getSourceTable().getColumns())
             coverNull = coverNull||col.getNullable();
         if(coverNull)
-            coverNull = !DataSourceEnum.MYSQL.equals(tcmContext.getCloneConfig().getDataSourceEnum());
+            coverNull = !(DataSourceEnum.MYSQL.equals(tcmContext.getCloneConfig().getDataSourceEnum()) || DataSourceEnum.RPDSQL.equals(tcmContext.getCloneConfig().getDataSourceEnum()));
 
 
         sb.append(replaceExportStatementMySQLShell(connectCommand,tableName,csvPath,delimiter,lineSeparate,quote,escape,coverNull)).append("\n");

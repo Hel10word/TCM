@@ -25,6 +25,9 @@ class TableCloneManagerTest {
     //========================== SQLSERVER ===============================
     DatabaseConfig configHudi = TestDataProvider.HudiConfig;
 
+    //========================== RPDSQL ===============================
+    DatabaseConfig configRpdSql = TestDataProvider.RPDSQLConfig;
+
     // create the table clone manager
     TableCloneManagerContext.Builder tcmcBuilder = new TableCloneManagerContext.Builder();
     TableCloneManagerContext tcmc = tcmcBuilder
@@ -74,17 +77,17 @@ class TableCloneManagerTest {
 
     @Test
     void fullFunctionTest() {
-        String sourceTableName = "lineitem_sf10";
+        String sourceTableName = "cdc_init";
 //        String cloneTableName = sourceTableName+"_clone";
-        String cloneTableName = "lineitem_sf10_pk";
+        String cloneTableName = "cdc_init_clone";
 
-        TableCloneManagerConfig configTest = TestDataProvider.getTCMConfig(configPostgreSQL, configSQLServer)
+        TableCloneManagerConfig configTest = TestDataProvider.getTCMConfig(configRpdSql, configMySQL)
                 .setOutSourceTableSQL(Boolean.FALSE)
                 .setOutCloneTableSQL(Boolean.FALSE)
                 .setCreatePrimaryKeyInClone(Boolean.TRUE)
-                .setCreateTableInClone(Boolean.FALSE)
+                .setCreateTableInClone(Boolean.TRUE)
                 .setExecuteExportScript(Boolean.FALSE)
-                .setExecuteLoadScript(Boolean.TRUE)
+                .setExecuteLoadScript(Boolean.FALSE)
                 .setDelimiter(",")
                 .setLineSeparate("\n")
                 .setQuote("\"")
@@ -101,8 +104,8 @@ class TableCloneManagerTest {
         Table sourceMappingTable = tcm.createSourceMappingTable(sourceTableName);
         Table cloneTable = tcm.createCloneTable(sourceMappingTable,cloneTableName);
         tcm.createTableInDatasource();
-        tcm.exportTableData();
-        tcm.loadTableData();
+//        tcm.exportTableData();
+//        tcm.loadTableData();
         tcm.deleteCache();
 
 //        System.out.println(sourceMappingTable.outTableInfo());

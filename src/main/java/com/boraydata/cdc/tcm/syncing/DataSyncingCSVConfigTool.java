@@ -45,6 +45,7 @@ public class DataSyncingCSVConfigTool {
         DataSourceEnum sourceEnum = context.getSourceConfig().getDataSourceEnum();
         DataSourceEnum cloneEnum = context.getCloneConfig().getDataSourceEnum();
         switch (sourceEnum){
+            case RPDSQL:
             case MYSQL:
                 // Nothing to do
                 break;
@@ -60,6 +61,7 @@ public class DataSyncingCSVConfigTool {
         }
 
         switch (cloneEnum){
+            case RPDSQL:
             case MYSQL:
 //                context.getTcmConfig().setQuote(null);
                 // Nothing to do

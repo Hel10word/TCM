@@ -15,15 +15,27 @@ import java.util.Properties;
  *
  *  E.g. PgSQL{boolean:t,boolean:f}  =>  MySQL{boolean:0,boolean:1}  =>  Spark{boolean:false,boolean:true}
  *
+ *  MySQL、RpdSQL Boolean export 0;1;''  load support 0;1;''
+ *  PostgreSQL   Boolean export f;t     load support true,yes,on,1,t;false,no,off,0;''
+ *  SQL Server  Boolean export 0;1;''   load support 0;1;''
+ *  HUDI        Boolean                 load support false;true;''
+ *
  *            |   Source  |   Clone   | Boolean | Byte | Money |
  *            | --------- | --------- | ------- | ---- | ----- |
  *            |   MySQL   |    MySQL  |         |  √√√ |       |
- *            |           |    PgSQL  |         |  √√√ |       |
- *            |           |    Hudi   |   √√√   |  √√√ |       |
+ *            |   RpdSQL  |    PgSQL  |         |  √√√ |       |
+ *            |           | SqlServer |         |  √√√ |       |
+ *            |           |    HUDI   |   √√√   |  √√√ |       |
  *            | --------- | --------- | ------- | ---- | ----- |
  *            |   PgSQL   |    MySQL  |   √√√   |      |  √√√  |
  *            |           |    PgSQL  |         |      |       |
- *            |           |    Hudi   |   √√√   |      |  √√√  |
+ *            |           | SqlServer |   √√√   |      |       |
+ *            |           |    HUDI   |   √√√   |      |  √√√  |
+ *            | --------- | --------- | ------- | ---- | ----- |
+ *            | SqlServer |    MySQL  |         |      |       |
+ *            |           |    PgSQL  |         |      |       |
+ *            |           | SqlServer |         |      |       |
+ *            |           |    HUDI   |   √√√   |      |       |
  *
  *      √√√ : need to create Temp table or use mapping query statement.
  * @author bufan
@@ -41,6 +53,8 @@ public class DataMappingSQLTool {
         mappingPts.put(DataSourceEnum.POSTGRESQL +FALSE,"'f'");
         mappingPts.put(DataSourceEnum.SQLSERVER +TRUE,"'1'");
         mappingPts.put(DataSourceEnum.SQLSERVER +FALSE,"'0'");
+        mappingPts.put(DataSourceEnum.RPDSQL+TRUE,"'1'");
+        mappingPts.put(DataSourceEnum.RPDSQL+FALSE,"'0'");
         mappingPts.put(DataSourceEnum.HUDI+TRUE,"'true'");
         mappingPts.put(DataSourceEnum.HUDI+FALSE,"'false'");
     }
@@ -64,7 +78,7 @@ public class DataMappingSQLTool {
                         .append(colName)
                         .append("::money::numeric) as ")
                         .append(colName);
-            }else if(TCMDataTypeEnum.BYTES.equals(colType) && DataSourceEnum.MYSQL.equals(tableType)){
+            }else if(TCMDataTypeEnum.BYTES.equals(colType) && (DataSourceEnum.MYSQL.equals(tableType) || DataSourceEnum.RPDSQL.equals(tableType))){
                 String dataType = column.getDataType().replaceAll("\\(.*\\)","");
                 if(
                         dataType.equalsIgnoreCase("BINARY") ||
@@ -118,20 +132,20 @@ public class DataMappingSQLTool {
      *          PostgreSQL export SQL grammar support query statement,not need to create Temp Table,
      */
     public static Table checkRelationship(Table table,DataSourceEnum sourceType,DataSourceEnum cloneType){
-        Boolean mappingFlag = Boolean.FALSE;
+        boolean mappingFlag = Boolean.FALSE;
         for (Column col: table.getColumns()){
             if(mappingFlag)break;
             TCMDataTypeEnum colType = col.getTcmDataTypeEnum();
-            if(sourceType.equals(DataSourceEnum.MYSQL)){
+            if(sourceType.equals(DataSourceEnum.MYSQL) || sourceType.equals(DataSourceEnum.RPDSQL)){
                 if(colType.equals(TCMDataTypeEnum.BOOLEAN) && cloneType.equals(DataSourceEnum.HUDI)){
                     mappingFlag = Boolean.TRUE;
                 }else if (colType.equals(TCMDataTypeEnum.BYTES)){
-                    if(cloneType.equals(DataSourceEnum.MYSQL) || cloneType.equals(DataSourceEnum.POSTGRESQL) || cloneType.equals(DataSourceEnum.HUDI))
+//                    if(cloneType.equals(DataSourceEnum.MYSQL) || cloneType.equals(DataSourceEnum.POSTGRESQL) || cloneType.equals(DataSourceEnum.RPDSQL) || cloneType.equals(DataSourceEnum.HUDI))
                         mappingFlag = Boolean.TRUE;
                 }
             }else if (sourceType.equals(DataSourceEnum.POSTGRESQL)){
                 if(colType.equals(TCMDataTypeEnum.BOOLEAN) || "MONEY".equalsIgnoreCase(StringUtil.dataTypeFormat(col.getDataType()))){
-                    if(cloneType.equals(DataSourceEnum.MYSQL) || cloneType.equals(DataSourceEnum.SQLSERVER) || cloneType.equals(DataSourceEnum.HUDI) )
+                    if(!cloneType.equals(DataSourceEnum.POSTGRESQL))
                         mappingFlag = Boolean.TRUE;
                 }
             }else if(sourceType.equals(DataSourceEnum.SQLSERVER)){

@@ -1,6 +1,7 @@
 package com.boraydata.cdc.tcm.syncing;
 
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
+import com.boraydata.cdc.tcm.mapping.RpdSqlMappingTool;
 
 /**
  * @author bufan
@@ -10,6 +11,7 @@ public class SyncingToolFactory {
     public static SyncingTool create(DataSourceEnum dataSourceEnum){
 
         switch (dataSourceEnum){
+            case RPDSQL:
             case MYSQL:
                 return new MySQLSyncingTool();
             case POSTGRESQL:

@@ -32,6 +32,8 @@ public class TestDataProvider {
     //========================== MySQL ===============================
     public static DatabaseConfig MySQLConfig = new DatabaseConfig()
             .setDatabaseName("test_db")
+            .setCatalog("def")
+            .setSchema("test_db")
             .setDataSourceEnum(DataSourceEnum.MYSQL)
             .setHost("192.168.30.38")
             .setPort("3306")
@@ -41,6 +43,8 @@ public class TestDataProvider {
     //========================== PostgreSQL ===============================
     public static DatabaseConfig PostgreSQLConfig = new DatabaseConfig()
             .setDatabaseName("test_db")
+            .setCatalog("test_db")
+            .setSchema("public")
             .setDataSourceEnum(DataSourceEnum.POSTGRESQL)
             .setHost("192.168.30.38")
             .setPort("5432")
@@ -49,11 +53,23 @@ public class TestDataProvider {
 
     public static DatabaseConfig SQLServerConfig = new DatabaseConfig()
             .setDatabaseName("test_db")
+            .setCatalog("test_db")
+            .setSchema("dbo")
             .setDataSourceEnum(DataSourceEnum.SQLSERVER)
             .setHost("192.168.120.237")
             .setPort("1433")
             .setUsername("sa")
             .setPassword("Rapids123*");
+
+    public static DatabaseConfig RPDSQLConfig = new DatabaseConfig()
+            .setDatabaseName("test_db")
+            .setCatalog("def")
+            .setSchema("test_db")
+            .setDataSourceEnum(DataSourceEnum.RPDSQL)
+            .setHost("192.168.120.69")
+            .setPort("3306")
+            .setUsername("root")
+            .setPassword("rdpuser");
 
     //========================== Hudi ===============================
     public static DatabaseConfig HudiConfig = new DatabaseConfig()

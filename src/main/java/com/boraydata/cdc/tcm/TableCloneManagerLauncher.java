@@ -10,7 +10,6 @@ import com.boraydata.cdc.tcm.exception.TCMException;
 import com.boraydata.cdc.tcm.entity.Table;
 import com.boraydata.cdc.tcm.utils.JacksonUtil;
 import com.boraydata.cdc.tcm.utils.RedisOperateUtil;
-import com.boraydata.cdc.tcm.utils.StringUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,10 +68,11 @@ public class TableCloneManagerLauncher {
         if(null != cloneTableNames) {
             for (int i = 0; i < cloneTableNames.size(); i++) {
                 cloneTableName = cloneTableNames.get(i);
-                if(Boolean.TYPE.equals(useCustomTables)){
+                if(Boolean.TRUE.equals(useCustomTables)){
                     if(customTables != null && !customTables.isEmpty() && i <= customTables.size()){
-                        sourceTableName = customTables.get(i).getTableName();
-                        config.setCustomTable(customTables.get(i));
+                        Table customTable = customTables.get(i);
+                        sourceTableName = customTable.getTableName();
+                        config.setCustomTable(customTable);
                     }else {
                         messageList.add(new Message().setCode(400).setMessage("The number of 'useCustomTables' and 'cloneTableNames' are inconsistent, please re-fill configuration file."));
                         continue;

@@ -1,146 +1,36 @@
 package com.boraydata.cdc.tcm.mapping;
 
-
-import com.boraydata.cdc.tcm.common.enums.TCMDataTypeEnum;
-import com.boraydata.cdc.tcm.exception.TCMException;
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
+import com.boraydata.cdc.tcm.common.enums.TCMDataTypeEnum;
 import com.boraydata.cdc.tcm.entity.Column;
 import com.boraydata.cdc.tcm.entity.Table;
+import com.boraydata.cdc.tcm.exception.TCMException;
 import com.boraydata.cdc.tcm.utils.StringUtil;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 /**
- * deal with the mapping relationship between MySQL Type and TCM Type
- * @since Fabric CDC V1.0 mainly uses the debezium plugin for parsing binlog log,so refer to part of the design.
- * design by :
- * @see <a href="https://debezium.io/documentation/reference/1.0/connectors/mysql.html#how-the-mysql-connector-maps-data-types_cdc"></a>
- * All Data Type from official document:
- * @see <a href="https://dev.mysql.com/doc/refman/5.7/en/data-types.html">MySQL 5.7 Data Type</a>
- * @author bufan
- * @date 2021/8/31
+ * @author : bufan
+ * @date : 2022/7/9
+ *
+ * @see <a href="https://docs.singlestore.com/db/v7.3/en/reference/sql-reference/data-types.html"></a>
  */
-public class MySQLMappingTool implements MappingTool {
-
-    private static final Map<String, TCMDataTypeEnum> mappingMap = new LinkedHashMap<>();
-    static {
-        /**
-         * @see <a href="https://dev.mysql.com/doc/refman/5.7/en/numeric-types.html">numeric-types</a>
-         */
-        mappingMap.put("TINYINT", TCMDataTypeEnum.INT8);
-        mappingMap.put("SMALLINT", TCMDataTypeEnum.INT16);
-        mappingMap.put("MEDIUMINT", TCMDataTypeEnum.INT32);
-        mappingMap.put("INT", TCMDataTypeEnum.INT32);
-        mappingMap.put("BIGINT", TCMDataTypeEnum.INT64);
-        mappingMap.put("DECIMAL", TCMDataTypeEnum.DECIMAL);
-        mappingMap.put("FLOAT", TCMDataTypeEnum.FLOAT32);
-        mappingMap.put("DOUBLE", TCMDataTypeEnum.FLOAT64);
-        mappingMap.put("BIT", TCMDataTypeEnum.BYTES);
-        mappingMap.put("TINYINT(1)", TCMDataTypeEnum.BOOLEAN);
-
-
-//        mappingMap.put("INTEGER", TCMDataTypeEnum.INT32);
-//        mappingMap.put("NUMERIC", TCMDataTypeEnum.DECIMAL);
-//        mappingMap.put("REAL", TCMDataTypeEnum.FLOAT64);
-//        mappingMap.put("DEC", TCMDataTypeEnum.DECIMAL);
-//        mappingMap.put("FIXED", TCMDataTypeEnum.DECIMAL);
-//        mappingMap.put("BOOL", TCMDataTypeEnum.BOOLEAN);
-//        mappingMap.put("BOOLEAN", TCMDataTypeEnum.BOOLEAN);
-
-        /**
-         * @see <a href="https://dev.mysql.com/doc/refman/5.7/en/date-and-time-types.html">date-and-time-types</a>
-         */
-        mappingMap.put("DATE", TCMDataTypeEnum.DATE);
-        mappingMap.put("TIME", TCMDataTypeEnum.TIME);
-        mappingMap.put("DATETIME", TCMDataTypeEnum.TIMESTAMP);
-        mappingMap.put("TIMESTAMP", TCMDataTypeEnum.TIMESTAMP);
-        mappingMap.put("YEAR", TCMDataTypeEnum.INT32);
-
-        /**
-         * @see <a href="https://dev.mysql.com/doc/refman/5.7/en/string-types.html">string-types</a>
-         */
-        mappingMap.put("CHAR", TCMDataTypeEnum.STRING);
-        mappingMap.put("VARCHAR", TCMDataTypeEnum.STRING);
-        mappingMap.put("BINARY", TCMDataTypeEnum.BYTES);
-        mappingMap.put("VARBINARY", TCMDataTypeEnum.BYTES);
-        mappingMap.put("BLOB", TCMDataTypeEnum.BYTES);
-        mappingMap.put("TEXT", TCMDataTypeEnum.TEXT);
-        mappingMap.put("TINYBLOB", TCMDataTypeEnum.BYTES);
-        mappingMap.put("TINYTEXT", TCMDataTypeEnum.TEXT);
-        mappingMap.put("MEDIUMBLOB", TCMDataTypeEnum.BYTES);
-        mappingMap.put("MEDIUMTEXT", TCMDataTypeEnum.TEXT);
-        mappingMap.put("LONGBLOB", TCMDataTypeEnum.BYTES);
-        mappingMap.put("LONGTEXT", TCMDataTypeEnum.TEXT);
-        mappingMap.put("ENUM", TCMDataTypeEnum.TEXT);
-        mappingMap.put("SET", TCMDataTypeEnum.TEXT);
-
-        /**
-         * @see <a href="https://dev.mysql.com/doc/refman/5.7/en/spatial-types.html">spatial-types</a>
-         */
-        mappingMap.put("GEOMETRY", TCMDataTypeEnum.TEXT);
-        mappingMap.put("POINT", TCMDataTypeEnum.TEXT);
-        mappingMap.put("LINESTRING", TCMDataTypeEnum.TEXT);
-        mappingMap.put("POLYGON", TCMDataTypeEnum.TEXT);
-        mappingMap.put("MULTIPOINT", TCMDataTypeEnum.TEXT);
-        mappingMap.put("MULTILINESTRING", TCMDataTypeEnum.TEXT);
-        mappingMap.put("MULTIPOLYGON", TCMDataTypeEnum.TEXT);
-        mappingMap.put("GEOMETRYCOLLECTION", TCMDataTypeEnum.TEXT);
-
-        /**
-         * @see <a href="https://dev.mysql.com/doc/refman/5.7/en/json.html">json</a>
-         */
-        mappingMap.put("JSON", TCMDataTypeEnum.TEXT);
-    }
-
-    @Override
-    public Table createSourceMappingTable(Table table) {
-        if(table.getColumns() == null || table.getColumns().isEmpty())
-            throw new TCMException("Table.getColumns() is null or empty \n"+table.outTableInfo());
-        List<Column> columns = table.getColumns();
-        for (Column column : columns){
-            if (StringUtil.isNullOrEmpty(column.getDataType()))
-                throw new TCMException("not found DataType value in "+column);
-            TCMDataTypeEnum relation = StringUtil.findRelation(mappingMap,column.getDataType(),null);
-            if (Objects.isNull(relation))
-                throw new TCMException("not found DataType relation in "+column);
-            String colDataType = StringUtil.dataTypeFormat(column.getDataType());
-//            if("TINYINT".equalsIgnoreCase(colDataType) && column.getCharacterMaximumPosition() == 1)
-//                relation = TCMDataTypeEnum.BOOLEAN;
-            if("FLOAT".equalsIgnoreCase(colDataType) && column.getNumericScale() != null)
-                relation = TCMDataTypeEnum.FLOAT64;
-            column.setTcmDataTypeEnum(relation);
-        }
-        table.setColumns(columns);
-        return table;
-    }
-
-
-
-    @Override
-    public Table createCloneMappingTable(Table table) {
-        Table cloneTable = table.clone();
-        if(table.getDataSourceEnum() != null &&
-                (DataSourceEnum.MYSQL.equals(table.getDataSourceEnum()) || DataSourceEnum.RPDSQL.equals(table.getDataSourceEnum()))
-        )
-            return cloneTable;
-        for (Column col : cloneTable.getColumns())
-            col.setDataType(col.getTcmDataTypeEnum().getMappingDataType(DataSourceEnum.MYSQL));
-        return cloneTable;
-    }
+public class RpdSqlMappingTool extends MySQLMappingTool {
 
     /**
      *
      * generate the Create Table Statement by table
-     * Refer to the official documentation (MySQL 5.7)
-     * @see <a href="https://dev.mysql.com/doc/refman/5.7/en/create-table.html">create-table</a>
+     * Refer to the official documentation (SingleStore v7.3)
+     * @see <a href="https://docs.singlestore.com/db/v7.3/en/reference/sql-reference/data-definition-language-ddl/create-table.html?action=version-change">create-table</a>
      * e.g.
-     *   Create Table If Not Exists `table name`(
+     *   Create rowstore Table If Not Exists `table name`(
      *      `column name` integer not null,
      *      `column name` varchar(20) not null,
      *      ....
-     *   )ENGINE = InnoDB;
+     *   );
      *
-     *  "ENGINE = InnoDB" is added by default, you can also not add;
+     *   default use rowstore in RpdSQL
      *
      * @Param Table : table={null,MySQL,test_table,columns={null,null,col_int,DataType=INT,dataTypeMapping=INT32}}
      * @Return: String
@@ -149,7 +39,7 @@ public class MySQLMappingTool implements MappingTool {
     public String getCreateTableSQL(Table table) {
         if(table.getTableName() == null)
             throw new TCMException("Failed in create table SQL,Because ‘Table.TableName’ is null. You should set one ."+table.getDataSourceEnum().name());
-        StringBuilder stringBuilder = new StringBuilder("Create Table If Not Exists `"+table.getTableName()+"`(\n");
+        StringBuilder stringBuilder = new StringBuilder("Create rowstore Table If Not Exists `"+table.getTableName()+"`(\n");
         List<Column> columns = table.getColumns();
         for(Column column : columns){
             TCMDataTypeEnum tcmDataTypeEnum = column.getTcmDataTypeEnum();
@@ -157,7 +47,7 @@ public class MySQLMappingTool implements MappingTool {
             if(StringUtil.isNullOrEmpty(dataType) && Objects.isNull(tcmDataTypeEnum))
                 throw new TCMException("Create Table SQL is fail,Because unable use null type:"+column);
             if(StringUtil.isNullOrEmpty(dataType))
-                dataType = tcmDataTypeEnum.getMappingDataType(DataSourceEnum.MYSQL);
+                dataType = tcmDataTypeEnum.getMappingDataType(DataSourceEnum.RPDSQL);
             stringBuilder.append("`").append(column.getColumnName()).append("` ").append(dataType);
 
             if(table.getOriginalDataSourceEnum() != null && (DataSourceEnum.MYSQL.equals(table.getOriginalDataSourceEnum())) || DataSourceEnum.RPDSQL.equals(table.getOriginalDataSourceEnum())){
@@ -195,10 +85,10 @@ public class MySQLMappingTool implements MappingTool {
 //                    // Nothing to do
 //                }
 //            } else
-             if(
+            if(
                     TCMDataTypeEnum.FLOAT64.equals(tcmDataTypeEnum) ||
 //                    TCMDataTypeEnum.FLOAT32.equals(tcmDataTypeEnum) ||
-                    TCMDataTypeEnum.DECIMAL.equals(tcmDataTypeEnum)
+                            TCMDataTypeEnum.DECIMAL.equals(tcmDataTypeEnum)
             ){
                 Integer precision = column.getNumericPrecision();
                 Integer scale = column.getNumericScale();
@@ -220,7 +110,7 @@ public class MySQLMappingTool implements MappingTool {
                 }
             }else if (
                     TCMDataTypeEnum.STRING.equals(tcmDataTypeEnum) ||
-                    TCMDataTypeEnum.BYTES.equals(tcmDataTypeEnum)
+                            TCMDataTypeEnum.BYTES.equals(tcmDataTypeEnum)
             ){
                 /**
                  * the VARCHAR or VARBINARY sometimes it cannot be set to (65535) , the field size is limited and many aspects.
@@ -246,12 +136,14 @@ public class MySQLMappingTool implements MappingTool {
             } else if (TCMDataTypeEnum.TIMESTAMP.equals(tcmDataTypeEnum)){
                 Integer datetimePrecision = column.getDatetimePrecision();
                 if(datetimePrecision != null){
-                    if(datetimePrecision > 0 && datetimePrecision <= 6){
-                        String fsp = "("+datetimePrecision+")";
-                        stringBuilder.append(fsp);
+                    if(datetimePrecision == 0 || datetimePrecision == 6)
+                        stringBuilder.append("(").append(datetimePrecision).append(")");
+//                    if(datetimePrecision > 0 && datetimePrecision <= 6){
+//                        String fsp = "("+datetimePrecision+")";
+//                        stringBuilder.append(fsp)
 //                                .append(" DEFAULT CURRENT_TIMESTAMP").append(fsp)
 //                                .append(" ON UPDATE CURRENT_TIMESTAMP").append(fsp);
-                    }
+//                    }
 //                    if(datetimePrecision == 0)
 //                        stringBuilder.append(" DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
                 } else {
@@ -268,7 +160,8 @@ public class MySQLMappingTool implements MappingTool {
             stringBuilder.append("PRIMARY KEY(").append(String.join(",", primaryKeys)).append(")\n,");
 
         stringBuilder.deleteCharAt(stringBuilder.length()-1);
-        stringBuilder.append(")ENGINE = InnoDB;");
+        stringBuilder.append(");");
         return stringBuilder.toString();
     }
+
 }

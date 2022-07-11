@@ -80,6 +80,7 @@ public class TableCloneManager {
     public Table createSourceMappingTable(String tableName){
         Table customTable = this.tableCloneManagerContext.getTcmConfig().getCustomTable();
         if(Objects.nonNull(customTable)) {
+            customTable.setDataSourceEnum(this.sourceConfig.getDataSourceEnum());
             this.tableCloneManagerContext.setSourceTable(customTable);
             return customTable;
         }
@@ -88,11 +89,15 @@ public class TableCloneManager {
         DataSourceEnum cloneEnum = this.tableCloneManagerContext.getCloneConfig().getDataSourceEnum();
         Table originTable = getSourceTableByTableName(this.sourceConfig, tableName);
         Table sourceMappingTable = this.sourceMappingTool.createSourceMappingTable(originTable);
+        if(sourceMappingTable.getDataSourceEnum() == null)
+            sourceMappingTable.setDataSourceEnum(sourceEnum);
+        if(sourceMappingTable.getOriginalDataSourceEnum() == null)
+            sourceMappingTable.setOriginalDataSourceEnum(sourceEnum);
         String createSourceTableSQL = this.sourceMappingTool.getCreateTableSQL(sourceMappingTable);
         this.tableCloneManagerContext.setSourceTable(sourceMappingTable);
         this.tableCloneManagerContext.setSourceTableSQL(createSourceTableSQL);
         Table tempTable = DataMappingSQLTool.checkRelationship(sourceMappingTable,sourceEnum,cloneEnum);
-        if(Boolean.FALSE.equals(Objects.isNull(tempTable))){
+        if(Objects.nonNull(tempTable)){
             this.tableCloneManagerContext.setTempTable(tempTable);
             List<String> primaryKeys = tempTable.getPrimaryKeys();
             tempTable.setPrimaryKeys(null);
@@ -106,7 +111,7 @@ public class TableCloneManager {
             String sqlFilePath = this.tableCloneManagerContext.getTempDirectory()+fileName;
             FileUtil.writeMsgToFile(createSourceTableSQL,sqlFilePath);
             String sql = this.tableCloneManagerContext.getTempTableCreateSQL();
-            if(Boolean.FALSE.equals(Objects.isNull(tempTable)) && DataSourceEnum.MYSQL.equals(tempTable.getOriginalDataSourceEnum()) && StringUtil.isNullOrEmpty(sql))
+            if(Boolean.FALSE.equals(Objects.isNull(tempTable)) && (DataSourceEnum.MYSQL.equals(tempTable.getOriginalDataSourceEnum()) || DataSourceEnum.RPDSQL.equals(tempTable.getOriginalDataSourceEnum())) && StringUtil.isNullOrEmpty(sql))
                 FileUtil.writeMsgToFile(sql,this.tableCloneManagerContext.getTempDirectory()+"TempTable.sql");
         }
         return sourceMappingTable;
@@ -219,7 +224,7 @@ public class TableCloneManager {
             cloneTable.setTableName(tableName);
         }else{
             cloneTable = this.cloneMappingTool.createCloneMappingTable(table);
-            cloneTable.setTableName(tableName);
+            cloneTable.setTableName(tableName).setDataSourceEnum(this.cloneConfig.getDataSourceEnum());
             DatabaseConfig cloneConfig = this.tableCloneManagerContext.getCloneConfig();
             if(StringUtil.nonEmpty(cloneConfig.getCatalog()))
                 cloneTable.setCatalogName(cloneConfig.getCatalog());
@@ -259,7 +264,7 @@ public class TableCloneManager {
         TableCloneManagerConfig config = tcmContext.getTcmConfig();
 
         // check the TempTable,at present, only MySQL needs to create temp table
-        if(Boolean.TRUE.equals(config.getExecuteExportScript()) && DataSourceEnum.MYSQL.equals(sourceType) && !StringUtil.isNullOrEmpty(tempTableSQL)){
+        if(Boolean.TRUE.equals(config.getExecuteExportScript()) && (DataSourceEnum.MYSQL.equals(sourceType) || DataSourceEnum.RPDSQL.equals(sourceType)) && !StringUtil.isNullOrEmpty(tempTableSQL)){
             createTableInDatasource(sourceConfig,tempTableSQL);
         }
 
@@ -271,7 +276,7 @@ public class TableCloneManager {
         if(cloneTable != null) {
             String cloneTableTableName = cloneTable.getTableName();
             if(
-                    ( DataSourceEnum.MYSQL.equals(cloneType) || DataSourceEnum.POSTGRESQL.equals(cloneType) || DataSourceEnum.SQLSERVER.equals(cloneType)) &&
+                    ( DataSourceEnum.MYSQL.equals(cloneType) || DataSourceEnum.POSTGRESQL.equals(cloneType) || DataSourceEnum.SQLSERVER.equals(cloneType) || DataSourceEnum.RPDSQL.equals(cloneType)) &&
                     tableExists(cloneConfig,cloneTableTableName)
             ) {
                 boolean tableInDatasource = createTableInDatasource(cloneConfig, "drop table " + cloneConfig.getSchema() + "." + cloneTableTableName);

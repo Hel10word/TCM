@@ -56,10 +56,10 @@ public class DatasourceConnectionFactory {
     }
     private static String getDBType(DataSourceEnum dataSourceEnum){
         // Hudi、Spark、Hive default use Hive_Driver
-        if(DataSourceEnum.HUDI.equals(dataSourceEnum)
-//                || DataSourceEnum.HIVE.equals(dataSourceEnum)
-        )
+        if(DataSourceEnum.HUDI.equals(dataSourceEnum))
             return "HIVE";
+        if(DataSourceEnum.RPDSQL.equals(dataSourceEnum))
+            return "MYSQL";
         return dataSourceEnum.name();
     }
 
@@ -93,7 +93,7 @@ public class DatasourceConnectionFactory {
             }else {
                 url.append(databaseName);
             }
-            if (DataSourceEnum.MYSQL.toString().equals(dbType))
+            if (DataSourceEnum.MYSQL.toString().equals(dbType) || DataSourceEnum.RPDSQL.toString().equals(dbType))
 //            url.append("?useSSL=false&useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT");
                 url.append("?useSSL=false&serverTimezone=UTC&allowLoadLocalInfile=true");
         }

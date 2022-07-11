@@ -230,24 +230,24 @@ public class TableCloneManagerConfig {
             if(hdfsCloneDataPath.charAt(hdfsCloneDataPath.length()-1) != '/')
                 this.hdfsCloneDataPath = hdfsCloneDataPath + "/";
         }
+        if(cloneEnum.equals(DataSourceEnum.KAFKA) || cloneEnum.equals(DataSourceEnum.HADOOP))
+            throw new TCMException("CloneDataType unable to be"+cloneEnum);
 
         if(null != this.cloneTableNames && !this.cloneTableNames.isEmpty()){
             if(this.sourceTableNames.size() != this.cloneTableNames.size())
                 throw new TCMException("the sourceTableNames size is :"+this.sourceTableNames.size() + " But cloneTableNames size is "+this.cloneTableNames.size());
         }else {
             if(StringUtil.isNullOrEmpty(sourceTableName))
-                throw new TCMException("the sourceTableName is null,sourceTableName:"+hoodieTableType);
+                throw new TCMException("the sourceTableName is null");
             if(StringUtil.isNullOrEmpty(cloneTableName))
                 this.cloneTableName = this.sourceTableName;
         }
 
-
-
         // Custom Table
         if(Objects.isNull(customTable) && Boolean.FALSE.equals(StringUtil.isNullOrEmpty(customSchemaFilePath)))
             this.customTable = JacksonUtil.filePathToObject(customSchemaFilePath,Table.class);
-        if(Objects.nonNull(customTable))
-            this.customTable.setTableName(sourceTableName).setDataSourceEnum(sourceEnum);
+//        if(Objects.nonNull(customTable))
+//            this.customTable.setTableName(sourceTableName).setDataSourceEnum(sourceEnum);
 
         if(tempDirectory.charAt(tempDirectory.length()-1) != '/')
             this.tempDirectory = tempDirectory + "/";

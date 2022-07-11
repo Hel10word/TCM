@@ -17,6 +17,8 @@ public class MappingToolFactory {
                 return new PostgreSQLMappingTool();
             case SQLSERVER:
                 return new SqlServerMappingTool();
+            case RPDSQL:
+                return new RpdSqlMappingTool();
             default:
                 return null;
         }

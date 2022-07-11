@@ -105,10 +105,6 @@ public class SqlServerMappingTool implements MappingTool{
             column.setTcmDataTypeEnum(relation);
         }
         table.setColumns(columns);
-        if(table.getDataSourceEnum() == null)
-            table.setDataSourceEnum(DataSourceEnum.SQLSERVER);
-        if(table.getOriginalDataSourceEnum() == null)
-            table.setOriginalDataSourceEnum(DataSourceEnum.SQLSERVER);
         return table;
     }
 
@@ -121,7 +117,6 @@ public class SqlServerMappingTool implements MappingTool{
             return cloneTable;
         for (Column col : cloneTable.getColumns())
             col.setDataType(col.getTcmDataTypeEnum().getMappingDataType(DataSourceEnum.SQLSERVER));
-        cloneTable.setDataSourceEnum(DataSourceEnum.SQLSERVER);
         return cloneTable;
     }
 

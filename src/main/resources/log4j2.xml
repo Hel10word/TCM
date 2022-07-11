@@ -103,14 +103,17 @@ monitorterval：是用于指定 log4j 自动重新检测读取配置内容的间
             <AppenderRef ref="TCMConsole" level="info"/>
 <!--            <AppenderRef ref="CdcWebLogFile" level="info"/>-->
         </Root>
-        <!--    org.apache.thrift、org.apache.hive    -->
-        <Logger name="org.apache" level="all">
-            <AppenderRef ref="TCMConsole" level="info"/>
-        </Logger>
-        <!--    hive    -->
-        <Logger name="com.boraydata.hive-jdbc-standalone" level="all">
+
+        <Logger name="org.apache.hive" level="warn">
             <AppenderRef ref="TCMConsole" level="warn"/>
         </Logger>
+        <Logger name="hive.metastore" level="warn">
+            <AppenderRef ref="TCMConsole" level="warn"/>
+        </Logger>
+        <Logger name="org.apache.hadoop.hive.conf" level="warn">
+            <AppenderRef ref="TCMConsole" level="warn"/>
+        </Logger>
+
     </Loggers>
 
 </Configuration>
