@@ -11,6 +11,7 @@ import com.boraydata.cdc.tcm.syncing.DataSyncingCSVConfigTool;
 import com.boraydata.cdc.tcm.utils.StringUtil;
 
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -133,20 +134,25 @@ public class ScalaScriptGenerateUtil {
         return this;
     }
 
-    public String loadCommand(String hdfsSourceDataDir,String localCsvPath,String hdfsCloneDataPath,String scriptPath,String sparkStartCommand){
+    public String loadCommand(String hdfsSourceDataDir, String localCsvPath, String hdfsCloneDataPath, String scriptPath, String sparkStartCommand, Boolean csvSaveInHDFS){
         StringBuilder loadShell = new StringBuilder();
+
         loadShell
-//                .append("\nhdfs dfs -mkdir -p ").append(hdfsSourceDataDir)
-                .append("\nhdfs dfs -mkdir -p ").append(hdfsCloneDataPath)
                 .append("\nhdfs dfs -rm -r ").append(hdfsCloneDataPath)
-//                .append("\ntime hdfs dfs -put -f ").append(localCsvPath).append(" ").append(hdfsSourceDataDir).append(" 2>&1")
-                // if the CSV File large and disk no space,save part of CSV for execute Spark-Shell
-//                .append("\nhead -5 ").append(localCsvPath).append(" > ").append(localCsvPath).append("_sample_data")
-//                .append("\nrm -f ").append(localCsvPath)
-                .append("\n\n").append("time ").append(sparkStartCommand)
-                .append(" -i ").append(scriptPath)
-                .append(" > ./").append(scriptPath).append(".out");
-//                .append("\nhdfs dfs -rm -r ").append(hdfsSourceDataDir).append(localCsvPath);
+                .append("\nhdfs dfs -mkdir -p ").append(hdfsCloneDataPath);
+        if(Boolean.TRUE.equals(csvSaveInHDFS)){
+            loadShell
+                    .append("\nhdfs dfs -mkdir -p ").append(hdfsSourceDataDir)
+                    .append("\ntime hdfs dfs -put -f ").append(localCsvPath).append(" ").append(hdfsSourceDataDir).append(" 2>&1")
+                    // if the CSV File large and disk no space,save part of CSV for execute Spark-Shell
+                    .append("\nhead -5 ").append(localCsvPath).append(" > ").append(localCsvPath).append("_sample_data")
+                    .append("\nrm -f ").append(localCsvPath)
+                    ;
+        }
+        loadShell.append("\n\n").append("time ").append(sparkStartCommand).append(" -i ").append(scriptPath).append(" > ").append(scriptPath).append(".out");
+        if(Boolean.TRUE.equals(csvSaveInHDFS)){
+            loadShell.append("\nhdfs dfs -rm -f ").append(hdfsSourceDataDir).append(localCsvPath);
+        }
         return loadShell.toString();
     }
 
@@ -170,6 +176,19 @@ public class ScalaScriptGenerateUtil {
             String columnName = column.getColumnName();
             TCMDataTypeEnum tcmMappingType = column.getTcmDataTypeEnum();
             String outDataType = tcmMappingType.getMappingDataType(DataSourceEnum.HUDI);
+            if(TCMDataTypeEnum.DECIMAL.equals(tcmMappingType)){
+                outDataType = outDataType+"(";
+                Integer precision = column.getNumericPrecision();
+                Integer scale = column.getNumericScale();
+                if(Objects.isNull(precision))
+                    outDataType = outDataType+"0,";
+                else
+                    outDataType = outDataType+precision+",";
+                if(Objects.isNull(scale))
+                    outDataType = outDataType+"0)";
+                else
+                    outDataType = outDataType+scale+")";
+            }
             this.scalaScript.append(".add(\"").append(columnName).append("\",").append(outDataType).append(")");
         }
         this.scalaScript.append(";\n");
@@ -206,7 +225,8 @@ public class ScalaScriptGenerateUtil {
             this.scalaScript.append(".option(\"quote\",\"").append(quote).append("\")");
         if(StringUtil.nonEmpty(escape))
             this.scalaScript.append(".option(\"escape\",\"").append(escape).append("\")");
-        this.scalaScript.append(".csv(\"file://").append(hdfsCsvPath).append("\")")
+//        this.scalaScript.append(".csv(\"file://").append(hdfsCsvPath).append("\")")
+        this.scalaScript.append(".csv(\"").append(hdfsCsvPath).append("\")")
                 /**
                  * @see <a href="https://stackoverflow.com/questions/32067467/create-new-dataframe-with-empty-null-field-values"></a>
                  * @see <a href="https://stackoverflow.com/questions/57945174/how-to-convert-timestamp-to-bigint-in-a-pyspark-dataframe"></a>

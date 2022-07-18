@@ -31,6 +31,6 @@ class HudiSyncingToolTest {
         TableCloneManagerContext tcmc = TestDataProvider.getTCMContext(TestDataProvider.MySQLConfig, configHudi);
         // COPY_ON_WRITE
         tcmc.getTcmConfig().setCloneTableName("temple_table").setHoodieTableType("MERGE_ON_READ");
-        syncingTool.deleteOriginTable(tcmc);
+//        syncingTool.deleteOriginTable(tcmc);
     }
 }

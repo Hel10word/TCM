@@ -1,6 +1,7 @@
 package com.boraydata.cdc.tcm.utils;
 
 import com.boraydata.cdc.tcm.common.enums.TCMDataTypeEnum;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.Map;
 import java.util.Random;
@@ -56,6 +57,34 @@ public class StringUtil {
                 x -> x.equalsIgnoreCase(StringUtil.dataTypeFormat(string))
         ).findFirst().map(map::get).orElse(def);
     }
+
+
+    public static String escapeJava(String str){
+        if(null == str)
+            return "";
+        else
+            return StringEscapeUtils.escapeJava(str)
+//                "\"" => """
+                    .replaceAll("\\\\\"","\"");
+//                "\\" => "\"
+//                    .replaceAll("\\\\\\\\","\\\\");
+    }
+
+    public static String escapeJava(String str,String key){
+        if(null == str)
+            return "";
+        else
+            return escapeJava(str,key,"\\");
+    }
+
+    public static String escapeJava(String str,String key,String escape_key){
+        if(null == str)
+            return "";
+        else
+            return str.replaceAll(StringEscapeUtils.escapeJava(key),
+                    StringEscapeUtils.escapeJava(escape_key)+StringEscapeUtils.escapeJava(key));
+    }
+
 
     // '/' => '////'
     public static String escapeRegexEncode(String str){

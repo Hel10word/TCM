@@ -17,6 +17,14 @@
     "password":"root",
     "databaseName":"test_db"
   },
+  "cloneConfig_rpdsql":{
+    "dataSourceEnum":"RPDSQL",
+    "host":"192.168.120.69",
+    "port":"3306",
+    "username":"root",
+    "password":"rdpuser",
+    "databaseName":"test_db"
+  },
   "cloneConfig_pg":{
     "dataSourceEnum":"POSTGRESQL",
     "host":"192.168.30.38",
@@ -27,7 +35,7 @@
     "catalog":"test_db",
     "schema":"public"
   },
-  "cloneConfig":{
+  "cloneConfig_sqlserver":{
     "dataSourceEnum":"SQLSERVER",
     "host":"192.168.120.237",
     "port":"1433",
@@ -37,44 +45,60 @@
     "catalog":"test_db",
     "schema":"dbo"
   },
-  "cloneConfig_hudi":{
+  "cloneConfig":{
     "dataSourceEnum":"HUDI",
     "host":"192.168.120.67",
     "port":"10000",
     "username":"rapids",
     "password":"rapids",
-    "databaseName":"test_cdc_hudi"
+    "databaseName":"test_db"
+  },
+  "cloneConfig_mysql_cdc":{
+    "dataSourceEnum":"MYSQL",
+    "host":"192.168.120.66",
+    "port":"3306",
+    "username":"root",
+    "password":"rapids",
+    "databaseName":"test_db"
+  },
+  "cloneConfig_pg_cdc":{
+    "dataSourceEnum":"POSTGRESQL",
+    "host":"192.168.120.66",
+    "port":"5432",
+    "username":"root",
+    "password":"123456",
+    "databaseName":"test_db",
+    "catalog":"test_db",
+    "schema":"public"
   },
   "redis":{
     "host":"192.168.120.66",
     "messageKey":"TestRedisKey",
     "port":"16379"
   },
-  "sourceTableNames":["lineitem_sf10"],
-  "cloneTableNames":["lineitem_sf10"],
-  "customTables":[{}],
-
+  "sourceTableNames":["lineitem_test"],
+  "cloneTableNames":["lineitem_test_pg"],
+  "customTables":[],
 
   "hdfsSourceDataDir":"hdfs:///cdc-init/",
-  "hdfsCloneDataPath":"hdfs:///cdc-init/temple_table",
-  "primaryKey":"col_varchar",
+  "hdfsCloneDataPath":"hdfs:///cdc-init/test_test_hudi_pg",
+  "primaryKey":"l_comment",
   "partitionKey":"_hoodie_date",
   "hoodieTableType":"MERGE_ON_READ",
   "nonPartition":false,
   "multiPartitionKeys":false,
-  "sparkCustomCommand":"spark-shell \\\n            --jars /opt/CDC/spark/jars/hudi-spark-bundle_2.11-0.8.0.jar \\\n            --driver-class-path $HADOOP_CONF_DIR \\\n            --packages org.apache.spark:spark-avro_2.11:2.4.4 \\\n            --master local[2] \\\n            --deploy-mode client \\\n            --driver-memory 2G \\\n            --executor-memory 2G \\\n            --num-executors 2",
-
-  "outSourceTableSQL":false,
-  "outCloneTableSQL":false,
+  "sparkCustomCommand":"spark-shell \\\n            --jars /opt/CDC/spark/jars/hudi-spark-bundle_2.11-0.8.0.jar \\\n            --driver-class-path $HADOOP_CONF_DIR \\\n            --packages org.apache.spark:spark-avro_2.11:2.4.4 \\\n            --master local[2] \\\n            --deploy-mode client \\\n            --driver-memory 4G \\\n            --executor-memory 4G \\\n            --num-executors 2",
+  "csvSaveInHDFS":false,
+  "useCustomTables":false,
+  "outSourceTableSQL":true,
+  "outCloneTableSQL":true,
   "createTableInClone":true,
   "createPrimaryKeyInClone":true,
   "executeExportScript":true,
   "executeLoadScript":true,
-  "deleteCache":true,
-  "tempDirectory":"./TCM-Temp",
+  "deleteCache":false,
+  "tempDirectory":"/data/cdc_data/fabric-cdc/init/TCM-Temp",
   "delimiter":"|",
-  "lineSeparate":"\n",
-  "quote":"\"",
-  "escape":"\\",
+  "sendRedis":false,
   "debug":false
 }

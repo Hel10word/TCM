@@ -36,7 +36,8 @@ public class PostgreSQLSyncingTool implements SyncingTool {
     @Override
     public String getLoadInfo(TableCloneManagerContext tcmContext) {
 //        System.out.println("generateLoadSQLByShell:\n"+generateLoadSQLByShell(tcmContext)+"\n");
-        return generateLoadSQLByJDBC(tcmContext);
+        return generateLoadSQLByShell(tcmContext);
+//        return generateLoadSQLByJDBC(tcmContext);
     }
 
     @Override
@@ -51,12 +52,12 @@ public class PostgreSQLSyncingTool implements SyncingTool {
 
     @Override
     public Boolean executeLoad(TableCloneManagerContext tcmContext) {
-//        String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
-//        if(tcmContext.getTcmConfig().getDebug())
-//            System.out.println(outStr);
-//        return true;
+        String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
+        if(tcmContext.getTcmConfig().getDebug())
+            System.out.println(outStr);
+        return true;
 
-        return LoadDataToPostgreSQLByJDBC(tcmContext);
+//        return LoadDataToPostgreSQLByJDBC(tcmContext);
     }
 
     // ================================================   PostgreSQL Syncing Common   ========================================================
@@ -85,7 +86,7 @@ public class PostgreSQLSyncingTool implements SyncingTool {
      * @author: bufan
      * @return: psql postgres://postgres:postgres@192.168.30.155:5432/test_db -c "\copy (select * from lineitem) to '/usr/local/lineitem.csv' with DELIMITER ',';"
      */
-    private String generateExportSQLByShell(TableCloneManagerContext tcmContext){
+    public String generateExportSQLByShell(TableCloneManagerContext tcmContext){
         Table tempTable = tcmContext.getTempTable();
         Table sourceTable = tcmContext.getSourceTable();
         String tableName = "";
@@ -138,7 +139,7 @@ public class PostgreSQLSyncingTool implements SyncingTool {
      * @return: psql postgres://postgres:postgres@192.168.30.155:5432/test_db -c "\copy lineitem from '/usr/local/lineitem.csv' with DELIMITER ',';"
 
      */
-    private String generateLoadSQLByShell(TableCloneManagerContext tcmContext){
+    public String generateLoadSQLByShell(TableCloneManagerContext tcmContext){
         String csvPath = "'./"+tcmContext.getCsvFileName()+"'";
         String tableName = tcmContext.getCloneTable().getTableName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();

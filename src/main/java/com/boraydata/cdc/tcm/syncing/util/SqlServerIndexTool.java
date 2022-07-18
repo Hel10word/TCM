@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -60,9 +61,13 @@ public class SqlServerIndexTool {
 
         List<String> allNonClusteredIndexList = getAllNonClusteredIndexList(dbConfig,tableName);
         Boolean flag = Boolean.TRUE;
+        if(allNonClusteredIndexList.isEmpty()){
+            logger.info("SQL Server Table have not NonClustered Index");
+            return flag;
+        }
         for (String indexName : allNonClusteredIndexList)
             flag = flag&&disableIndex(dbConfig,tableName,indexName);
-        logger.info("Disable SQL Server NonClustered Index:{}",flag);
+        logger.info("Disable SQL Server NonClustered Index: {} status: {}",String.join(",", allNonClusteredIndexList),flag);
         return flag;
     }
     public static boolean rebuildIndex(TableCloneManagerContext tcmContext){
@@ -74,9 +79,12 @@ public class SqlServerIndexTool {
 
         List<String> allNonClusteredIndexList = getAllNonClusteredIndexList(dbConfig,tableName);
         Boolean flag = Boolean.TRUE;
+        if(allNonClusteredIndexList.isEmpty()){
+            return flag;
+        }
         for (String indexName : allNonClusteredIndexList)
             flag = flag&&rebuildIndex(dbConfig,tableName,indexName);
-        logger.info("Rebuild SQL Server NonClustered Index:{}",flag);
+        logger.info("Rebuild SQL Server NonClustered Index: {} status: {}",String.join(",", allNonClusteredIndexList),flag);
         return flag;
     }
 

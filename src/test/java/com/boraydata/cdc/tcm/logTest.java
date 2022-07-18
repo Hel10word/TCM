@@ -1,9 +1,18 @@
 package com.boraydata.cdc.tcm;
 
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
+import com.boraydata.cdc.tcm.utils.JacksonUtil;
+import com.boraydata.cdc.tcm.utils.StringUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.logging.log4j.core.util.JsonUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * https://logging.apache.org/log4j/2.x/manual/lookups.html

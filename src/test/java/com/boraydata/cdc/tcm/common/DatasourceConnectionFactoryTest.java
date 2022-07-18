@@ -33,10 +33,10 @@ class DatasourceConnectionFactoryTest {
     public void executeQuerySQLTest(){
         // http://www.postgres.cn/docs/12/infoschema-columns.html
 //        String sql = "select * from information_schema.COLUMNS where table_name in ('lineitem_sf1')";
-//        String sql = "show databases";
+        String sql = "show databases";
 //        String sql = "select * from information_schema.schemata";
 //        String sql = "show tables";
-        String sql = "select * from test;";
+//        String sql = "select * from test;";
 //        String sql = "drop table if exists temple_table_rt";
 //        String sql = "drop table if exists customer_ro;drop table if exists customer_rt;";
 //        String sql = configMySQL.getDataSourceEnum().SQL_AllTableInfo;
@@ -58,10 +58,10 @@ class DatasourceConnectionFactoryTest {
 //        list.forEach(System.out::println);
 
 //        String sql = "create table test(id int)";
-        DatasourceConnectionFactory.showQueryBySQL(configMySQL, sql);
+//        DatasourceConnectionFactory.showQueryBySQL(configMySQL, sql);
 //        DatasourceConnectionFactory.showQueryBySQL(configPostgreSQL, sql);
 //        DatasourceConnectionFactory.showQueryBySQL(configSqlServer, sql);
-//        DatasourceConnectionFactory.showQueryBySQL(configHudi, sql);
+        DatasourceConnectionFactory.showQueryBySQL(configHudi, sql);
 
 //        System.out.println(list.get(0).toString());
     }

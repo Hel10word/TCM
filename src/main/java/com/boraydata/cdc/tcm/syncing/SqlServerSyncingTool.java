@@ -8,7 +8,6 @@ import com.boraydata.cdc.tcm.entity.Table;
 import com.boraydata.cdc.tcm.syncing.util.SqlServerIndexTool;
 import com.boraydata.cdc.tcm.utils.StringUtil;
 
-import java.util.List;
 import java.util.Objects;
 
 
@@ -93,7 +92,7 @@ public class SqlServerSyncingTool implements SyncingTool {
      * @author : bufan
      * @return : bcp dbo.lineitem out /opt/split_files/export.csv -S localhost -U sa -PRapids123* -d flowtest -c -t '|' -r '\n' -a 4096
      */
-    private String generateExportSQLByBCP(TableCloneManagerContext tcmContext) {
+    public String generateExportSQLByBCP(TableCloneManagerContext tcmContext) {
 
         Table tempTable = tcmContext.getTempTable();
         Table sourceTable = tcmContext.getSourceTable();

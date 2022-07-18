@@ -5,6 +5,8 @@ import com.boraydata.cdc.tcm.common.DatabaseConfig;
 import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
+import com.boraydata.cdc.tcm.syncing.tool.Mysql;
+import com.boraydata.cdc.tcm.syncing.tool.PostgreSQL;
 import com.boraydata.cdc.tcm.utils.FileUtil;
 import com.boraydata.cdc.tcm.entity.Table;
 import org.junit.jupiter.api.Test;
@@ -24,7 +26,7 @@ import java.util.Properties;
  * @author bufan
  * @date 2022/3/30
  */
-public class PostgreSQLCopyManageTest {
+public class PostgreSQLSyncingToolTest {
 
     PostgreSQLSyncingTool tool = new PostgreSQLSyncingTool();
 
@@ -92,15 +94,30 @@ public class PostgreSQLCopyManageTest {
 
     @Test
     public void getSQLShellTest(){
-        TableCloneManagerContext tcmc = TestDataProvider.getTCMContext(TestDataProvider.PostgreSQLConfig, TestDataProvider.PostgreSQLConfig);
-        Table table = TestDataProvider.getTable(DataSourceEnum.MYSQL, "lineitem_test");
+        PostgreSQL tool = new PostgreSQL();
+        DatabaseConfig config = new DatabaseConfig()
+                .setDataSourceEnum(DataSourceEnum.POSTGRESQL)
+                .setHost("192.168.10.11")
+                .setPort("6432")
+                .setUsername("postgres")
+                .setPassword("123456")
+                .setDatabaseName("test_db")
+                .setCatalog("test_db")
+                .setSchema("public");
+        TableCloneManagerContext tcmc = TestDataProvider.getTCMContext(config, config);
+        Table table = TestDataProvider.getTable(DataSourceEnum.POSTGRESQL, "lineitem_test");
         tcmc.setSourceTable(table)
 //                .setTempTable(table)
                 .setCloneTable(table)
                 .setCsvFileName("test.csv");
+        tcmc.getTcmConfig()
+                .setDelimiter("|")
+                .setLineSeparate(null)
+                .setQuote("\"")
+                .setEscape("\\");
 
-        System.out.println("Export:\n"+tool.getExportInfo(tcmc)+"\n");
-        System.out.println("Load:\n"+tool.getLoadInfo(tcmc));
+        System.out.println("generateExportSQLByShell:\n"+tool.generateExportSQLByShell(tcmc)+"\n");
+        System.out.println("generateLoadSQLByShell:\n"+tool.generateLoadSQLByShell(tcmc));
 
     }
 }

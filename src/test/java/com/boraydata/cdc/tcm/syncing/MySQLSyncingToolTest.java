@@ -1,10 +1,12 @@
 package com.boraydata.cdc.tcm.syncing;
 
 
+import com.boraydata.cdc.tcm.common.DatabaseConfig;
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.TestDataProvider;
 import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
 import com.boraydata.cdc.tcm.entity.Table;
+import com.boraydata.cdc.tcm.syncing.tool.Mysql;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -12,15 +14,20 @@ import org.junit.jupiter.api.Test;
  * @date 2021/11/8
  */
 class MySQLSyncingToolTest {
-    MySQLSyncingTool tool = new MySQLSyncingTool();
-
-
+    Mysql tool = new Mysql();
+    DatabaseConfig config = new DatabaseConfig()
+            .setDataSourceEnum(DataSourceEnum.MYSQL)
+            .setHost("192.168.30.38")
+            .setPort("3306")
+            .setUsername("root")
+            .setPassword("root")
+            .setDatabaseName("test_db");
 
 
     @Test
     public void generateExportSQLByShellTest(){
-        TableCloneManagerContext tcmc = TestDataProvider.getTCMContext(TestDataProvider.MySQLConfig, TestDataProvider.MySQLConfig);
-        Table table = TestDataProvider.getTable(DataSourceEnum.MYSQL, "test_table");
+        TableCloneManagerContext tcmc = TestDataProvider.getTCMContext(config,config);
+        Table table = TestDataProvider.getTable(DataSourceEnum.MYSQL, "lineitem_test");
         tcmc.setSourceTable(table)
 //                .setTempTable(table)
                 .setCloneTable(table)
@@ -28,18 +35,23 @@ class MySQLSyncingToolTest {
         tcmc.getTcmConfig()
                 .setDelimiter("|")
                 .setLineSeparate("\n")
-                .setQuote("\"")
-                .setEscape("\\");
+                .setQuote(null)
+                .setEscape(null)
+        ;
 
 
-        tool.getExportInfo(tcmc);
-        tool.getLoadInfo(tcmc);
-
-
-//        System.out.println(tcmc.getExportShellContent());
-//        System.out.println(tcmc.getLoadShellContent());
+        System.out.println("\ngenerateExportSQLByMySQLShell:");
+        System.out.println(tool.generateExportSQLByMySQLShell(tcmc));
+        System.out.println("\ngenerateExportSQLByShell:");
+        System.out.println(tool.generateExportSQLByShell(tcmc));
+        System.out.println("\ngenerateLoadSQLByJDBC:");
+        tool.generateLoadSQLByJDBC(tcmc);
+        System.out.println(tcmc.getLoadShellContent());
+        System.out.println("\ngenerateLoadSQLByMySQLShell:");
+        System.out.println(tool.generateLoadSQLByMySQLShell(tcmc));
+        System.out.println("\ngenerateLoadSQLByShell:");
+        System.out.println(tool.generateLoadSQLByShell(tcmc));
     }
-
 
 
 }

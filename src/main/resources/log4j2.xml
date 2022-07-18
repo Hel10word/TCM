@@ -29,7 +29,7 @@ monitorterval：是用于指定 log4j 自动重新检测读取配置内容的间
             %x 输出和当前线程相关联的NDC(嵌套诊断环境),像javaservlets多客户多线程的应用中
         -->
 <!--        <Property name="consolePattern" >[%-5p] %d{ISO8601} [%t] %30c{4} %M() %L : %m%n</Property>-->
-        <Property name="consolePattern">%highlight{%-5level} %d{ISO8601} [%style{%t}{bright,blue}] %style{%20c{-3} %M() %L}{bright,yellow}: %m %style{%throwable}{red} %n</Property>
+        <Property name="consolePattern">%highlight{%-5level} %d{ISO8601} [%style{%t}{bright,blue}] %style{%30c %M() %L}{bright,yellow}: %m %style{%throwable}{red} %n</Property>
     </Properties>
 
     <Appenders>

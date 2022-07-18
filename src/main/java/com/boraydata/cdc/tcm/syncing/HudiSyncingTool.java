@@ -7,9 +7,11 @@ import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
 import com.boraydata.cdc.tcm.common.TableCloneManagerConfig;
 import com.boraydata.cdc.tcm.entity.Table;
 import com.boraydata.cdc.tcm.syncing.util.ScalaScriptGenerateUtil;
+import com.boraydata.cdc.tcm.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -39,8 +41,13 @@ public class HudiSyncingTool implements SyncingTool {
 
         Table cloneTable = tcmContext.getCloneTable();
         String hdfsSourceDataDir = tcmConfig.getHdfsSourceDataDir();
-//        String hdfsSourceFileName = hdfsSourceDataDir + tcmContext.getCsvFileName();
-        String hdfsSourceFileName = tcmConfig.getTempDirectory() + tcmContext.getCsvFileName();
+        String hdfsSourceFileName = null;
+        if(Boolean.TRUE.equals(tcmConfig.getCsvSaveInHDFS()))
+            hdfsSourceFileName = hdfsSourceDataDir + tcmContext.getCsvFileName();
+        else {
+            String dirPath = Paths.get(tcmConfig.getTempDirectory()).toAbsolutePath().normalize().toString();
+            hdfsSourceFileName = "file://" + Paths.get(dirPath,  tcmContext.getCsvFileName());
+        }
         String scriptContent = hudiTool.initSriptFile(cloneTable,hdfsSourceFileName,cloneConfig,tcmConfig);
 
         String scriptName = "Load_CSV_to_hudi_"+tcmConfig.getHoodieTableType()+".scala";
@@ -50,7 +57,7 @@ public class HudiSyncingTool implements SyncingTool {
         tcmContext.setLoadDataInHudiScalaScriptContent(scriptContent);
         tcmContext.setLoadDataInHudiScalaScriptName(scriptName);
 
-        String loadContent = hudiTool.loadCommand(hdfsSourceDataDir,localCsvPath,tcmConfig.getHdfsCloneDataPath(),scriptPath,tcmConfig.getSparkCustomCommand());
+        String loadContent = hudiTool.loadCommand(hdfsSourceDataDir,localCsvPath,tcmConfig.getHdfsCloneDataPath(),scriptPath,tcmConfig.getSparkCustomCommand(),tcmConfig.getCsvSaveInHDFS());
         tcmContext.setLoadShellContent(loadContent);
         return loadContent;
     }
@@ -62,7 +69,6 @@ public class HudiSyncingTool implements SyncingTool {
 
     @Override
     public Boolean executeLoad(TableCloneManagerContext tcmContext) {
-//        deleteOriginTable(tcmContext);
         String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
         if(tcmContext.getTcmConfig().getDebug())
             logger.info(outStr);

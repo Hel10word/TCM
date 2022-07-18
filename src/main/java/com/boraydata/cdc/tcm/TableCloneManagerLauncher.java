@@ -96,11 +96,13 @@ public class TableCloneManagerLauncher {
             Message message = tableCloneManager(config, deleteFlag, debugFlag, sourceTableName, cloneTableName, sourceDataType, cloneDataType);
             messageList.add(message);
         }
-        if(messageList.size()==1)
-            RedisOperateUtil.sendMessage(config.getRedis(),JacksonUtil.toJson(messageList.get(0)));
-        else
-            RedisOperateUtil.sendMessage(config.getRedis(),JacksonUtil.toJson(messageList));
-
+        if(Boolean.TRUE.equals(config.getSendRedis())) {
+            logger.info("send result to Redis,key:{}",config.getRedis().getMessageKey());
+            if (messageList.size() == 1)
+                RedisOperateUtil.sendMessage(config.getRedis(), JacksonUtil.toJson(messageList.get(0)));
+            else
+                RedisOperateUtil.sendMessage(config.getRedis(), JacksonUtil.toJson(messageList));
+        }
 
     }
 

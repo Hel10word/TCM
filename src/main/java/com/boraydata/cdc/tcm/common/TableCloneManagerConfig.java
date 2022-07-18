@@ -123,6 +123,12 @@ public class TableCloneManagerConfig {
     private String sparkCustomCommand;
 
     /**
+     * export csv File, and put in hdfs,can reduce the pressure on the disk during run spark job
+     * default: false (Optional)
+     */
+    private Boolean csvSaveInHDFS = false;
+
+    /**
      * Prefer to use Custom Tables information as source table
      * default: false (Optional)
      */
@@ -194,6 +200,12 @@ public class TableCloneManagerConfig {
      */
     private String escape = "\\";
     /**
+     * send result to redis
+     * default: true (Optional)
+     */
+    private Boolean sendRedis = true;
+
+    /**
      * Whether to output detailed information during the running process
      * default: false (Optional)
      */
@@ -225,6 +237,9 @@ public class TableCloneManagerConfig {
             if(!hoodieTableType.equals("MERGE_ON_READ") && !hoodieTableType.equals("COPY_ON_WRITE"))
                 throw new TCMException("if you choose Hudi as sink type,should make sure the hoodieTableType value is correct，not is "+hoodieTableType);
 
+            String[] primaryKeyArray = primaryKey.split(",");
+            if(primaryKeyArray.length>1)
+                this.primaryKey = primaryKeyArray[0];
             if(hdfsSourceDataDir.charAt(hdfsSourceDataDir.length()-1) != '/')
                 this.hdfsSourceDataDir = hdfsSourceDataDir + "/";
             if(hdfsCloneDataPath.charAt(hdfsCloneDataPath.length()-1) != '/')
@@ -419,6 +434,15 @@ public class TableCloneManagerConfig {
         return this;
     }
 
+    public Boolean getCsvSaveInHDFS() {
+        return csvSaveInHDFS;
+    }
+
+    public TableCloneManagerConfig setCsvSaveInHDFS(Boolean csvSaveInHDFS) {
+        this.csvSaveInHDFS = csvSaveInHDFS;
+        return this;
+    }
+
     public Boolean getUseCustomTables() {
         return useCustomTables;
     }
@@ -542,6 +566,15 @@ public class TableCloneManagerConfig {
 
     public TableCloneManagerConfig setEscape(String escape) {
         this.escape = escape;
+        return this;
+    }
+
+    public Boolean getSendRedis() {
+        return sendRedis;
+    }
+
+    public TableCloneManagerConfig setSendRedis(Boolean sendRedis) {
+        this.sendRedis = sendRedis;
         return this;
     }
 

@@ -51,6 +51,7 @@ public class TestDataProvider {
             .setUsername("postgres")
             .setPassword("postgres");
 
+    //========================== SQL Server ===============================
     public static DatabaseConfig SQLServerConfig = new DatabaseConfig()
             .setDatabaseName("test_db")
             .setCatalog("test_db")
@@ -61,6 +62,7 @@ public class TestDataProvider {
             .setUsername("sa")
             .setPassword("Rapids123*");
 
+    //========================== Rpd SQL ===============================
     public static DatabaseConfig RPDSQLConfig = new DatabaseConfig()
             .setDatabaseName("test_db")
             .setCatalog("def")

@@ -16,16 +16,16 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum TCMDataTypeEnum {
 //  tcm Type        Type name       default MySQL type              default PostgreSQL type          default SQL Server type     default HIVE type        default Scala DataFrame type
-    INT8        ("INT8",        "TINYINT",          "SMALLINT",         "TINYINT",          "SMALLINT",      "IntegerType"),
-    INT16       ("INT16",       "SMALLINT",         "SMALLINT",         "SMALLINT",         "SMALLINT",      "IntegerType"),
+    INT8        ("INT8",        "TINYINT",          "SMALLINT",         "TINYINT",          "SMALLINT",      "ShortType"),
+    INT16       ("INT16",       "SMALLINT",         "SMALLINT",         "SMALLINT",         "SMALLINT",      "ShortType"),
     INT32       ("INT32",       "INTEGER",          "INT",              "INT",              "INT",           "IntegerType"),
     INT64       ("INT64",       "BIGINT",           "BIGINT",           "BIGINT",           "BIGINT",        "LongType"),
     FLOAT32     ("FLOAT32",     "FLOAT",            "REAL",             "REAL",             "FLOAT",         "FloatType"),
     FLOAT64     ("FLOAT64",     "DOUBLE",           "DOUBLE PRECISION", "FLOAT",            "DOUBLE",        "DoubleType"),
     BOOLEAN     ("BOOLEAN",     "TINYINT(1)",       "BOOLEAN",          "BIT",              "BOOLEAN",       "BooleanType"),
     STRING      ("STRING",      "VARCHAR",          "VARCHAR",          "NVARCHAR",         "STRING",        "StringType"),
-    BYTES       ("BYTES",       "VARBINARY",        "BYTEA",            "VARBINARY",        "BINARY",        "StringType"),
-    DECIMAL     ("DECIMAL",     "DECIMAL",          "DECIMAL",          "DECIMAL",          "DECIMAL",       "StringType"),
+    BYTES       ("BYTES",       "VARBINARY",        "BYTEA",            "VARBINARY",        "BINARY",        "BinaryType"),
+    DECIMAL     ("DECIMAL",     "DECIMAL",          "DECIMAL",          "DECIMAL",          "DECIMAL",       "DecimalType"),
     DATE        ("DATE",        "DATE",             "DATE",             "DATE",             "DATE",          "DateType"),
     TIME        ("TIME",        "TIME",             "TIME",             "TIME",             "TIMESTAMP",     "TimestampType"),
     TIMESTAMP   ("TIMESTAMP",   "TIMESTAMP",        "TIMESTAMP",        "DATETIMEOFFSET",   "TIMESTAMP",     "TimestampType"),

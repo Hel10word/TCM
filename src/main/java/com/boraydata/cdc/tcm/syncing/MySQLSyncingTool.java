@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Objects;
+import static com.boraydata.cdc.tcm.utils.StringUtil.escapeJava;
 
 /**
  * Export and Load Table Data by MySQL.
@@ -39,8 +40,8 @@ public class MySQLSyncingTool implements SyncingTool {
 //        System.out.println("generateLoadSQLByMySQLShell:\n"+generateLoadSQLByMySQLShell(tcmContext)+"\n");
 //        System.out.println("generateLoadSQLByShell:\n"+generateLoadSQLByShell(tcmContext)+"\n");
 //        return generateLoadSQLByMySQLShell(tcmContext);
-//        return generateLoadSQLByShell(tcmContext);
-        return generateLoadSQLByJDBC(tcmContext);
+        return generateLoadSQLByShell(tcmContext);
+//        return generateLoadSQLByJDBC(tcmContext);
     }
 
     @Override
@@ -53,13 +54,13 @@ public class MySQLSyncingTool implements SyncingTool {
 
     @Override
     public Boolean executeLoad(TableCloneManagerContext tcmContext) {
-//        String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
-//        if(tcmContext.getTcmConfig().getDebug())
-//            System.out.println(outStr);
-//        return true;
+        String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
+        if(tcmContext.getTcmConfig().getDebug())
+            System.out.println(outStr);
+        return true;
 
 //        return LoadDataToMySQLByJDBC5(tcmContext);
-        return LoadDataToMySQLByJDBC8(tcmContext);
+//        return LoadDataToMySQLByJDBC8(tcmContext);
     }
 
     // ================================================   MySQL Syncing Common   ========================================================
