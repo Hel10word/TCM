@@ -18,6 +18,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
 
+import static com.boraydata.cdc.tcm.utils.StringUtil.escapeJava;
+
 /**
  * Export and Load Table Data by PostgreSQL
  *
@@ -95,41 +97,41 @@ public class PostgreSQLSyncingTool implements SyncingTool {
         else
             tableName = sourceTable.getTableName();
 
-        String csvPath = "'./"+tcmContext.getCsvFileName()+"'";
+        String csvPath = "./"+tcmContext.getCsvFileName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
         String lineSeparate = tcmContext.getTcmConfig().getLineSeparate();
         String quote = tcmContext.getTcmConfig().getQuote();
         String escape = tcmContext.getTcmConfig().getEscape();
         String connectCommand = getConnectCommand(tcmContext.getSourceConfig());
-        String exportSQL = StringUtil.escapeRegexDoubleQuoteEncode(generateExportSQL(tableName,csvPath,delimiter,lineSeparate,quote,escape).replaceAll("\\\\","\\\\\\\\"));
-        String exportContent = connectCommand+"\"\\"+exportSQL+"\"";
+        String exportSQL = generateExportSQL(tableName,csvPath,delimiter,lineSeparate,quote,escape);
+        String exportContent = connectCommand+"\"\\"+escapeJava(exportSQL,"\"")+"\"";
         tcmContext.setExportShellContent(exportContent);
         return exportContent;
     }
 
     private String generateExportSQL(String tableName,String filePath, String delimiter,String lineSeparate,String quote,String escape){
-//        tableName = StringUtil.escapeRegexSingleQuoteEncode(tableName);
-//        filePath = StringUtil.escapeRegexSingleQuoteEncode(filePath);
-        delimiter = StringUtil.escapeRegexSingleQuoteEncode(delimiter);
-        lineSeparate = StringUtil.escapeRegexSingleQuoteEncode(lineSeparate);
-        quote = StringUtil.escapeRegexSingleQuoteEncode(quote);
-        escape = StringUtil.escapeRegexSingleQuoteEncode(escape);
+//        tableName = escapeJava(tableName);
+        filePath = escapeJava(filePath);
+        delimiter = escapeJava(delimiter);
+        lineSeparate = escapeJava(lineSeparate);
+        quote = escapeJava(quote);
+        escape = escapeJava(escape);
         StringBuilder stringBuilder = new StringBuilder("COPY ").append(tableName)
-                .append(" TO ").append(filePath)
+                .append(" TO ").append("'").append(escapeJava(filePath,"'")).append("'")
                 .append(" WITH ");
         if(StringUtil.nonEmpty(delimiter)) {
-            if(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7.equals(delimiter))
+            if(escapeJava(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7).equals(delimiter))
                 stringBuilder.append("DELIMITER E'\\007' ");
             else
-                stringBuilder.append("DELIMITER '").append(delimiter).append("' ");
+                stringBuilder.append("DELIMITER '").append(escapeJava(delimiter,"'")).append("' ");
         }
         stringBuilder.append("NULL '' ");
         if(StringUtil.nonEmpty(quote) || StringUtil.nonEmpty(escape))
             stringBuilder.append("CSV ");
         if(StringUtil.nonEmpty(quote))
-            stringBuilder.append("QUOTE '").append(quote).append("' FORCE QUOTE * ");
+            stringBuilder.append("QUOTE '").append(escapeJava(quote,"'")).append("' FORCE QUOTE * ");
         if(StringUtil.nonEmpty(escape))
-            stringBuilder.append("ESCAPE '").append(escape).append("' ");
+            stringBuilder.append("ESCAPE '").append(escapeJava(escape,"'")).append("' ");
         return stringBuilder.toString();
     }
 
@@ -140,7 +142,7 @@ public class PostgreSQLSyncingTool implements SyncingTool {
 
      */
     public String generateLoadSQLByShell(TableCloneManagerContext tcmContext){
-        String csvPath = "'./"+tcmContext.getCsvFileName()+"'";
+        String csvPath = "./"+tcmContext.getCsvFileName();
         String tableName = tcmContext.getCloneTable().getTableName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
         String lineSeparate = tcmContext.getTcmConfig().getLineSeparate();
@@ -151,34 +153,36 @@ public class PostgreSQLSyncingTool implements SyncingTool {
 //        if(DataSourceEnum.MYSQL.equals(tcmContext.getSourceConfig().getDataSourceEnum()))
 //            nullStr = "\\N";
 
-        String loadSQL = StringUtil.escapeRegexDoubleQuoteEncode(generateLoadSQL(tableName,csvPath,delimiter,lineSeparate,quote,escape,nullStr).replaceAll("\\\\","\\\\\\\\"));
-        String loadContent = connectCommand+"\"\\"+loadSQL+"\"";
+        String loadSQL = generateLoadSQL(tableName,csvPath,delimiter,lineSeparate,quote,escape,nullStr);
+        String loadContent = connectCommand+"\"\\"+escapeJava(loadSQL,"\"")+"\"";
         tcmContext.setLoadShellContent(loadContent);
         return loadContent;
     }
+
+
     private String generateLoadSQL(String tableName,String filePath, String delimiter,String lineSeparate,String quote,String escape,String nullStr){
-        tableName = StringUtil.escapeRegexSingleQuoteEncode(tableName);
-//        filePath = StringUtil.escapeRegexSingleQuoteEncode(filePath);
-        delimiter = StringUtil.escapeRegexSingleQuoteEncode(delimiter);
-        lineSeparate = StringUtil.escapeRegexSingleQuoteEncode(lineSeparate);
-        quote = StringUtil.escapeRegexSingleQuoteEncode(quote);
-        escape = StringUtil.escapeRegexSingleQuoteEncode(escape);
+        tableName = escapeJava(tableName);
+        filePath = escapeJava(filePath);
+        delimiter = escapeJava(delimiter);
+        lineSeparate = escapeJava(lineSeparate);
+        quote = escapeJava(quote);
+        escape = escapeJava(escape);
         StringBuilder stringBuilder = new StringBuilder("COPY ").append(tableName)
-                .append(" FROM ").append(filePath)
+                .append(" FROM ").append("'").append(escapeJava(filePath,"'")).append("'")
                 .append(" WITH ");
         if(StringUtil.nonEmpty(delimiter)){
-            if(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7.equals(delimiter))
+            if(escapeJava(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7).equals(delimiter))
                 stringBuilder.append("DELIMITER E'\\007' ");
             else
-                stringBuilder.append("DELIMITER '").append(delimiter).append("' ");
+                stringBuilder.append("DELIMITER '").append(escapeJava(delimiter,"'")).append("' ");
         }
         stringBuilder.append("NULL '' ");
         if(StringUtil.nonEmpty(quote) || StringUtil.nonEmpty(escape))
             stringBuilder.append("CSV ");
         if(StringUtil.nonEmpty(quote))
-            stringBuilder.append("QUOTE '").append(quote).append("' ");
+            stringBuilder.append("QUOTE '").append(escapeJava(quote,"'")).append("' ");
         if(StringUtil.nonEmpty(escape))
-            stringBuilder.append("ESCAPE '").append(escape).append("' ");
+            stringBuilder.append("ESCAPE '").append(escapeJava(escape,"'")).append("' ");
         return stringBuilder.toString();
     }
 

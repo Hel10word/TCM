@@ -10,6 +10,8 @@ import com.boraydata.cdc.tcm.utils.StringUtil;
 
 import java.util.Objects;
 
+import static com.boraydata.cdc.tcm.utils.StringUtil.escapeJava;
+
 
 /**
  * Export and Load Table Data by SQL Server
@@ -116,7 +118,7 @@ public class SqlServerSyncingTool implements SyncingTool {
         String escape = tcmContext.getTcmConfig().getEscape();
         String bcpConnectCommand = getBCPConnectCommand(tcmContext.getSourceConfig());
 //        String exportContent = replaceExportStatementShellByOut(bcpConnectCommand,tableName,csvPath,delimiter,hudiFlag);
-        String exportContent = eplaceExportStatementShell(bcpConnectCommand,sourceTable,tableName,csvPath,delimiter,lineSeparate,quote,escape);
+        String exportContent = replaceExportStatementShell(bcpConnectCommand,sourceTable,tableName,csvPath,delimiter,lineSeparate,quote,escape);
 
         /**
          * echo -e "aaa \r\n cccc" | sed -r 's/\r/bbbb/g'
@@ -136,12 +138,13 @@ public class SqlServerSyncingTool implements SyncingTool {
     /**
      * @see <a href="https://docs.microsoft.com/zh-cn/sql/tools/bcp-utility?view=sql-server-linux-ver15#g-copying-data-from-a-query-to-a-data-file"></a>
      */
-    private String eplaceExportStatementShell(String con,Table table, String tableName, String filePath, String delimiter,String lineSeparate,String quote,String escape){
-//        tableName = StringUtil.escapeRegexQuoteEncode(tableName);
-        delimiter = StringUtil.escapeRegexSingleQuoteEncode(delimiter).replaceAll("\\\\","\\\\");
-        lineSeparate = StringUtil.escapeRegexSingleQuoteEncode(lineSeparate).replaceAll("\\\\","\\\\");
-        quote = StringUtil.escapeRegexQuoteEncode(quote);
-//        escape = StringUtil.escapeRegexQuoteEncode(escape).replaceAll("\\\\","\\\\\\\\");
+    private String replaceExportStatementShell(String con,Table table, String tableName, String filePath, String delimiter,String lineSeparate,String quote,String escape){
+
+        tableName = escapeJava(tableName);
+        delimiter = escapeJava(delimiter);
+        lineSeparate = escapeJava(lineSeparate);
+        quote = escapeJava(quote);
+        escape = escapeJava(escape);
 
         /**
          * with t1 as(
@@ -154,27 +157,26 @@ public class SqlServerSyncingTool implements SyncingTool {
             String templeTable = "table_"+StringUtil.getRandom();
             StringBuilder tableQuery = new StringBuilder("with ").append(templeTable).append(" as(").append(tableName).append(") select ");
             for (Column col : table.getColumns())
-                tableQuery.append("QUOTENAME(").append(col.getColumnName()).append(",'").append(quote).append("'),");
+                tableQuery.append("QUOTENAME(").append(col.getColumnName()).append(",'").append(escapeJava(quote,"'")).append("'),");
             if(tableQuery.lastIndexOf(",") == tableQuery.length()-1)
                 tableQuery.deleteCharAt(tableQuery.length()-1);
             tableName = tableQuery.append(" from ").append(templeTable).toString();
-            tableName = tableName.replaceAll("\\\\","\\\\");
         }
-        StringBuilder stringBuilder = new StringBuilder(con.replace("?","\""+tableName+"\" queryout '"+filePath+"'"));
+        StringBuilder stringBuilder = new StringBuilder(con.replace("?","\""+escapeJava(tableName,"\"")+"\" queryout '"+escapeJava(filePath,"'")+"'"));
         if(StringUtil.nonEmpty(delimiter)) {
 //            stringBuilder.append(" -t '").append(delimiter).append("'");
-            if(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7.equals(delimiter))
+            if(escapeJava(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7).equals(delimiter))
                 stringBuilder.append("-t '0x07'");
             else
-                stringBuilder.append(" -t '").append(delimiter).append("'");
+                stringBuilder.append(" -t '").append(escapeJava(delimiter,"'")).append("'");
         }
         if(StringUtil.nonEmpty(lineSeparate))
-            stringBuilder.append(" -r '").append(lineSeparate).append("'");
+            stringBuilder.append(" -r '").append(escapeJava(lineSeparate,"'")).append("'");
 
         return stringBuilder.toString();
     }
 
-    private String generateLoadSQLByBCP(TableCloneManagerContext tcmContext) {
+    public String generateLoadSQLByBCP(TableCloneManagerContext tcmContext) {
         String csvPath = "./"+tcmContext.getCsvFileName();
         String tableName = tcmContext.getCloneConfig().getSchema()+"."+tcmContext.getCloneTable().getTableName();
         String delimiter = tcmContext.getTcmConfig().getDelimiter();
@@ -190,18 +192,21 @@ public class SqlServerSyncingTool implements SyncingTool {
 
 
     private String replaceLoadStatementShell(String con,String tableName, String filePath, String delimiter,String lineSeparate,String quote,String escape) {
-        delimiter = StringUtil.escapeRegexSingleQuoteEncode(delimiter).replaceAll("\\\\","\\\\");
-        lineSeparate = StringUtil.escapeRegexSingleQuoteEncode(lineSeparate).replaceAll("\\\\","\\\\");
+        tableName = escapeJava(tableName);
+        delimiter = escapeJava(delimiter);
+        lineSeparate = escapeJava(lineSeparate);
+        quote = escapeJava(quote);
+        escape = escapeJava(escape);
 
-        StringBuilder stringBuilder = new StringBuilder(con.replace("?","\""+tableName+"\" in '"+filePath+"'"));
+        StringBuilder stringBuilder = new StringBuilder(con.replace("?","\""+escapeJava(tableName,"\"")+"\" in '"+filePath+"'"));
         if(StringUtil.nonEmpty(delimiter)) {
-            if(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7.equals(delimiter))
+            if(escapeJava(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7).equals(delimiter))
                 stringBuilder.append("-t '0x07'");
             else
-                stringBuilder.append(" -t '").append(delimiter).append("'");
+                stringBuilder.append(" -t '").append(escapeJava(delimiter,"'")).append("'");
         }
         if(StringUtil.nonEmpty(lineSeparate))
-            stringBuilder.append(" -r '").append(lineSeparate).append("'");
+            stringBuilder.append(" -r '").append(escapeJava(lineSeparate,"'")).append("'");
 
         return stringBuilder.toString();
     }

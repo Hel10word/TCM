@@ -36,7 +36,6 @@ class StringUtilTest {
 
     @Test
     void escapeStrTest() {
-        System.out.println(StringUtil.escapeRegexQuoteEncode("\n"));
         char ball = (char) 7;
         String ball_str = String.valueOf(ball);
         System.out.println(ball);

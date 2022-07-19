@@ -11,13 +11,14 @@ public class SyncingToolFactory {
     public static SyncingTool create(DataSourceEnum dataSourceEnum){
 
         switch (dataSourceEnum){
-            case RPDSQL:
             case MYSQL:
                 return new MySQLSyncingTool();
             case POSTGRESQL:
                 return new PostgreSQLSyncingTool();
             case SQLSERVER:
                 return new SqlServerSyncingTool();
+            case RPDSQL:
+                return new RpdSqlSyncingTool();
             case HUDI:
                 return new HudiSyncingTool();
             default:

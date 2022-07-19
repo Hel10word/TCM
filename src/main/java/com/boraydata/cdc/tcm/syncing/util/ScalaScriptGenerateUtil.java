@@ -13,6 +13,8 @@ import com.boraydata.cdc.tcm.utils.StringUtil;
 import java.util.List;
 import java.util.Objects;
 
+import static com.boraydata.cdc.tcm.utils.StringUtil.escapeJava;
+
 
 /**
  * Scala DataType for Hudi
@@ -213,18 +215,18 @@ public class ScalaScriptGenerateUtil {
 //        this.scalaScript.append("\nval df = spark.read.schema(schema)").append(options)
 //                .append(".csv(\"").append(hdfsCsvPath).append("\")")
         this.scalaScript.append("\nval df = spark.read.schema(schema)");
-        delimiter = StringUtil.escapeRegexDoubleQuoteEncode(delimiter);
-        quote = StringUtil.escapeRegexDoubleQuoteEncode(quote);
-        escape = StringUtil.escapeRegexDoubleQuoteEncode(escape).replaceAll("\\\\","\\\\\\\\");
-        if(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7.equals(delimiter))
+//        delimiter = escapeJava(delimiter);
+        quote = escapeJava(quote);
+        escape = escapeJava(escape).replaceAll("\\\\","\\\\\\\\");
+        if(escapeJava(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7).equals(delimiter))
             this.scalaScript.append(".option(\"delimiter\",\"\\u0007\")");
         else
-            this.scalaScript.append(".option(\"delimiter\",\"").append(delimiter).append("\")");
+            this.scalaScript.append(".option(\"delimiter\",\"").append(escapeJava(delimiter,"\"")).append("\")");
 
         if(StringUtil.nonEmpty(quote))
-            this.scalaScript.append(".option(\"quote\",\"").append(quote).append("\")");
+            this.scalaScript.append(".option(\"quote\",\"").append(escapeJava(quote,"\"")).append("\")");
         if(StringUtil.nonEmpty(escape))
-            this.scalaScript.append(".option(\"escape\",\"").append(escape).append("\")");
+            this.scalaScript.append(".option(\"escape\",\"").append(escapeJava(escape,"\"")).append("\")");
 //        this.scalaScript.append(".csv(\"file://").append(hdfsCsvPath).append("\")")
         this.scalaScript.append(".csv(\"").append(hdfsCsvPath).append("\")")
                 /**

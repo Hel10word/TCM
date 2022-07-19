@@ -19,16 +19,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Objects;
+
 import static com.boraydata.cdc.tcm.utils.StringUtil.escapeJava;
 
 /**
- * Export and Load Table Data by MySQL.
- *
- * @author bufan
- * @date 2021/9/24
+ * @author : bufan
+ * @date : 2022/7/18
  */
+public class RpdSqlSyncingTool implements SyncingTool  {
 
-public class MySQLSyncingTool implements SyncingTool {
 
     @Override
     public String getExportInfo(TableCloneManagerContext tcmContext) {
@@ -40,9 +39,8 @@ public class MySQLSyncingTool implements SyncingTool {
     public String getLoadInfo(TableCloneManagerContext tcmContext) {
 //        System.out.println("generateLoadSQLByMySQLShell:\n"+generateLoadSQLByMySQLShell(tcmContext)+"\n");
 //        System.out.println("generateLoadSQLByShell:\n"+generateLoadSQLByShell(tcmContext)+"\n");
-//        return generateLoadSQLByMySQLShell(tcmContext);
+        return generateLoadSQLByMySQLShell(tcmContext);
 //        return generateLoadSQLByShell(tcmContext);
-        return generateLoadSQLByJDBC(tcmContext);
     }
 
     @Override
@@ -55,13 +53,13 @@ public class MySQLSyncingTool implements SyncingTool {
 
     @Override
     public Boolean executeLoad(TableCloneManagerContext tcmContext) {
-//        String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
-//        if(tcmContext.getTcmConfig().getDebug())
-//            System.out.println(outStr);
-//        return true;
+        String outStr = CommandExecutor.executeShell(tcmContext.getTempDirectory(),tcmContext.getLoadShellName(),tcmContext.getTcmConfig().getDebug());
+        if(tcmContext.getTcmConfig().getDebug())
+            System.out.println(outStr);
+        return true;
 
 //        return LoadDataToMySQLByJDBC5(tcmContext);
-        return LoadDataToMySQLByJDBC8(tcmContext);
+//        return LoadDataToMySQLByJDBC8(tcmContext);
     }
 
     // ================================================   MySQL Syncing Common   ========================================================
@@ -434,7 +432,7 @@ public class MySQLSyncingTool implements SyncingTool {
 //                mysql5Statement.executeUpdate();
 //                return true;
 //            }else
-                return false;
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
         }catch (FileNotFoundException e) {

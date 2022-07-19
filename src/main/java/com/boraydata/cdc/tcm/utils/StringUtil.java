@@ -85,39 +85,4 @@ public class StringUtil {
                     StringEscapeUtils.escapeJava(escape_key)+StringEscapeUtils.escapeJava(key));
     }
 
-
-    // '/' => '////'
-    public static String escapeRegexEncode(String str){
-        if(isNullOrEmpty(str))
-            return "";
-        if("\n".equalsIgnoreCase(str))
-            return "\\n";
-        return str.replaceAll("\\\\","\\\\\\\\\\\\\\\\");
-    }
-
-
-    public static String escapeRegexSingleQuoteEncode(String str){
-        if(isNullOrEmpty(str))
-            return "";
-        if("\n".equalsIgnoreCase(str))
-            return "\\n";
-        return str.replaceAll("'","\\\\\\'");
-    }
-    public static String escapeRegexDoubleQuoteEncode(String str){
-        if(isNullOrEmpty(str))
-            return "";
-        if("\n".equalsIgnoreCase(str))
-            return "\\n";
-        return str.replaceAll("\"","\\\\\\\"");
-    }
-
-    // java: \\\\\\\"    out to file: \\\"    e.g. quote:"\\\""    in  regex \"
-    public static String escapeRegexQuoteEncode(String str){
-        if(isNullOrEmpty(str))
-            return "";
-        if("\n".equalsIgnoreCase(str))
-            return "\\n";
-        return escapeRegexDoubleQuoteEncode(escapeRegexSingleQuoteEncode(escapeRegexEncode(str)));
-    }
-
 }

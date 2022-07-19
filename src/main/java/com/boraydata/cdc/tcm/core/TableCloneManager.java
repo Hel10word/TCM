@@ -335,7 +335,14 @@ public class TableCloneManager {
         Table tempTable = this.tableCloneManagerContext.getTempTable();
         Table sourceTable = this.tableCloneManagerContext.getSourceTable();
         Table table = Objects.isNull(tempTable)?sourceTable:tempTable;
-        String exportShellName = "Export_from_"+sourceType+"_"+table.getTableName()+".sh";
+        String exportShellName = null;
+        if(
+                DataSourceEnum.POSTGRESQL.equals(this.tableCloneManagerContext.getSourceConfig().getDataSourceEnum()) ||
+                DataSourceEnum.SQLSERVER.equals(this.tableCloneManagerContext.getSourceConfig().getDataSourceEnum())
+        )
+            exportShellName = "Export_from_"+sourceType+"_"+sourceTable.getTableName()+".sh";
+        else
+            exportShellName = "Export_from_"+sourceType+"_"+table.getTableName()+".sh";
         this.tableCloneManagerContext.setExportShellName(exportShellName);
 
         String exportShellPath = this.tableCloneManagerContext.getTempDirectory()+exportShellName;

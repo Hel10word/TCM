@@ -14,7 +14,8 @@ import org.junit.jupiter.api.Test;
  * @date 2021/11/8
  */
 class MySQLSyncingToolTest {
-    Mysql tool = new Mysql();
+//    Mysql tool = new Mysql();
+    MySQLSyncingTool tool = new MySQLSyncingTool();
     DatabaseConfig config = new DatabaseConfig()
             .setDataSourceEnum(DataSourceEnum.MYSQL)
             .setHost("192.168.30.38")
@@ -35,8 +36,8 @@ class MySQLSyncingToolTest {
         tcmc.getTcmConfig()
                 .setDelimiter("|")
                 .setLineSeparate("\n")
-                .setQuote(null)
-                .setEscape(null)
+                .setQuote("\"")
+                .setEscape("\\")
         ;
 
 
