@@ -1,7 +1,6 @@
 package com.boraydata.cdc.tcm.syncing;
 
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
-import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
 import com.boraydata.cdc.tcm.entity.Column;
 import com.boraydata.cdc.tcm.entity.Table;
@@ -126,9 +125,9 @@ public class SqlServerSyncingTool implements SyncingTool {
          * @see <a href="https://www.gnu.org/software/sed/manual/sed.html#sed-commands-list"></a>
          * @see <a href="https://www.gnu.org/software/sed/manual/sed.html#Branching-and-flow-control"></a>
          */
-        if(DataSourceEnum.POSTGRESQL.equals(tcmContext.getCloneConfig().getDataSourceEnum()))
-            exportContent = exportContent+"\n"+
-                    "sed -r -i \":x;N;s/\\r\\n/\\\\\\r\\\\\\n/g;bx\" "+csvPath;
+//        if(DataSourceEnum.POSTGRESQL.equals(tcmContext.getCloneConfig().getDataSourceEnum()))
+//            exportContent = exportContent+"\n"+
+//                    "sed -r -i \":x;N;s/\\r\\n/\\\\\\r\\\\\\n/g;bx\" "+csvPath;
 
         tcmContext.setExportShellContent(exportContent);
         return exportContent;

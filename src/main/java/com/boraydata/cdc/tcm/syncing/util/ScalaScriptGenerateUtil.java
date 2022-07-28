@@ -169,6 +169,10 @@ public class ScalaScriptGenerateUtil {
     //    .add("gender",StringType)
     //    .add("city",StringType)
     //    ;
+    /**
+     * or use SQL
+     * @see <a href="https://vimsky.com/examples/detail/java-method-org.apache.spark.sql.SQLContext.sql.html"></a>
+     */
     private ScalaScriptGenerateUtil setSchema(Table table){
         this.scalaScript.append("\nval schema = new StructType()");
         List<Column> columns = table.getColumns();

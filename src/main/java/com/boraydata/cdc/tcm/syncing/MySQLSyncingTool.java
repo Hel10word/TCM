@@ -13,6 +13,7 @@ import com.mysql.cj.jdbc.ClientPreparedStatement;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -30,8 +31,11 @@ import static com.boraydata.cdc.tcm.utils.StringUtil.escapeJava;
 
 public class MySQLSyncingTool implements SyncingTool {
 
+    public static final String MYSQL_DUMP_ERROR_LOG="mysqlDumpError.log";
+
     @Override
     public String getExportInfo(TableCloneManagerContext tcmContext) {
+//        return generateExportSQLByMysqlDump(tcmContext);
 //        return generateExportSQLByShell(tcmContext);
         return generateExportSQLByMySQLShell(tcmContext);
     }
@@ -83,6 +87,74 @@ public class MySQLSyncingTool implements SyncingTool {
                 config.getPassword(),
                 config.getDatabaseName());
     }
+
+
+    // ================================================   MySQL Dump Shell  Export   ========================================================
+    /**
+     * @see <a href="https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html"></a>
+     *
+     * mysqldump -h 192.168.30.38 -P 3306 -u root -proot -B test_db --tables lineitem_sf10 -C -q  -t --log-error=/usr/local/expand/export-and-import-shell/error.log --compact --hex-blob -T /usr/local/expand/export-and-import-shell/ --fields-terminated-by=',' --fields-enclosed-by='"' --fields-escaped-by='\\' --lines-terminated-by='\n'
+     */
+    public String generateExportSQLByMysqlDump(TableCloneManagerContext tcmContext){
+        Table tempTable = tcmContext.getTempTable();
+        Table sourceTable = tcmContext.getSourceTable();
+        boolean tempTableIsNull = Objects.isNull(tempTable);
+
+        String tableName = tempTableIsNull?sourceTable.getTableName():tempTable.getTableName();
+//        String csvPath = "./"+tcmContext.getCsvFileName();
+//        String dirPath = Paths.get(tcmContext.getTempDirectory()).toAbsolutePath().normalize().toString();
+//        String dirPath = tcmContext.getTempDirectory();
+        tcmContext.setCsvFileName(tableName);
+        String delimiter = tcmContext.getTcmConfig().getDelimiter();
+        String lineSeparate = tcmContext.getTcmConfig().getLineSeparate();
+        String quote = tcmContext.getTcmConfig().getQuote();
+        String escape = tcmContext.getTcmConfig().getEscape();
+
+        StringBuilder sb = new StringBuilder();
+
+        String mysqlCommand = getConnectCommand(tcmContext.getSourceConfig(),"mysql");
+        String dumpCommand = getConnectCommand(tcmContext.getSourceConfig(), "mysqldump").replaceFirst("--database","-B");
+
+        // Write data to temp table
+        // -e "insert into temp_table select * from lineitem"
+        if(Boolean.FALSE.equals(tempTableIsNull))
+            sb.append(mysqlCommand).append("-e \"INSERT INTO ").append(tableName).append(" ").append(tcmContext.getTempTableSelectSQL()).append(";\"\n");
+
+        // Export data from table
+        sb.append(replaceExportStatementMysqlDump(dumpCommand,tableName,null,delimiter,lineSeparate,quote,escape)).append("\n");
+
+        // drop temp table
+        // -e "drop table if exists temp_table"
+        if(Boolean.FALSE.equals(tempTableIsNull))
+            sb.append(mysqlCommand).append("-e \"DROP TABLE IF EXISTS ").append(tableName).append(";\"\n");
+
+        String exportShell = sb.toString();
+        tcmContext.setExportShellContent(exportShell);
+
+        return exportShell;
+    }
+    private String replaceExportStatementMysqlDump(String con, String tableName, String filePath, String delimiter,String lineSeparate,String quote,String escape){
+        tableName = escapeJava(tableName);
+        delimiter = escapeJava(delimiter);
+        lineSeparate = escapeJava(lineSeparate);
+        quote = escapeJava(quote);
+        escape = escapeJava(escape);
+        StringBuilder sb = new StringBuilder(con).append("-C -q  -t --compact --hex-blob --tables ").append(tableName)
+                .append(" --log-error=./").append(MYSQL_DUMP_ERROR_LOG)
+                .append(" -T ./");
+         if(StringUtil.nonEmpty(delimiter))
+             sb.append(" --fields-terminated-by=").append("'").append(escapeJava(delimiter,"'")).append("'");
+        if(StringUtil.nonEmpty(lineSeparate))
+            sb.append(" --lines-terminated-by=").append("'").append(escapeJava(lineSeparate,"'")).append("'");
+        if(StringUtil.nonEmpty(quote))
+            sb.append(" --fields-enclosed-by=").append("'").append(escapeJava(quote,"'")).append("'");
+        if(StringUtil.nonEmpty(escape))
+            sb.append(" --fields-escaped-by=").append("'").append(escapeJava(escape,"'")).append("'");
+
+        return sb.toString();
+    }
+
+
 
     // ================================================   Shell   ========================================================
     /**

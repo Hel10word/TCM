@@ -2,12 +2,22 @@ package com.boraydata.cdc.tcm.syncing;
 
 
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
+import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
 import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.TestDataProvider;
 import com.boraydata.cdc.tcm.core.TableCloneManagerContext;
 import com.boraydata.cdc.tcm.entity.Table;
-import com.boraydata.cdc.tcm.syncing.tool.Mysql;
+import com.boraydata.cdc.tcm.utils.FileUtil;
+import com.mysql.cj.jdbc.ClientPreparedStatement;
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * @author bufan
@@ -40,18 +50,13 @@ class MySQLSyncingToolTest {
                 .setEscape("\\")
         ;
 
-
-        System.out.println("\ngenerateExportSQLByMySQLShell:");
-        System.out.println(tool.generateExportSQLByMySQLShell(tcmc));
-        System.out.println("\ngenerateExportSQLByShell:");
-        System.out.println(tool.generateExportSQLByShell(tcmc));
-        System.out.println("\ngenerateLoadSQLByJDBC:");
+        System.out.println("generateExportSQLByMysqlDump:\n"+tool.generateExportSQLByMysqlDump(tcmc));
+        System.out.println("generateExportSQLByMySQLShell:\n"+tool.generateExportSQLByMySQLShell(tcmc));
+        System.out.println("generateExportSQLByShell:\n"+tool.generateExportSQLByShell(tcmc));
         tool.generateLoadSQLByJDBC(tcmc);
-        System.out.println(tcmc.getLoadShellContent());
-        System.out.println("\ngenerateLoadSQLByMySQLShell:");
-        System.out.println(tool.generateLoadSQLByMySQLShell(tcmc));
-        System.out.println("\ngenerateLoadSQLByShell:");
-        System.out.println(tool.generateLoadSQLByShell(tcmc));
+        System.out.println("generateLoadSQLByJDBC:\n"+tcmc.getLoadShellContent());
+        System.out.println("generateLoadSQLByMySQLShell:\n"+tool.generateLoadSQLByMySQLShell(tcmc));
+        System.out.println("generateLoadSQLByShell:\n"+tool.generateLoadSQLByShell(tcmc));
     }
 
 

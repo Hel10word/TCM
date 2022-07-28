@@ -10,12 +10,14 @@ import com.boraydata.cdc.tcm.mapping.DataMappingSQLTool;
 import com.boraydata.cdc.tcm.mapping.MappingTool;
 import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
 import com.boraydata.cdc.tcm.syncing.DataSyncingCSVConfigTool;
+import com.boraydata.cdc.tcm.syncing.MySQLSyncingTool;
 import com.boraydata.cdc.tcm.syncing.SyncingTool;
 import com.boraydata.cdc.tcm.utils.FileUtil;
 import com.boraydata.cdc.tcm.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -406,7 +408,9 @@ public class TableCloneManager {
 
     // ========================================  Delete Cache File  ===========================
     public void deleteCache(){
-        String dir = this.tableCloneManagerContext.getTempDirectory();
+//        String dir = this.tableCloneManagerContext.getTempDirectory();
+        String dir = Paths.get(this.tableCloneManagerContext.getTempDirectory()).toAbsolutePath().normalize().toString();
+
         String sourcFile = this.tableCloneManagerContext.getSourceTableSQLFileName();
         String cloneFile = this.tableCloneManagerContext.getCloneTableSQLFileName();
         String csvFile = this.tableCloneManagerContext.getCsvFileName();
@@ -414,26 +418,29 @@ public class TableCloneManager {
         String loadShellName = this.tableCloneManagerContext.getLoadShellName();
         String scalaScriptName = this.tableCloneManagerContext.getLoadDataInHudiScalaScriptName();
         String scalaOut = this.tableCloneManagerContext.getLoadDataInHudiScalaScriptName()+".out";
+        String mysqlDumpErrorLog = MySQLSyncingTool.MYSQL_DUMP_ERROR_LOG;
         String hadoopLog = "hadoop.log";
 
         if(StringUtil.isNullOrEmpty(dir) || !FileUtil.isDirectory(dir))
             return;
 
         if(!StringUtil.isNullOrEmpty(sourcFile))
-            FileUtil.deleteFile(dir+sourcFile);
+            FileUtil.deleteFile(Paths.get(dir,  sourcFile).toString());
         if(!StringUtil.isNullOrEmpty(cloneFile))
-            FileUtil.deleteFile(dir+cloneFile);
+            FileUtil.deleteFile(Paths.get(dir,  cloneFile).toString());
         if(!StringUtil.isNullOrEmpty(exportShellName))
-            FileUtil.deleteFile(dir+exportShellName);
+            FileUtil.deleteFile(Paths.get(dir,  exportShellName).toString());
         if(!StringUtil.isNullOrEmpty(loadShellName))
-            FileUtil.deleteFile(dir+loadShellName);
+            FileUtil.deleteFile(Paths.get(dir,  loadShellName).toString());
         if(!StringUtil.isNullOrEmpty(csvFile))
-            FileUtil.deleteFile(dir+csvFile);
+            FileUtil.deleteFile(Paths.get(dir,  csvFile).toString());
+        FileUtil.deleteFile(Paths.get(dir,  mysqlDumpErrorLog).toString());
         if(!StringUtil.isNullOrEmpty(scalaScriptName)) {
-            FileUtil.deleteFile(dir + scalaScriptName);
-            FileUtil.deleteFile(dir + scalaOut);
-            FileUtil.deleteFile(dir + csvFile+"_sample_data");
-            FileUtil.deleteFile(dir+hadoopLog);
+            FileUtil.deleteFile(Paths.get(dir,  scalaScriptName).toString());
+            FileUtil.deleteFile(Paths.get(dir,  scalaOut).toString());
+            FileUtil.deleteFile(Paths.get(dir,  csvFile+"_sample_data").toString());
+            FileUtil.deleteFile(Paths.get(dir,  hadoopLog).toString());
+
         }
     }
 

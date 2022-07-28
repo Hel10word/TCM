@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
@@ -27,6 +28,9 @@ import static com.boraydata.cdc.tcm.utils.StringUtil.escapeJava;
  * @date 2021/9/26
  */
 public class PostgreSQLSyncingTool implements SyncingTool {
+
+    private static final String JDBC_EXPORT_PATH = "STDOUT";
+    private static final String JDBC_LOAD_PATH = "STDIN";
 
     @Override
     public String getExportInfo(TableCloneManagerContext tcmContext) {
@@ -116,9 +120,13 @@ public class PostgreSQLSyncingTool implements SyncingTool {
         lineSeparate = escapeJava(lineSeparate);
         quote = escapeJava(quote);
         escape = escapeJava(escape);
-        StringBuilder stringBuilder = new StringBuilder("COPY ").append(tableName)
-                .append(" TO ").append("'").append(escapeJava(filePath,"'")).append("'")
-                .append(" WITH ");
+        StringBuilder stringBuilder = new StringBuilder("COPY ").append(tableName);
+        if(JDBC_EXPORT_PATH.equals(filePath))
+            stringBuilder.append(" TO ").append(JDBC_EXPORT_PATH);
+        else
+            stringBuilder.append(" TO ").append("'").append(escapeJava(filePath,"'")).append("'");
+
+         stringBuilder.append(" WITH ");
         if(StringUtil.nonEmpty(delimiter)) {
             if(escapeJava(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7).equals(delimiter))
                 stringBuilder.append("DELIMITER E'\\007' ");
@@ -167,9 +175,13 @@ public class PostgreSQLSyncingTool implements SyncingTool {
         lineSeparate = escapeJava(lineSeparate);
         quote = escapeJava(quote);
         escape = escapeJava(escape);
-        StringBuilder stringBuilder = new StringBuilder("COPY ").append(tableName)
-                .append(" FROM ").append("'").append(escapeJava(filePath,"'")).append("'")
-                .append(" WITH ");
+        StringBuilder stringBuilder = new StringBuilder("COPY ").append(tableName);
+        if(JDBC_LOAD_PATH.equals(filePath))
+            stringBuilder.append(" FROM ").append(JDBC_LOAD_PATH);
+        else
+            stringBuilder.append(" FROM ").append("'").append(escapeJava(filePath,"'")).append("'");
+
+        stringBuilder.append(" WITH ");
         if(StringUtil.nonEmpty(delimiter)){
             if(escapeJava(DataSyncingCSVConfigTool.SQL_SERVER_DELIMITER_7).equals(delimiter))
                 stringBuilder.append("DELIMITER E'\\007' ");
@@ -207,8 +219,8 @@ public class PostgreSQLSyncingTool implements SyncingTool {
         String lineSeparate = tcmContext.getTcmConfig().getLineSeparate();
         String quote = tcmContext.getTcmConfig().getQuote();
         String escape = tcmContext.getTcmConfig().getEscape();
-        String exportSQL = generateExportSQL(tableName,"STDIN",delimiter,lineSeparate,quote,escape);
-//        String sql = "COPY " + tableName + " TO STDIN WITH DELIMITER '"+delimiter+"'";
+        String exportSQL = generateExportSQL(tableName,JDBC_EXPORT_PATH,delimiter,lineSeparate,quote,escape);
+//        String sql = "COPY " + tableName + " TO STDOUT WITH DELIMITER '"+delimiter+"'";
         tcmContext.setExportShellContent(exportSQL);
         return "# PostgreSQL Export Data By JDBC-CopyManager,SQL Statements : "+exportSQL;
     }
@@ -222,14 +234,14 @@ public class PostgreSQLSyncingTool implements SyncingTool {
         String nullStr = "";
 //        if(DataSourceEnum.MYSQL.equals(tcmContext.getSourceConfig().getDataSourceEnum()))
 //            nullStr = "\\N";
-        String loadSQL = generateLoadSQL(tableName,"STDIN",delimiter,lineSeparate,quote,escape,nullStr);
+        String loadSQL = generateLoadSQL(tableName,JDBC_LOAD_PATH,delimiter,lineSeparate,quote,escape,nullStr);
 //        String sql = "COPY " + tableName + " FROM STDIN WITH DELIMITER '"+delimiter+"'";
         tcmContext.setLoadShellContent(loadSQL);
         return "# PostgreSQL Load Data By JDBC-CopyManager,SQL Statements : "+loadSQL;
     }
 
     private Boolean ExportDataFromPostgreSQLByJDBC(TableCloneManagerContext tcmContext){
-        String filePath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
+        String filePath = Paths.get(tcmContext.getTempDirectory(),tcmContext.getCsvFileName()).toString();
         String sql = tcmContext.getExportShellContent();
         File file = FileUtil.createNewFile(filePath);
         try(
@@ -246,7 +258,7 @@ public class PostgreSQLSyncingTool implements SyncingTool {
     }
 
     private Boolean LoadDataToPostgreSQLByJDBC(TableCloneManagerContext tcmContext){
-        String filePath = tcmContext.getTempDirectory()+tcmContext.getCsvFileName();
+        String filePath = Paths.get(tcmContext.getTempDirectory()+tcmContext.getCsvFileName()).toString();
         String sql = tcmContext.getLoadShellContent();
         File file = FileUtil.getFile(filePath);
         try(
@@ -254,7 +266,8 @@ public class PostgreSQLSyncingTool implements SyncingTool {
                 FileInputStream fileInputStream = new FileInputStream(file)
         ){
             CopyManager copyManager = new CopyManager((BaseConnection) conn);
-            long l = copyManager.copyIn(sql, fileInputStream);
+            long l = copyManager.copyIn(sql, fileInputStream,1024*1024);
+//            long l = copyManager.copyIn(sql, fileInputStream);
             return true;
         } catch (SQLException | IOException e) {
             e.printStackTrace();

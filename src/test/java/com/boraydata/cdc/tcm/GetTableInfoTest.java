@@ -2,6 +2,7 @@ package com.boraydata.cdc.tcm;
 
 import com.boraydata.cdc.tcm.common.DatabaseConfig;
 import com.boraydata.cdc.tcm.common.DatasourceConnectionFactory;
+import com.boraydata.cdc.tcm.common.enums.DataSourceEnum;
 import com.boraydata.cdc.tcm.core.TableCloneManager;
 import com.boraydata.cdc.tcm.entity.Table;
 import com.boraydata.cdc.tcm.mapping.MappingTool;
@@ -29,7 +30,16 @@ public class GetTableInfoTest {
 //            .setPassword("root")
 //            .create();
 
-    DatabaseConfig postgreSQLConfig = TestDataProvider.PostgreSQLConfig;
+//    DatabaseConfig postgreSQLConfig = TestDataProvider.PostgreSQLConfig;
+    DatabaseConfig postgreSQLConfig = new DatabaseConfig()
+        .setDataSourceEnum(DataSourceEnum.POSTGRESQL)
+        .setHost("192.168.10.11")
+        .setPort("6432")
+        .setUsername("postgres")
+        .setPassword("123456")
+        .setDatabaseName("test_db")
+        .setCatalog("test_db")
+        .setSchema("public");
 
     DatabaseConfig sqlserverConfig = TestDataProvider.SQLServerConfig.setCatalog("test_db").setSchema("dbo");
 
@@ -37,12 +47,12 @@ public class GetTableInfoTest {
 
 //    String tableName = "test_table";
 //    String tableName = "cdc_init";
-    String tableName = "lineitem_test";
+    String tableName = "lineitem_sf10";
 //    String tableName = "exact_numerics_sqlserver";
 //    DatabaseConfig config = mysqlConfig;
-//    DatabaseConfig config = postgreSQLConfig;
+    DatabaseConfig config = postgreSQLConfig;
 //    DatabaseConfig config = sqlserverConfig;
-    DatabaseConfig config = rpdsqlConfig;
+//    DatabaseConfig config = rpdsqlConfig;
     @Test
     public void test() throws JsonProcessingException {
         showTableInfoBySQL(config,tableName);
@@ -55,6 +65,13 @@ public class GetTableInfoTest {
         System.out.println(sourceMappingTable.outTableInfo());
         System.out.println(JacksonUtil.toJson(sourceMappingTable));
     }
+
+
+
+
+
+
+
 
 
     public void showTableInfoBySQL(DatabaseConfig config,String tableName){
