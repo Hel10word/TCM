@@ -77,8 +77,8 @@ public class TableCloneManagerConfig {
 
     /**
      * CSV file save to HDFS Path.
-     * default: N/A (Required)
-     * e.g. hdfs:///HudiTest/
+     * default: N/A (Optional)
+     * e.g. hdfs://192.168.120.66:9000/HudiTest/
      */
     private String hdfsSourceDataDir;
 

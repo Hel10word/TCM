@@ -99,6 +99,9 @@
   "deleteCache":false,
   "tempDirectory":"/data/cdc_data/fabric-cdc/init/TCM-Temp",
   "delimiter":"|",
+  "lineSeparate": "\\n",
+  "quote": null,
+  "escape": null,
   "sendRedis":false,
   "debug":false
 }
