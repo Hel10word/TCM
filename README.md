@@ -424,7 +424,7 @@ CTM is a tool for initialization table between different Data Source . Now suppo
 
 **Custom Table Configuration**
 
-view to [Custom Table Configuration](Custom Table Configuration.md)
+view to [Custom-Table-Configuration](Custom-Table-Configuration.md)
 
 
 
