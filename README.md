@@ -568,5 +568,5 @@ view to [TCM-Performance](OtherInformation/CDC初始化同步性能测试.md)
 ## Other
 
 -   The specific execution method can refer to [TableCloneManage.java](src/main/java/com/boraydata/cdc/tcm/TableCloneManagerLauncher.java)
--   The table field mapping relationship please refer to  [CDC Init DB-DB 说明.md](OtherInformation/DB-DB/CDC Init DB-DB 说明.md)
+-   The table field mapping relationship please refer to  [CDC-Init-DB-DB-说明.md](OtherInformation/DB-DB/CDC-Init-DB-DB-说明.md)
 
