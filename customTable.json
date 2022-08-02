@@ -1,1 +1,28 @@
-{"tableName":"customTable","primaryKeys":["col_tinyint","col_smallint"],"columns":[{"columnName":"col_varchar","characterMaximumPosition":255,"mappingDataType":"STRING","nullable":false},{"columnName":"col_decimal","numericPrecision":65,"numericScale":30,"mappingDataType":"DECIMAL","nullable":true},{"columnName":"col_time_stamp","datetimePrecision":6,"mappingDataType":"TIMESTAMP","nullable":true}]}
+{
+  "tableName":"customTable",
+  "primaryKeys":[
+    "col_tinyint",
+    "col_smallint"
+  ],
+  "columns":[
+    {
+      "columnName":"col_varchar",
+      "characterMaximumPosition":255,
+      "mappingDataType":"STRING",
+      "nullable":false
+    },
+    {
+      "columnName":"col_decimal",
+      "numericPrecision":65,
+      "numericScale":30,
+      "mappingDataType":"DECIMAL",
+      "nullable":true
+    },
+    {
+      "columnName":"col_time_stamp",
+      "datetimePrecision":6,
+      "mappingDataType":"TIMESTAMP",
+      "nullable":true
+    }
+  ]
+}
